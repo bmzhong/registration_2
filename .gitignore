@@ -1,5 +1,6 @@
 datasets/hdf5
 datasets/temp_data
+__pycache__
 **/logs
 *.pth
 *.nii.gz
