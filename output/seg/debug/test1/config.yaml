@@ -1,0 +1,33 @@
+TrainConfig:
+  start_new_model: True
+  max_save_num: 2                 # numbers that checkpoint files saved; default 2
+  gpu: "0"
+  data_path: "datasets/json/LPBA40.json"
+  epoch: 100
+  batchsize: 1
+  checkpoint: ""
+  val_interval: 1
+
+TestConfig:
+  checkpoint: "output/seg/debug/debug1/checkpoint/best_epoch_0095.pth"
+  save_image: True
+  gpu: "0"
+
+ModelConfig:
+  type: "UNet"
+
+
+
+OptimConfig:
+  load_checkpoint: False     # whether load a checkpoint in training, using the path defined in Trainconfig
+  optimizer:
+    type: "Adam"
+    params:
+      lr: 0.0004
+  lr_scheduler:
+    type: "StepLR"
+    params:
+      step_size: 1500
+      gamma: 0.5
+      warmup: True
+      warmup_steps: 100

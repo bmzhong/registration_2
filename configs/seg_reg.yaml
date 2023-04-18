@@ -1,0 +1,88 @@
+TrainConfig:
+  start_new_model: True
+  max_save_num: 2                 # numbers that checkpoint files saved; default 2
+  data_path: "datasets/json/LPBA40.json"
+  epoch: 100
+  gpu: "0"
+  M: -1
+  batchsize: 1
+  Seg:
+    gpu: "0"
+    seg_step_per_epoch: 5
+    checkpoint: ""
+    val_interval: 1
+  Reg:
+    gpu: "0"
+    batchsize: 1
+    reg_step_per_epoch: 20
+    checkpoint: ""
+    val_interval: 1
+
+TestConfig:
+  gpu: "0"
+  Seg:
+    checkpoint: ""
+  Reg:
+    checkpoint: ""
+
+
+
+ModelConfig:
+  Seg:
+    type: "UNet"
+  Reg:
+    type: "VoxelMorpher"
+
+
+OptimConfig:
+  Seg:
+    load_checkpoint: False     # whether load a checkpoint in training, using the path defined in Trainconfig
+    optimizer:
+      type: "Adam"
+      params:
+        lr: 0.0004
+    lr_scheduler:
+      type: "StepLR"
+      params:
+        step_size: 1500
+        gamma: 0.5
+        warmup: True
+        warmup_steps: 100
+  Reg:
+    load_checkpoint: False     # whether load a checkpoint in training, using the path defined in Trainconfig
+    optimizer:
+      type: "Adam"
+      params:
+        lr: 0.0004
+    lr_scheduler:
+      type: "StepLR"
+      params:
+        step_size: 1500
+        gamma: 0.5
+        warmup: True
+        warmup_steps: 100
+
+
+LossConfig:
+  Reg:
+    component:
+      similarity_loss: 'NCCLoss'
+      segmentation_loss: 'DiceLoss'
+      gradient_loss: True
+      bending_energy_loss: False
+    weight:
+      similarity_loss: 1
+      segmentation_loss: 1
+      gradient_loss: 1
+      bending_energy_loss: 1
+  Seg:
+    component:
+      supervised_loss: 'DiceLoss'
+      anatomy_loss: 'DiceLoss'
+    weight:
+      similarity_loss: 1
+      segmentation_loss: 1
+
+
+
+
