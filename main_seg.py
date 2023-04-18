@@ -4,7 +4,7 @@ import warnings
 from util.util import set_random_seed, get_basedir
 from shutil import copyfile
 import yaml
-from train_seg import train
+from train_seg_semi_supervised import train
 from test_seg import test
 
 warnings.filterwarnings("ignore")

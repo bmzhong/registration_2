@@ -33,8 +33,10 @@ def train(config, basedir):
     with open(config['TrainConfig']['data_path'], 'r') as f:
         dataset_config = json.load(f)
 
-
-    train_dataset = PairDataset(dataset_config, 'train_pair', dataset_config['segmentation_available'])
+    if config['TrainConfig']['semi_supervised']:
+        train_dataset = PairDataset(dataset_config, 'train_pair', dataset_config['segmentation_available'])
+    else:
+        train_dataset = PairDataset(dataset_config, 'train_pair')
 
     val_dataset = PairDataset(dataset_config, 'val_pair')
     test_dataset = PairDataset(dataset_config, 'test_pair')

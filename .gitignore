@@ -1,3 +1,5 @@
 datasets/hdf5
 datasets/temp_data
+**/logs
+*.pth
 *.nii.gz
