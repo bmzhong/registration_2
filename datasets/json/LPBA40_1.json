@@ -3423,5 +3423,36 @@
             "S05",
             "S29"
         ]
-    ]
+    ],
+    "segmentation_available": {
+        "S38": false,
+        "S03": false,
+        "S40": true,
+        "S31": false,
+        "S35": false,
+        "S17": false,
+        "S37": false,
+        "S09": false,
+        "S14": false,
+        "S06": false,
+        "S18": false,
+        "S15": false,
+        "S34": false,
+        "S08": false,
+        "S33": false,
+        "S02": false,
+        "S27": false,
+        "S13": false,
+        "S32": false,
+        "S25": false,
+        "S07": false,
+        "S24": false,
+        "S22": false,
+        "S20": false,
+        "S10": false,
+        "S39": false,
+        "S04": false,
+        "S01": false
+    },
+    "M": 1
 }

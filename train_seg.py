@@ -23,14 +23,18 @@ from torchvision.transforms import transforms
 from util.visual.tensorboard_visual import tensorboard_visual_segmentation, visual_gradient, tensorboard_visual_dvf
 
 
-def train(config, basedir):
+def train_seg(config, basedir):
     writer = SummaryWriter(log_dir=os.path.join(basedir, "logs"))
     model_saver = ModelSaver(config["TrainConfig"].get("max_save_num", 2))
-
+    """
+     ------------------------------------------------
+               preparing dataset
+     ------------------------------------------------
+    """
     with open(config['TrainConfig']['data_path'], 'r') as f:
         dataset_config = json.load(f)
     if config['TrainConfig']['semi_supervised']:
-        data_names = [key if value else None for key, value in dataset_config['segmentation_available']]
+        data_names = [key if value else None for key, value in dataset_config['segmentation_available'].items()]
         data_names = list(filter(None, data_names))
         train_dataset = SingleDataset(dataset_config, 'train', data_names=data_names)
     else:
@@ -42,7 +46,11 @@ def train(config, basedir):
     print(f'test dataset size: {len(test_dataset)}')
     train_dataloader = DataLoader(train_dataset, config["TrainConfig"]['batchsize'], shuffle=True)
     val_dataloader = DataLoader(val_dataset, config["TrainConfig"]['batchsize'], shuffle=False)
-
+    """
+     ------------------------------------------------
+               loading model
+     ------------------------------------------------
+    """
     checkpoint = None
     if len(config['TrainConfig']['checkpoint']) > 0:
         checkpoint = config['TrainConfig']['checkpoint']
@@ -66,6 +74,12 @@ def train(config, basedir):
     step = 0
     best_val_metric = -1. * float('inf')
     for epoch in range(1, config["TrainConfig"]["epoch"] + 1):
+        """
+         ------------------------------------------------
+                 training network
+         ------------------------------------------------
+        """
+
         seg_net.train()
         train_losses = []
         train_metrics = []
@@ -105,6 +119,11 @@ def train(config, basedir):
         writer.add_scalar("train/dice", mean_metric, epoch)
         writer.add_scalar("lr", optimizer.get_cur_lr(), epoch)
         visual_gradient(seg_net, writer, epoch)
+        """
+         ------------------------------------------------
+                validating network
+         ------------------------------------------------
+        """
         if epoch % config['TrainConfig']['val_interval'] == 0:
             seg_net.eval()
             val_losses = []
@@ -131,9 +150,9 @@ def train(config, basedir):
 
                 predict_argmax = torch.argmax(predict_softmax, dim=1, keepdim=True)
                 tensorboard_visual_segmentation(mode='val', name=id[0], writer=writer, step=epoch,
-                                                volume=volume[0].clone().detach(),
-                                                predict=predict_argmax[0].clone().detach(),
-                                                target=label[0].clone().detach())
+                                                volume=volume[0][0].detach().cpu(),
+                                                predict=predict_argmax[0][0].detach().cpu(),
+                                                target=label[0][0].detach().cpu())
             print(f"Epoch {epoch}/{config['TrainConfig']['epoch']}:")
             mean_loss = np.mean(val_losses)
             mean_metric = np.mean(val_metrics)

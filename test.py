@@ -1,11 +1,34 @@
 import logging
 import os
-outfile = open('./test1.txt', 'w', encoding='utf-8')
-a=1
-outfile.write(f'111111111 {a}\n')
-outfile.write(f'111111111 {a}\n')
-outfile.write(f'111111111 {a}\n')
-outfile.close()
+import matplotlib.pyplot as plt
+import time
+a=time.asctime()
+print(a)
+print(type(a))
+
+# def test(d=1):
+#     figure=plt.figure(figsize=(10, 10))
+#     x = [i for i in range(100)]
+#     y = [i*d for i in range(100)]
+#     plt.plot(x, y)
+#     return figure
+#
+# figure = test(d=1)
+# plt.savefig('111.png')
+# figure = test(d=100)
+# plt.savefig('100.png')
+
+# from tqdm import tqdm
+# a=(i for i in range(100000))
+# for i in tqdm(a):
+#     print(i)
+
+# outfile = open('./output/seg/debug/debug1\\log.txt', 'w', encoding='utf-8')
+# a=1
+# outfile.write(f'111111111 {a}\n')
+# outfile.write(f'111111111 {a}\n')
+# outfile.write(f'111111111 {a}\n')
+# outfile.close()
 
 # import numpy as np
 # np.random.seed(0)

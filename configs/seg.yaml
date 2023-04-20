@@ -3,15 +3,15 @@ TrainConfig:
   max_save_num: 2                 # numbers that checkpoint files saved; default 2
   gpu: "0"
   data_path: "datasets/json/LPBA40.json"
-  epoch: 100
+  epoch: 50
   batchsize: 2
   checkpoint: ""
   val_interval: 5
   semi_supervised: False
 
 TestConfig:
-  data_path: "datasets/json/LPBA40.json"
-  checkpoint: "output/seg/debug/debug4/checkpoint/last_epoch_0100.pth"
+  data_path: "datasets/json/LPBA40_test.json"
+  checkpoint: "output/seg/debug/debug1/checkpoint/last_epoch.pth"
   save_image: True
   gpu: "0"
 

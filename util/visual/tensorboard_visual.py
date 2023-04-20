@@ -8,8 +8,9 @@ import cv2
 import numpy as np
 import torch.nn.functional as F
 import SimpleITK as sitk
-
-from util.visual.visual_registration import preview_3D_deformation, preview_3D_vector_field, preview_image
+import matplotlib.pyplot as plt
+from util.visual.visual_registration import preview_3D_deformation, preview_3D_vector_field
+from util.visual.visual_image  import preview_image
 
 
 def tensorboard_visual_segmentation(mode, name, writer, step, volume, predict, target, interval=10):
@@ -17,14 +18,9 @@ def tensorboard_visual_segmentation(mode, name, writer, step, volume, predict, t
     mode: train/val/test
     name: image name
     writer: SummaryWriter
-    predict:  1, D, H, W
-    target:   1, D, H, W
+    predict:  D, H, W
+    target:   D, H, W
     """
-
-    # D, H, W
-    volume = volume[0].cpu()
-    predict = predict[0].cpu()
-    target = target[0].cpu()
 
     title_name = name + '_volume, label, predict'
 
@@ -38,14 +34,11 @@ def tensorboard_visual_registration(mode, name, writer, step, fix, mov, reg, int
     mode: train/val/test
     name: image name
     writer: SummaryWriter
-    predict:  1, D, H, W
-    target:   1, D, H, W
+    predict:  D, H, W
+    target:   D, H, W
     """
 
-    # D, H, W
-    fix = fix[0].cpu()
-    mov = mov[0].cpu()
-    reg = reg[0].cpu()
+
     title_name = name + '_fix, mov, reg'
     img_list = [fix, mov, reg]
     tag = mode + '/' + name
@@ -82,7 +75,7 @@ def visual_img_list(tag, title_name, writer, step, img_list, interval):
 
 def create_header(shape, name):
     header = np.zeros((100, shape[2], 1), dtype=np.uint8) + 255
-    header = cv2.putText(header, name, (10, header.shape[0] // 2), cv2.FONT_HERSHEY_SIMPLEX, 0.40, 0, 1)
+    header = cv2.putText(header, name, (10, header.shape[0] // 2), cv2.FONT_HERSHEY_SIMPLEX, 0.40, 0, 2)
     header = header.astype(np.float32) / 255
     header = np.transpose(header, (2, 0, 1))
     header = torch.Tensor(header)
@@ -97,14 +90,20 @@ def visual_gradient(model: Module, writer: SummaryWriter, step: int):
 
 def tensorboard_visual_deformation(name, dvf, grid_spacing, writer, step, **kwargs):
     figure = preview_3D_deformation(dvf, grid_spacing, **kwargs)
+    plt.suptitle(name, fontsize=25)
+    figure.tight_layout()
     writer.add_figure(name, figure, step)
 
 
 def tensorboard_visual_dvf(name, dvf, writer, step):
     figure = preview_3D_vector_field(dvf)
+    plt.suptitle(name, fontsize=25)
+    figure.tight_layout()
     writer.add_figure(name, figure, step)
 
 
 def tensorboard_visual_det(name, det, writer, step, **kwargs):
     figure = preview_image(det, **kwargs)
+    plt.suptitle(name, fontsize=25)
+    figure.tight_layout()
     writer.add_figure(name, figure, step)

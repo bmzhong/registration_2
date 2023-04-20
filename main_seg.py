@@ -1,11 +1,12 @@
 import argparse
 import os
+import time
 import warnings
 from util.util import set_random_seed, get_basedir
 from shutil import copyfile
 import yaml
-from train_seg_semi_supervised import train
-from test_seg import test
+from train_seg import train_seg
+from test_seg import test_seg
 
 warnings.filterwarnings("ignore")
 
@@ -42,11 +43,18 @@ if __name__ == '__main__':
 
     copyfile(args.config, os.path.join(basedir, "config.yaml"))
     print(f"base dir is {basedir}")
-
+    start_time = time.time()
     if args.train:
         os.environ["CUDA_VISIBLE_DEVICES"] = config["TrainConfig"]["gpu"]
+        train_seg(config, basedir)
 
-        train(config, basedir)
+        checkpoint = os.path.join(basedir, "checkpoint", 'best_epoch.pth')
+        test_basedir = get_basedir(os.path.join(basedir, 'test'), config["TrainConfig"]["start_new_model"])
+        test_seg(config, test_basedir, checkpoint=checkpoint)
+
     elif args.test:
         os.environ["CUDA_VISIBLE_DEVICES"] = config["TestConfig"]["gpu"]
-        test(config, basedir, args.checkpoint)
+        test_seg(config, basedir, args.checkpoint)
+    end_time = time.time()
+    run_time = end_time - start_time
+    print(f"run time: {int(run_time)} s")

@@ -10,26 +10,27 @@ import torch.nn.functional as F
 from util.Optimizer import Optimizer
 from util.ModelSaver import ModelSaver
 from util.data_util.dataset import PairDataset
-from util.loss.DiceLoss import DiceLoss
 from util.visual.tensorboard_visual import visual_gradient, tensorboard_visual_registration, tensorboard_visual_dvf, \
     tensorboard_visual_det
 from util.util import update_dict
 from util.util import mean_dict
-from util.loss.MSELoss import MSELoss
-from util.loss.NCCLoss import NCCLoss
 from util.loss.GradientLoss import GradientLoss
 from util.loss.BendingEnergyLoss import BendingEnergyLoss
 from util.metric.registration_metric import folds_count_metric, folds_ratio_metric, mse_metric, jacobian_determinant
 from util.metric.segmentation_metric import dice_metric
 from util.visual.tensorboard_visual import tensorboard_visual_deformation
-import time
 from util import loss
 
 
-def train(config, basedir):
+def train_reg(config, basedir):
     writer = SummaryWriter(log_dir=os.path.join(basedir, "logs"))
     model_saver = ModelSaver(config["TrainConfig"].get("max_save_num", 2))
 
+    """
+     ------------------------------------------------
+               preparing dataset
+     ------------------------------------------------
+    """
     with open(config['TrainConfig']['data_path'], 'r') as f:
         dataset_config = json.load(f)
     train_dataset = PairDataset(dataset_config, 'train_pair')
@@ -40,6 +41,12 @@ def train(config, basedir):
     print(f'test dataset size: {len(test_dataset)}')
     train_dataloader = DataLoader(train_dataset, config["TrainConfig"]['batchsize'], shuffle=True)
     val_dataloader = DataLoader(val_dataset, config["TrainConfig"]['batchsize'], shuffle=False)
+
+    """
+     ------------------------------------------------
+               loading model
+     ------------------------------------------------
+    """
     checkpoint = None
     if len(config['TrainConfig']['checkpoint']) > 0:
         checkpoint = config['TrainConfig']['checkpoint']
@@ -60,13 +67,20 @@ def train(config, basedir):
         reg_net = torch.nn.DataParallel(reg_net, device_ids=[i for i in range(gpu_num)])
         STN_bilinear = torch.nn.DataParallel(STN_bilinear, device_ids=[i for i in range(gpu_num)])
         STN_nearest = torch.nn.DataParallel(STN_nearest, device_ids=[i for i in range(gpu_num)])
+
     optimizer = Optimizer(config=config["OptimConfig"],
                           model=reg_net,
                           checkpoint=config["TrainConfig"]["checkpoint"])
     loss_function_dict = get_loss_function(config)
     step = 0
     best_val_dice_metric = -1. * float('inf')
+
     for epoch in range(1, config["TrainConfig"]["epoch"] + 1):
+        """
+         ------------------------------------------------
+                 training network
+         ------------------------------------------------
+        """
         reg_net.train()
         train_losses_dict = dict()
         train_metrics_dict = dict()
@@ -104,16 +118,22 @@ def train(config, basedir):
         mean_train_loss_dict = mean_dict(train_losses_dict)
         mean_train_metric_dict = mean_dict(train_metrics_dict)
         print(f"Epoch {epoch}/{config['TrainConfig']['epoch']}:")
-        print("loss: ")
         for loss_type, loss_value in mean_train_loss_dict.items():
             writer.add_scalar("train/loss/" + loss_type, loss_value, epoch)
-            print(f"\ttraining {loss_type}: {loss_value}")
-        print("metric: ")
+        print(f"training total loss: {mean_train_loss_dict['total_loss']}")
+
         for metric_type, metric_value in mean_train_metric_dict.items():
             writer.add_scalar("train/metric/" + metric_type, metric_value, epoch)
-            print(f"\ttraining {metric_type}: {metric_value}")
+        print(f"training dice: {mean_train_loss_dict['dice']}")
         writer.add_scalar("lr", optimizer.get_cur_lr(), epoch)
         visual_gradient(reg_net, writer, epoch)
+
+        """
+         ------------------------------------------------
+                validating network
+         ------------------------------------------------
+        """
+
         if epoch % config['TrainConfig']['val_interval'] == 0:
             reg_net.eval()
             val_losses_dict = dict()
@@ -141,15 +161,22 @@ def train(config, basedir):
                 update_dict(val_metrics_dict, metric_dict)
 
                 tensorboard_visual_registration(mode='val', name=id1[0] + '_' + id2[0] + '/img', writer=writer,
-                                                step=epoch, fix=volume2[0], mov=volume1[0], reg=warp_volume1[0])
+                                                step=epoch, fix=volume2[0][0].detach().cpu(),
+                                                mov=volume1[0][0].detach().cpu(),
+                                                reg=warp_volume1[0][0].detach().cpu())
                 tensorboard_visual_registration(mode='val', name=id1[0] + '_' + id2[0] + '/seg', writer=writer,
-                                                step=epoch, fix=label2[0], mov=label1[0], reg=warp_label1[0])
+                                                step=epoch, fix=label2[0][0].detach().cpu(),
+                                                mov=label1[0][0].detach().cpu(), reg=warp_label1[0][0].detach().cpu())
+
                 tag = 'val/' + id1[0] + '_' + id2[0]
+
                 tensorboard_visual_deformation(name=tag + '/deformation', dvf=dvf[0].detach().cpu(),
-                                               grid_spacing=1, writer=writer, step=epoch, linewidth=1, color='darkblue')
+                                               grid_spacing=dvf.shape[-1] // 30, writer=writer, step=epoch,
+                                               linewidth=1, color='darkblue')
+
                 tensorboard_visual_dvf(name=tag + '/dvf', dvf=dvf[0].detach().cpu(), writer=writer, step=epoch)
 
-                det = jacobian_determinant(dvf[0].clone().detach().cpu())
+                det = jacobian_determinant(dvf[0].detach().cpu())
 
                 tensorboard_visual_det(name=tag + '/det', det=det, writer=writer, step=epoch, normalize_by='slice',
                                        threshold=0, cmap='gray')
@@ -158,14 +185,12 @@ def train(config, basedir):
             mean_val_metric_dict = mean_dict(val_metrics_dict)
 
             print(f"Epoch {epoch}/{config['TrainConfig']['epoch']}:")
-            print("loss: ")
             for loss_type, loss_value in mean_val_loss_dict.items():
                 writer.add_scalar("val/loss/" + loss_type, loss_value, epoch)
-                print(f"\tval {loss_type}: {loss_value}")
-            print('metric: ')
+            print(f"val total loss: {mean_val_loss_dict['dice']}")
             for metric_type, metric_value in mean_val_metric_dict.items():
                 writer.add_scalar("val/metric/" + metric_type, metric_value, epoch)
-                print(f"\tval {metric_type}: {metric_value}")
+            print(f"val dice: {mean_val_metric_dict['dice']}")
 
             if mean_val_metric_dict['dice'] > best_val_dice_metric:
                 best_val_dice_metric = mean_val_metric_dict['dice']
@@ -209,22 +234,8 @@ def compute_reg_metric(dvf, warp_volume1, warp_label1, volume2, label2):
 def get_loss_function(config):
     loss_function_dict = dict()
 
-    loss_function_dict['similarity_loss'] = getattr(loss, config['LossConfig']['component']['similarity_loss'])
-    loss_function_dict['segmentation_loss'] = getattr(loss, config['LossConfig']['component']['segmentation_loss'])
-
-    # if config['LossConfig']['component']['similarity_loss'] == 'ncc':
-    #     loss_function_dict['similarity_loss'] = NCCLoss()
-    # elif config['LossConfig']['component']['similarity_loss'] == 'mse':
-    #     loss_function_dict['similarity_loss'] = MSELoss()
-    # else:
-    #     raise Exception("error similarity config")
-    #
-    # if config['LossConfig']['component']['segmentation_loss'] == 'dice':
-    #     loss_function_dict['segmentation_loss'] = DiceLoss()
-    # elif config['LossConfig']['component']['segmentation_loss'] == 'mse':
-    #     loss_function_dict['segmentation_loss'] = MSELoss()
-    # else:
-    #     raise Exception('error segmentation config')
+    loss_function_dict['similarity_loss'] = getattr(loss, config['LossConfig']['component']['similarity_loss'])()
+    loss_function_dict['segmentation_loss'] = getattr(loss, config['LossConfig']['component']['segmentation_loss'])()
 
     if config['LossConfig']['component']['gradient_loss']:
         loss_function_dict['gradient_loss'] = GradientLoss()

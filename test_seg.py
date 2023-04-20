@@ -1,5 +1,5 @@
-import logging
 import os
+import time
 from shutil import copyfile
 
 import torch
@@ -12,16 +12,17 @@ import monai
 import numpy as np
 from tqdm import tqdm
 from util.metric.segmentation_metric import dice_metric
-from util.visual.image_visual import write_image
+from util.visual.image_util import write_image, save_image_figure
 
 
-def test(config, basedir, checkpoint=None, test_dataset=None):
-    outfile = open(os.path.join(basedir, "logs", "log.txt"), 'w', encoding='utf-8')
-
+def test_seg(config, basedir, checkpoint=None, model_config=None):
+    outfile = open(os.path.join(basedir, "log.txt"), 'a', encoding='utf-8')
+    outfile.write(f"\n--------------{time.asctime()}------------------\n")
     with open(config['TestConfig']['data_path'], 'r') as f:
         dataset_config = json.load(f)
-    if test_dataset is None:
-        test_dataset = SingleDataset(dataset_config, 'test')
+
+    test_dataset = SingleDataset(dataset_config, 'test')
+
     print(f'test dataset size: {len(test_dataset)}')
     test_loader = DataLoader(test_dataset, batch_size=1, shuffle=False)
 
@@ -31,7 +32,10 @@ def test(config, basedir, checkpoint=None, test_dataset=None):
     copyfile(checkpoint, os.path.join(
         basedir, "checkpoint", "checkpoint.pth"))
 
-    seg_net = get_seg_model(config['ModelConfig'], dataset_config['region_number'] + 1, checkpoint)
+    if model_config is None:
+        model_config = config['ModelConfig']
+
+    seg_net = get_seg_model(model_config, dataset_config['region_number'] + 1, checkpoint)
 
     total = sum([param.nelement() for param in seg_net.parameters()])
     print("Number of parameter: %.2fM" % (total / 1e6))
@@ -65,8 +69,11 @@ def test(config, basedir, checkpoint=None, test_dataset=None):
         outfile.write(f'{id[0]}  dice: {dice} \n')
         if config["TestConfig"]["save_image"]:
             predict_argmax = torch.argmax(predict_softmax, dim=1, keepdim=True)
-            output_dir = os.path.join(basedir, "images")
-            write_image(output_dir, id[0], predict_argmax[0], 'label')
+            output_dir = os.path.join(basedir, "images",id[0])
+            write_image(output_dir, id[0], predict_argmax[0][0], 'label')
+            save_image_figure(output_dir, id[0] + '_image_slice', volume[0][0].detach().cpu())
+            save_image_figure(output_dir, id[0] + '_label_slice', label[0][0].detach().cpu())
+            save_image_figure(output_dir, id[0] + '_predict_slice', predict_argmax[0][0].detach().cpu())
 
     mean_metric = np.mean(test_metrics)
     std_metric = np.std(test_metrics)

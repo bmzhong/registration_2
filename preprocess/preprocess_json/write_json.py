@@ -161,7 +161,7 @@ if __name__ == '__main__':
     LPBA40_path = '../../datasets/hdf5/LPBA40.h5'
     LPBA40_output_path = '../../datasets/json/LPBA40.json'
     write_json(LPBA40_path, LPBA40_output_path, train_size=0.7,
-               val_size=0.1, test_size=0.2, sampling_ratio=0.5)
+               val_size=0.1, test_size=0.2, sampling_ratio=1.)
 
     # Mindboggle101_path = '../../datasets/hdf5/Mindboggle101.h5'
     # Mindboggle101_output_path = '../../datasets/json/Mindboggle101.json'

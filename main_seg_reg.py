@@ -1,15 +1,15 @@
 import argparse
 import os
+import time
 import warnings
 from util.util import set_random_seed, get_basedir
 from shutil import copyfile
 import yaml
-from train_reg import train_reg
+from train_seg_reg import train_seg_reg
 from test_reg import test_reg
+from test_seg import test_seg
 
 warnings.filterwarnings("ignore")
-import time
-
 
 def get_args():
     parser = argparse.ArgumentParser()
@@ -46,15 +46,27 @@ if __name__ == '__main__':
     start_time = time.time()
     if args.train:
         os.environ["CUDA_VISIBLE_DEVICES"] = config["TrainConfig"]["gpu"]
-        train_reg(config, basedir)
+        train_seg_reg(config, basedir)
 
-        checkpoint = os.path.join(basedir, "checkpoint", 'best_epoch.pth')
-        test_basedir = get_basedir(os.path.join(basedir, 'test'), config["TrainConfig"]["start_new_model"])
-        test_reg(config, test_basedir, checkpoint=checkpoint)
+        reg_checkpoint = os.path.join(basedir, "checkpoint", 'reg_best_epoch.pth')
+        reg_test_basedir = get_basedir(os.path.join(basedir, 'reg_test'), config["TrainConfig"]["start_new_model"])
+        test_reg(config, reg_test_basedir, checkpoint=reg_checkpoint, model_config=config['ModelConfig']['Reg'])
+
+        seg_checkpoint = os.path.join(basedir, "checkpoint", 'seg_best_epoch.pth')
+        seg_test_basedir = get_basedir(os.path.join(basedir, 'seg_test'), config["TrainConfig"]["start_new_model"])
+        test_seg(config, seg_test_basedir, checkpoint=seg_checkpoint, model_config=config['ModelConfig']['Seg'])
 
     elif args.test:
+
         os.environ["CUDA_VISIBLE_DEVICES"] = config["TestConfig"]["gpu"]
-        test_reg(config, basedir, checkpoint=args.checkpoint)
+
+        reg_checkpoint = config['TestConfig']['Reg']['checkpoint']
+        reg_test_basedir = os.path.join(basedir, 'reg_test')
+        test_reg(config, reg_test_basedir, checkpoint=reg_checkpoint, model_config=config['ModelConfig']['Reg'])
+
+        seg_checkpoint = config['TestConfig']['Seg']['checkpoint']
+        seg_test_basedir = os.path.join(basedir, 'seg_test')
+        test_seg(config, seg_test_basedir, checkpoint=seg_checkpoint, model_config=config['ModelConfig']['Seg'])
     end_time = time.time()
     run_time = end_time - start_time
     print(f"run time: {int(run_time)} s")

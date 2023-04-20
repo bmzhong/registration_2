@@ -22,13 +22,13 @@ class SingleDataset(Dataset):
 
         if self.segmentation_available is not None and self.segmentation_available.get(self.data_names[index],
                                                                                        True) is False:
-            img['label'] = None
+            img['label'] = []
 
-        img = self.as_type_to_tensor(img)
+        # img = self.as_type_to_tensor(img)
         if self.transform is None:
-            return img['id'], img['volume'], img.get('label', None)
+            return img['id'], img['volume'], img.get('label', [])
         img['volume'] = self.transform(img['volume'])
-        return img['id'], img['volume'], img.get('label', None)
+        return img['id'], img['volume'], img.get('label', [])
 
     def __len__(self):
         return len(self.data_names)
@@ -56,25 +56,26 @@ class PairDataset(Dataset):
         img1 = self.file[img1_name]
 
         if self.segmentation_available is not None and self.segmentation_available.get(img1_name, True) is False:
-            img1['label'] = None
+            img1['label'] = []
 
         img2 = self.file[img2_name]
 
         if self.segmentation_available is not None and self.segmentation_available.get(img2_name, True) is False:
-            img2['label'] = None
+            img2['label'] = []
 
         img = {'id1': img1['id'],
                'volume1': img1['volume'],
-               'label1': img1.get('label', None),
+               'label1': img1.get('label', []),
                'id2': img2['id'],
                'volume2': img2['volume'],
-               'label2': img2.get('label', None)}
+               'label2': img2.get('label', [])}
 
-        img = self.as_type_to_tensor(img)
+        # img = self.as_type_to_tensor(img)
         if self.transform is None:
             return img['id1'], img['volume1'], img['label1'], img['id2'], img['volume2'], img['label2']
         img['volume1'] = self.transform(img['volume1'])
         img['volume2'] = self.transform(img['volume2'])
+        print(type(img['id1']),type(img['volume1']))
         return img['id1'], img['volume1'], img['label1'], img['id2'], img['volume2'], img['label2']
 
     def __len__(self):

@@ -2,15 +2,19 @@ TrainConfig:
   start_new_model: True
   max_save_num: 2                 # numbers that checkpoint files saved; default 2
   gpu: "0"
-  data_path: "datasets/json/LPBA40.json"
-  epoch: 100
-  batchsize: 1
+  data_path: "datasets/json/LPBA40_test.json"
+  epoch: 50
+  batchsize: 8
   checkpoint: ""
   val_interval: 1
+  semi_supervised: True
+
+
 #  writer_board_interval: 10
 
 TestConfig:
-  checkpoint: ""
+  checkpoint: "output/reg/debug/debug1/checkpoint/best_epoch.pth"
+  data_path: "datasets/json/LPBA40_test.json"
   save_image: True
   gpu: "0"
 
@@ -35,8 +39,8 @@ OptimConfig:
 
 LossConfig:
   component:
-    similarity_loss: 'ncc'
-    segmentation_loss: 'dice'
+    similarity_loss: 'NCCLoss'
+    segmentation_loss: 'DiceLoss'
     gradient_loss: True
     bending_energy_loss: False
   weight:

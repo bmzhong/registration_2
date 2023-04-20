@@ -1,25 +1,27 @@
 TrainConfig:
   start_new_model: True
   max_save_num: 2                 # numbers that checkpoint files saved; default 2
-  data_path: "datasets/json/LPBA40.json"
-  epoch: 100
+  data_path: "datasets/json/LPBA40_test.json"
+  epoch: 50
   gpu: "0"
   M: -1
-  batchsize: 1
+  batchsize: 2
   Seg:
     gpu: "0"
     seg_step_per_epoch: 5
     checkpoint: ""
-    val_interval: 1
+    val_interval: 5
   Reg:
     gpu: "0"
     batchsize: 1
     reg_step_per_epoch: 20
     checkpoint: ""
-    val_interval: 1
+    val_interval: 5
 
 TestConfig:
   gpu: "0"
+  data_path: "datasets/json/LPBA40_test.json"
+  save_image: True
   Seg:
     checkpoint: ""
   Reg:
@@ -80,8 +82,8 @@ LossConfig:
       supervised_loss: 'DiceLoss'
       anatomy_loss: 'DiceLoss'
     weight:
-      similarity_loss: 1
-      segmentation_loss: 1
+      supervised_loss: 1
+      anatomy_loss: 1
 
 
 

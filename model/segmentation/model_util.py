@@ -21,7 +21,7 @@ def get_seg_model(model_config, num_classes, checkpoint=None):
             adn_ordering='NDA'
         )
     else:
-        raise Exception(f"There are no {model_config['ModelConfig']['type']}, please check.")
+        raise Exception(f"There are no {model_config['type']}, please check.")
 
     if checkpoint is not None:
         seg_net.load_state_dict(torch.load(checkpoint)["model"])

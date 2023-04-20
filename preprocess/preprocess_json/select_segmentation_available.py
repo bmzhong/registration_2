@@ -2,10 +2,7 @@ import json
 import numpy as np
 
 
-def LPBA40(M, data_path):
-    with open(data_path, 'r') as f:
-        dataset_config = json.load(f)
-
+def LPBA40_M(M, dataset_config, output_path):
     train_data_names = np.array(dataset_config['train'])
 
     segmentation_available = {name: False for name in train_data_names}
@@ -14,11 +11,17 @@ def LPBA40(M, data_path):
     segmentation_available.update(segmentation_available_true_dict)
     dataset_config['segmentation_available'] = segmentation_available
     dataset_config['M'] = M
-    with open(data_path, 'w') as f:
+    with open(output_path, 'w') as f:
         json.dump(dataset_config, f, indent=4)
 
 
 if __name__ == '__main__':
     np.random.seed(0)
     data_path = '../../datasets/json/LPBA40.json'
-    LPBA40(M=20, data_path=data_path)
+    with open(data_path, 'r') as f:
+        dataset_config = json.load(f)
+    train_size = dataset_config['train_size']
+    M_list = [1,int(train_size * 0.5), int(train_size * 1.0)]
+    for M in M_list:
+        output_path = '../../datasets/json/LPBA40_' + str(M) + '.json'
+        LPBA40_M(M=M, dataset_config=dataset_config, output_path=output_path)

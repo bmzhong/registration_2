@@ -1,14 +1,16 @@
 import argparse
 import os
+import time
 import warnings
+
+from test_reg import test_reg
 from util.util import set_random_seed, get_basedir
 from shutil import copyfile
 import yaml
-from train_reg import train_reg
-from test_reg import test_reg
+
+from train_reg_semi_supervised import train_reg_semi_supervised
 
 warnings.filterwarnings("ignore")
-import time
 
 
 def get_args():
@@ -46,13 +48,14 @@ if __name__ == '__main__':
     start_time = time.time()
     if args.train:
         os.environ["CUDA_VISIBLE_DEVICES"] = config["TrainConfig"]["gpu"]
-        train_reg(config, basedir)
+        train_reg_semi_supervised(config, basedir)
 
         checkpoint = os.path.join(basedir, "checkpoint", 'best_epoch.pth')
         test_basedir = get_basedir(os.path.join(basedir, 'test'), config["TrainConfig"]["start_new_model"])
         test_reg(config, test_basedir, checkpoint=checkpoint)
 
     elif args.test:
+
         os.environ["CUDA_VISIBLE_DEVICES"] = config["TestConfig"]["gpu"]
         test_reg(config, basedir, checkpoint=args.checkpoint)
     end_time = time.time()

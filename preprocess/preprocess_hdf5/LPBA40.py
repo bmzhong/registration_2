@@ -9,8 +9,8 @@ from preprocess.preprocess_hdf5.hdf5_utils import *
 
 
 def get_LPBA40_label_map():
-    root_path = r'G:\biomdeical\registration\public_data\LPBA40\LPBA40_Subjects_Delineation_Space_MRI_and_label_files\LPBA40subjects.delineation_space\LPBA40\delineation_space\S01\S01.delineation.structure.label.img.gz'
-    label = sitk.ReadImage(root_path)
+    source_path = r'G:\biomdeical\registration\public_data\LPBA40\LPBA40_Subjects_Delineation_Space_MRI_and_label_files\LPBA40subjects.delineation_space\LPBA40\delineation_space\S01\S01.delineation.structure.label.img.gz'
+    label = sitk.ReadImage(source_path)
 
     label = sitk.GetArrayFromImage(label)
     label_unique = list(np.unique(label))
@@ -27,16 +27,10 @@ def get_LPBA40_label_map():
     return label_map
 
 
-def write_LPBA40():
-    output_path = '../../datasets/hdf5/LPBA40.h5'
+def write_LPBA40(image_size, source_path, output_path, scale_factor):
     if os.path.exists(output_path):
         os.remove(output_path)
     file = h5py.File(output_path, 'w')
-    image_size = [32, 32, 32]
-    root_path = r'G:\biomdeical\registration\public_data\LPBA40\LPBA40_Subjects_Delineation_Space_MRI_and' \
-                r'_label_files\LPBA40subjects.delineation_space\LPBA40\delineation_space'
-
-    # label_map = get_LPBA40_label_map()
 
     label_map = {0: 0,
                  21: 1, 22: 1, 23: 1, 24: 1, 25: 1, 26: 1, 27: 1,
@@ -54,11 +48,11 @@ def write_LPBA40():
 
                  }
     file.attrs['label_map'] = [[origin_label, target_label] for origin_label, target_label in label_map.items()]
-    scale_factor = 255.
+
     volume_resize = monai.transforms.Resize(spatial_size=image_size, mode='trilinear', align_corners=False)
     label_resize = monai.transforms.Resize(spatial_size=image_size, mode='nearest', align_corners=None)
-    for dir_name in tqdm(os.listdir(root_path)):
-        img_dir = os.path.join(root_path, dir_name)
+    for dir_name in tqdm(os.listdir(source_path)):
+        img_dir = os.path.join(source_path, dir_name)
         if os.path.isdir(img_dir):
             volume_name = dir_name + '.delineation.skullstripped.img.gz'
             volume_path = os.path.join(img_dir, volume_name)
@@ -101,8 +95,12 @@ def write_LPBA40():
 
 
 if __name__ == '__main__':
-
-    write_LPBA40()
+    source_path = r'G:\biomdeical\registration\public_data\LPBA40\LPBA40_Subjects_Delineation_Space_MRI_and' \
+                  r'_label_files\LPBA40subjects.delineation_space\LPBA40\delineation_space'
+    output_path = '../../datasets/hdf5/LPBA40.h5'
+    image_size = [160, 160, 160]
+    scale_factor = 1.
+    write_LPBA40(image_size, source_path, output_path, scale_factor)
     hdf5_path = '../../datasets/hdf5/LPBA40.h5'
     output_dir = r'G:\biomdeical\registration\data\datasets'
     extract_hdf5(hdf5_path, output_dir)
