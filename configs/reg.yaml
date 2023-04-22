@@ -1,3 +1,5 @@
+# reg.yaml
+
 TrainConfig:
   start_new_model: True
   max_save_num: 2                 # numbers that checkpoint files saved; default 2
@@ -37,16 +39,31 @@ OptimConfig:
       warmup_steps: 100
 
 LossConfig:
-  component:
-    similarity_loss: 'NCCLoss'
-    segmentation_loss: 'DiceLoss'
-    gradient_loss: True
-    bending_energy_loss: False
-  weight:
-    similarity_loss: 1
-    segmentation_loss: 1
-    gradient_loss: 1
-    bending_energy_loss: 1
+
+  similarity_loss:
+    use: True
+    type: 'NCCLoss'
+    weight: 1
+
+  segmentation_loss:
+    use: True
+    type: 'MonAIDiceLoss'
+    params:
+      include_background: True
+      to_onehot_y: False
+      softmax: False
+      reduction: 'mean'
+    weight: 1
+
+  gradient_loss:
+    use: True
+    type: 'GradientLoss'
+    weight: 1
+
+  bending_energy_loss:
+    use: False
+    type: 'BendingEnergyLoss'
+    weight: 1
 
 
 

@@ -1,5 +1,4 @@
 import json
-import logging
 import numpy as np
 from tqdm import tqdm
 from model.registration.model_util import get_reg_model
@@ -14,24 +13,21 @@ from model.segmentation.model_util import get_seg_model
 from util.Optimizer import Optimizer
 from util.ModelSaver import ModelSaver
 from util.data_util.dataset import PairDataset, SingleDataset
-from util.loss.DiceLoss import DiceLoss
-from util.visual.image_util import write_image
-from util.visual.tensorboard_visual import visual_gradient, tensorboard_visual_registration, tensorboard_visual_dvf, \
-    tensorboard_visual_det, tensorboard_visual_segmentation
+
+from util.visual.tensorboard_visual import tensorboard_visual_registration, tensorboard_visual_dvf, \
+    tensorboard_visual_det, tensorboard_visual_segmentation, tensorboard_visual_RGB_dvf, \
+    tensorboard_visual_deformation_2
 from util.util import update_dict, std_dict
 from util.util import mean_dict
 from util.util import swap_training
-from util.loss.MSELoss import MSELoss
-from util.loss.NCCLoss import NCCLoss
+
 from util.loss.GradientLoss import GradientLoss
 from util.loss.BendingEnergyLoss import BendingEnergyLoss
 from util.metric.registration_metric import folds_count_metric, folds_ratio_metric, mse_metric, jacobian_determinant
 from util.metric.segmentation_metric import dice_metric
 from util.visual.tensorboard_visual import tensorboard_visual_deformation
-import time
 from util import loss
 from util.seg_reg_util import create_train_dataset
-from shutil import copyfile
 
 
 def train_seg_reg(config, basedir):
@@ -119,24 +115,26 @@ def train_seg_reg(config, basedir):
         swap_training(network_to_train=reg_net, network_to_not_train=seg_net)
         reg_net.train()
         reg_train_losses_dict = dict()
+        with tqdm(total=reg_step_per_epoch) as pbar:
+            for id1, volume1, label1, id2, volume2, label2 in reg_batch_generator_train(reg_step_per_epoch):
+                volume1 = volume1.to(reg_device)
+                label1 = label1.to(reg_device) if label1 != [] else label1
 
-        for id1, volume1, label1, id2, volume2, label2 in reg_batch_generator_train(reg_step_per_epoch):
-            volume1 = volume1.to(reg_device)
-            label1 = label1.to(reg_device) if label1 != [] else label1
+                volume2 = volume2.to(reg_device)
+                label2 = label2.to(reg_device) if label2 != [] else label2
 
-            volume2 = volume2.to(reg_device)
-            label2 = label2.to(reg_device) if label2 != [] else label2
+                reg_optimizer.zero_grad()
 
-            reg_optimizer.zero_grad()
+                dvf = reg_net(volume1, volume2)
 
-            dvf = reg_net(volume1, volume2)
+                loss_dict = compute_reg_loss1(config=config, dvf=dvf, reg_loss_function_dict=reg_loss_function_dict,
+                                              seg_net=seg_net, STN_bilinear=STN_bilinear,
+                                              volume1=volume1, label1=label1, volume2=volume2, label2=label2)
 
-            loss_dict = compute_reg_loss1(config=config, dvf=dvf, loss_function_dict=reg_loss_function_dict,
-                                          seg_net=seg_net, STN_bilinear=STN_bilinear, STN_nearest=STN_nearest,
-                                          volume1=volume1, label1=label1, volume2=volume2, label2=label2)
-            loss_dict['total_loss'].backward()
-            reg_optimizer.step()
-            update_dict(reg_train_losses_dict, loss_dict)
+                loss_dict['total_loss'].backward()
+                reg_optimizer.step()
+                update_dict(reg_train_losses_dict, loss_dict)
+                pbar.update(1)
 
         reg_mean_train_loss_dict = mean_dict(reg_train_losses_dict)
         print(f"\n\033[32mEpoch {epoch}/{config['TrainConfig']['epoch']}: \033[0m")
@@ -155,50 +153,56 @@ def train_seg_reg(config, basedir):
             reg_net.eval()
             reg_val_losses_dict = dict()
             reg_val_metrics_dict = dict()
-            for id1, volume1, label1, id2, volume2, label2 in reg_val_dataloader:
-                volume1 = volume1.to(reg_device)
-                label1 = label1.to(reg_device)
-                volume2 = volume2.to(reg_device)
-                label2 = label2.to(reg_device)
-                dvf = reg_net(volume1, volume2)
+            with torch.no_grad():
+                for id1, volume1, label1, id2, volume2, label2 in reg_val_dataloader:
+                    volume1 = volume1.to(reg_device)
+                    label1 = label1.to(reg_device)
+                    volume2 = volume2.to(reg_device)
+                    label2 = label2.to(reg_device)
+                    dvf = reg_net(volume1, volume2)
 
-                loss_dict = compute_reg_loss1(config=config, dvf=dvf, loss_function_dict=reg_loss_function_dict,
-                                              seg_net=seg_net, STN_bilinear=STN_bilinear, STN_nearest=STN_nearest,
-                                              volume1=volume1, label1=label1, volume2=volume2, label2=label2)
-                update_dict(reg_val_losses_dict, loss_dict)
+                    loss_dict = compute_reg_loss1(config=config, dvf=dvf, reg_loss_function_dict=reg_loss_function_dict,
+                                                  seg_net=seg_net, STN_bilinear=STN_bilinear,
+                                                  volume1=volume1, label1=label1, volume2=volume2, label2=label2)
 
-                warp_volume1 = STN_bilinear(volume1, dvf)
-                warp_label1 = STN_nearest(label1.float(), dvf).type(torch.uint8)
+                    update_dict(reg_val_losses_dict, loss_dict)
 
-                axis_order = (0, label1.dim() - 1) + tuple(range(1, label1.dim() - 1))
-                warp_label1_one_hot = F.one_hot(warp_label1.squeeze(dim=1).long()).permute(axis_order).contiguous()
-                label2_one_hot = F.one_hot(label2.squeeze(dim=1).long()).permute(axis_order).contiguous()
+                    warp_volume1 = STN_bilinear(volume1, dvf)
+                    warp_label1 = STN_nearest(label1.float(), dvf)
 
-                metric_dict = compute_reg_metric(dvf.clone().detach(), warp_volume1.clone().detach(),
-                                                 warp_label1_one_hot.clone().detach(),
-                                                 volume2.clone().detach(), label2_one_hot.clone().detach())
-                update_dict(reg_val_metrics_dict, metric_dict)
+                    axis_order = (0, label1.dim() - 1) + tuple(range(1, label1.dim() - 1))
+                    warp_label1_one_hot = F.one_hot(warp_label1.squeeze(dim=1).long()).permute(axis_order).contiguous()
+                    label2_one_hot = F.one_hot(label2.squeeze(dim=1).long()).permute(axis_order).contiguous()
 
-                tensorboard_visual_registration(mode='val/reg/', name=id1[0] + '_' + id2[0] + '/img', writer=writer,
-                                                step=epoch, fix=volume2[0][0].detach().cpu(),
-                                                mov=volume1[0][0].detach().cpu(),
-                                                reg=warp_volume1[0][0].detach().cpu())
-                tensorboard_visual_registration(mode='val/reg/', name=id1[0] + '_' + id2[0] + '/seg', writer=writer,
-                                                step=epoch, fix=label2[0][0].detach().cpu(),
-                                                mov=label1[0][0].detach().cpu(), reg=warp_label1[0][0].detach().cpu())
+                    metric_dict = compute_reg_metric(dvf.clone().detach(), warp_volume1.clone().detach(),
+                                                     warp_label1_one_hot.clone().detach(),
+                                                     volume2.clone().detach(), label2_one_hot.clone().detach())
+                    update_dict(reg_val_metrics_dict, metric_dict)
 
-                tag = 'val/reg/' + id1[0] + '_' + id2[0]
+                    tensorboard_visual_registration(mode='val/reg/', name=id1[0] + '_' + id2[0] + '/img', writer=writer,
+                                                    step=epoch, fix=volume2[0][0].detach().cpu(),
+                                                    mov=volume1[0][0].detach().cpu(),
+                                                    reg=warp_volume1[0][0].detach().cpu())
+                    tensorboard_visual_registration(mode='val/reg/', name=id1[0] + '_' + id2[0] + '/seg', writer=writer,
+                                                    step=epoch, fix=label2[0][0].detach().cpu(),
+                                                    mov=label1[0][0].detach().cpu(),
+                                                    reg=warp_label1[0][0].detach().cpu())
 
-                tensorboard_visual_deformation(name=tag + '/deformation', dvf=dvf[0].detach().cpu(),
-                                               grid_spacing=dvf.shape[-1] // 30, writer=writer, step=epoch, linewidth=1,
-                                               color='darkblue')
+                    tag = 'val/reg/' + id1[0] + '_' + id2[0]
 
-                tensorboard_visual_dvf(name=tag + '/dvf', dvf=dvf[0].detach().cpu(), writer=writer, step=epoch)
+                    tensorboard_visual_deformation(name=tag + '/deformation', dvf=dvf[0].detach().cpu(),
+                                                   grid_spacing=dvf.shape[-1] // 50, writer=writer, step=epoch,
+                                                   linewidth=1,
+                                                   color='darkblue')
 
-                det = jacobian_determinant(dvf[0].detach().cpu())
+                    tensorboard_visual_dvf(name=tag + '/dvf', dvf=dvf[0].detach().cpu(), writer=writer, step=epoch)
+                    tensorboard_visual_RGB_dvf(name=tag + '/rgb_dvf', dvf=dvf[0].detach().cpu(), writer=writer,
+                                               step=epoch)
 
-                tensorboard_visual_det(name=tag + '/det', det=det, writer=writer, step=epoch, normalize_by='slice',
-                                       threshold=0, cmap='gray')
+                    det = jacobian_determinant(dvf[0].detach().cpu())
+
+                    tensorboard_visual_det(name=tag + '/det', det=det, writer=writer, step=epoch, normalize_by='slice',
+                                           threshold=0, cmap='gray')
 
             reg_mean_val_loss_dict = mean_dict(reg_val_losses_dict)
             reg_mean_val_metric_dict = mean_dict(reg_val_metrics_dict)
@@ -212,8 +216,12 @@ def train_seg_reg(config, basedir):
             print(f"\033[32mval reg dice: {reg_mean_val_metric_dict['dice']} \033[0m")
             if reg_mean_val_metric_dict['dice'] > reg_best_val_metric:
                 reg_best_val_metric = reg_mean_val_metric_dict['dice']
-                reg_model_saver.save(os.path.join(basedir, "checkpoint", "reg_best_epoch.pth"),
-                                     {"model": reg_net.state_dict(), "optim": reg_net.state_dict()})
+                if len(reg_gpu) > 1:
+                    reg_model_saver.save(os.path.join(basedir, "checkpoint", "reg_best_epoch.pth"),
+                                         {"model": reg_net.module.state_dict(), "optim": reg_net.state_dict()})
+                else:
+                    reg_model_saver.save(os.path.join(basedir, "checkpoint", "reg_best_epoch.pth"),
+                                         {"model": reg_net.state_dict(), "optim": reg_net.state_dict()})
         """
          ------------------------------------------------
                 training seg_net
@@ -223,30 +231,31 @@ def train_seg_reg(config, basedir):
 
         seg_net.train()
         seg_train_losses_dict = dict()
+        with tqdm(total=seg_step_per_epoch) as pbar:
+            for id1, volume1, label1, id2, volume2, label2 in seg_batch_generator_train(seg_step_per_epoch):
+                volume1 = volume1.to(reg_device)
+                label1 = label1.to(reg_device) if label1 != [] else label1
 
-        for id1, volume1, label1, id2, volume2, label2 in seg_batch_generator_train(seg_step_per_epoch):
-            volume1 = volume1.to(reg_device)
-            label1 = label1.to(reg_device) if label1 != [] else label1
+                volume2 = volume2.to(reg_device)
+                label2 = label2.to(reg_device) if label2 != [] else label2
 
-            volume2 = volume2.to(reg_device)
-            label2 = label2.to(reg_device) if label2 != [] else label2
+                seg_optimizer.zero_grad()
 
-            seg_optimizer.zero_grad()
+                dvf = reg_net(volume1, volume2)
+                label1_predict = seg_net(volume1)
+                label2_predict = seg_net(volume2)
 
-            dvf = reg_net(volume1, volume2)
-            label1_predict = seg_net(volume1)
-            label2_predict = seg_net(volume2)
+                label1_predict = F.softmax(label1_predict, dim=1)
+                label2_predict = F.softmax(label2_predict, dim=1)
+                loss_dict = compute_seg_loss1(config=config, dvf=dvf, seg_loss_function_dict=seg_loss_function_dict,
+                                              STN_nearest=STN_nearest, label1=label1, label1_predict=label1_predict,
+                                              label2=label2, label2_predict=label2_predict)
+                loss_dict['total_loss'].backward()
 
-            label1_predict = F.softmax(label1_predict, dim=1)
-            label2_predict = F.softmax(label2_predict, dim=1)
-            loss_dict = compute_seg_loss1(config=config, dvf=dvf, seg_loss_function_dict=seg_loss_function_dict,
-                                          STN_nearest=STN_nearest, label1=label1, label1_predict=label1_predict,
-                                          label2=label2, label2_predict=label2_predict)
-            loss_dict['total_loss'].backward()
+                seg_optimizer.step()
 
-            seg_optimizer.step()
-
-            update_dict(seg_train_losses_dict, loss_dict)
+                update_dict(seg_train_losses_dict, loss_dict)
+                pbar.update(1)
         seg_mean_train_loss_dict = mean_dict(seg_train_losses_dict)
         print(f"\n\033[34mEpoch {epoch}/{config['TrainConfig']['epoch']}:\033[0m")
 
@@ -265,32 +274,34 @@ def train_seg_reg(config, basedir):
             seg_net.eval()
             seg_val_losses = []
             seg_val_metrics = []
-            for id, volume, label in seg_val_dataloader:
-                volume = volume.to(seg_device)
-                label = label.to(seg_device)
+            with torch.no_grad():
+                for id, volume, label in seg_val_dataloader:
+                    volume = volume.to(seg_device)
+                    label = label.to(seg_device)
 
-                predict = seg_net(volume)
+                    predict = seg_net(volume)
 
-                predict_softmax = F.softmax(predict, dim=1)
+                    predict_softmax = F.softmax(predict, dim=1)
 
-                axis_order = (0, label.dim() - 1) + tuple(range(1, label.dim() - 1))
-                label_one_hot = F.one_hot(label.squeeze(dim=1).long()).permute(axis_order).contiguous()
+                    axis_order = (0, label.dim() - 1) + tuple(range(1, label.dim() - 1))
+                    label_one_hot = F.one_hot(label.squeeze(dim=1).long()).permute(axis_order).contiguous()
 
-                loss = seg_loss_function_dict['supervised_loss'](predict_softmax, label_one_hot.float())
-                seg_val_losses.append(loss.item())
+                    loss = seg_loss_function_dict['supervised_loss'](predict_softmax, label_one_hot.float())
+                    seg_val_losses.append(loss.item())
 
-                predict_one_hot = F.one_hot(torch.argmax(predict, dim=1).long()).permute(axis_order).contiguous()
+                    predict_one_hot = F.one_hot(torch.argmax(predict, dim=1).long()).permute(axis_order).contiguous()
 
-                dice = dice_metric(predict_one_hot.clone().detach(), label_one_hot.clone().detach(), background=True)
+                    dice = dice_metric(predict_one_hot.clone().detach(), label_one_hot.clone().detach(),
+                                       background=True)
 
-                seg_val_metrics.append(dice.item())
+                    seg_val_metrics.append(dice.item())
 
-                predict_argmax = torch.argmax(predict_softmax, dim=1, keepdim=True)
+                    predict_argmax = torch.argmax(predict_softmax, dim=1, keepdim=True)
 
-                tensorboard_visual_segmentation(mode='val/seg/', name=id[0], writer=writer, step=epoch,
-                                                volume=volume[0][0].detach().cpu(),
-                                                predict=predict_argmax[0][0].detach().cpu(),
-                                                target=label[0][0].detach().cpu())
+                    tensorboard_visual_segmentation(mode='val/seg/', name=id[0], writer=writer, step=epoch,
+                                                    volume=volume[0][0].detach().cpu(),
+                                                    predict=predict_argmax[0][0].detach().cpu(),
+                                                    target=label[0][0].detach().cpu())
 
             seg_mean_val_loss = np.mean(seg_val_losses)
             seg_mean_val_metric = np.mean(seg_val_metrics)
@@ -301,16 +312,29 @@ def train_seg_reg(config, basedir):
             writer.add_scalar("val/seg/dice", seg_mean_val_metric, epoch)
             if seg_mean_val_metric > seg_best_val_metric:
                 seg_best_val_metric = seg_mean_val_metric
-                seg_model_saver.save(os.path.join(basedir, "checkpoint", "seg_best_epoch.pth"),
-                                     {"model": seg_net.state_dict(), "optim": seg_optimizer.state_dict()})
+                if len(seg_gpu) > 1:
+                    seg_model_saver.save(os.path.join(basedir, "checkpoint", "seg_best_epoch.pth"),
+                                         {"model": seg_net.module.state_dict(), "optim": seg_optimizer.state_dict()})
+                else:
+                    seg_model_saver.save(os.path.join(basedir, "checkpoint", "seg_best_epoch.pth"),
+                                         {"model": seg_net.state_dict(), "optim": seg_optimizer.state_dict()})
 
-    reg_model_saver.save(
-        os.path.join(basedir, "checkpoint", "reg_last_epoch.pth"),
-        {"model": reg_net.state_dict(), "optim": reg_optimizer.state_dict()})
-
-    seg_model_saver.save(
-        os.path.join(basedir, "checkpoint", "seg_last_epoch.pth"),
-        {"model": seg_net.state_dict(), "optim": seg_optimizer.state_dict()})
+    if len(reg_gpu) > 1:
+        reg_model_saver.save(
+            os.path.join(basedir, "checkpoint", "reg_last_epoch.pth"),
+            {"model": reg_net.module.state_dict(), "optim": reg_optimizer.state_dict()})
+    else:
+        reg_model_saver.save(
+            os.path.join(basedir, "checkpoint", "reg_last_epoch.pth"),
+            {"model": reg_net.state_dict(), "optim": reg_optimizer.state_dict()})
+    if len(seg_gpu) > 1:
+        seg_model_saver.save(
+            os.path.join(basedir, "checkpoint", "seg_last_epoch.pth"),
+            {"model": seg_net.module.state_dict(), "optim": seg_optimizer.state_dict()})
+    else:
+        seg_model_saver.save(
+            os.path.join(basedir, "checkpoint", "seg_last_epoch.pth"),
+            {"model": seg_net.state_dict(), "optim": seg_optimizer.state_dict()})
 
 
 def compute_seg_loss1(config, dvf, seg_loss_function_dict, STN_nearest, label1, label1_predict, label2, label2_predict):
@@ -338,35 +362,38 @@ def compute_seg_loss1(config, dvf, seg_loss_function_dict, STN_nearest, label1, 
     loss_dict['anatomy_loss'] = anatomy_loss
     total_loss = 0.
     for loss_type in loss_dict.keys():
-        total_loss = total_loss + config['LossConfig']['Seg']['weight'][loss_type] * loss_dict[loss_type]
+        total_loss = total_loss + config['LossConfig']['Seg'][loss_type]['weight'] * loss_dict[loss_type]
     loss_dict['total_loss'] = total_loss
     return loss_dict
 
 
-def compute_reg_loss1(config, dvf, loss_function_dict, seg_net, STN_bilinear, STN_nearest, volume1, label1, volume2,
+def compute_reg_loss1(config, dvf, reg_loss_function_dict, seg_net, STN_bilinear, volume1, label1, volume2,
                       label2):
     loss_dict = {}
 
-    loss_dict['similarity_loss'] = loss_function_dict['similarity_loss'](STN_bilinear(volume1, dvf), volume2)
+    if config['LossConfig']['Reg']['similarity_loss']['use']:
+        loss_dict['similarity_loss'] = reg_loss_function_dict['similarity_loss'](STN_bilinear(volume1, dvf), volume2)
 
-    loss_dict['segmentation_loss'] = anatomy_loss(dvf, STN_nearest, seg_net, loss_function_dict['segmentation_loss'],
-                                                  volume1, label1, volume2, label2)
+    if config['LossConfig']['Reg']['segmentation_loss']['use']:
+        loss_dict['segmentation_loss'] = anatomy_loss(dvf, STN_bilinear, seg_net,
+                                                      reg_loss_function_dict['segmentation_loss'],
+                                                      volume1, label1, volume2, label2)
 
-    if config['LossConfig']['Reg']['component']['gradient_loss']:
-        loss_dict['gradient_loss'] = loss_function_dict['gradient_loss'](dvf)
+    if config['LossConfig']['Reg']['gradient_loss']['use']:
+        loss_dict['gradient_loss'] = reg_loss_function_dict['gradient_loss'](dvf)
 
-    if config['LossConfig']['Reg']['component']['bending_energy_loss']:
-        loss_dict['bending_energy_loss'] = loss_function_dict['bending_energy_loss'](dvf)
+    if config['LossConfig']['Reg']['bending_energy_loss']['use']:
+        loss_dict['bending_energy_loss'] = reg_loss_function_dict['bending_energy_loss'](dvf)
 
     total_loss = 0.
     for loss_type in loss_dict.keys():
-        total_loss = total_loss + config['LossConfig']['Reg']['weight'][loss_type] * loss_dict[loss_type]
+        total_loss = total_loss + config['LossConfig']['Reg'][loss_type]['weight'] * loss_dict[loss_type]
     loss_dict['total_loss'] = total_loss
 
     return loss_dict
 
 
-def anatomy_loss(dvf, STN_nearest, seg_net, segmentation_loss_function, volume1, label1, volume2, label2):
+def anatomy_loss(dvf, STN_bilinear, seg_net, segmentation_loss_function, volume1, label1, volume2, label2):
     if label1 != []:
         axis_order = (0, label1.dim() - 1) + tuple(range(1, label1.dim() - 1))
         label1_new = F.one_hot(label1.squeeze(dim=1).long()).permute(axis_order).contiguous()
@@ -381,7 +408,39 @@ def anatomy_loss(dvf, STN_nearest, seg_net, segmentation_loss_function, volume1,
         label2_new = seg_net(volume2)
         label2_new = F.softmax(label2_new, dim=1)
 
-    return segmentation_loss_function(STN_nearest(label1_new.float(), dvf), label2_new)
+    return segmentation_loss_function(STN_bilinear(label1_new.float(), dvf), label2_new)
+
+
+def get_reg_loss_function(config):
+    loss_function_dict = dict()
+
+    if config['LossConfig']['Reg']['similarity_loss']['use']:
+        loss_function_dict['similarity_loss'] = getattr(loss, config['LossConfig']['Reg']['similarity_loss']['type'])()
+
+    if config['LossConfig']['Reg']['segmentation_loss']['use']:
+        loss_function_dict['segmentation_loss'] = getattr(loss,
+                                                          config['LossConfig']['Reg']['segmentation_loss']['type'])(
+            **config['LossConfig']['Reg']['segmentation_loss']['params'])
+
+    if config['LossConfig']['Reg']['gradient_loss']['use']:
+        loss_function_dict['gradient_loss'] = getattr(loss,
+                                                      config['LossConfig']['Reg']['gradient_loss']['type'])()
+
+    if config['LossConfig']['Reg']['bending_energy_loss']['use']:
+        loss_function_dict['bending_energy_loss'] = getattr(loss,
+                                                            config['LossConfig']['Reg']['bending_energy_loss'][
+                                                                'type'])()
+    return loss_function_dict
+
+
+def get_seg_loss_function(config):
+    loss_function_dict = dict()
+
+    loss_function_dict['supervised_loss'] = getattr(loss, config['LossConfig']['Seg']['supervised_loss']['type'])()
+
+    loss_function_dict['anatomy_loss'] = getattr(loss, config['LossConfig']['Seg']['anatomy_loss']['type'])()
+
+    return loss_function_dict
 
 
 def compute_reg_metric(dvf, warp_volume1, warp_label1, volume2, label2):
@@ -391,147 +450,3 @@ def compute_reg_metric(dvf, warp_volume1, warp_label1, volume2, label2):
     metric_dict['folds_count'] = folds_count_metric(dvf).item()
     metric_dict['mse'] = mse_metric(warp_volume1, volume2).item()
     return metric_dict
-
-
-def get_reg_loss_function(config):
-    loss_function_dict = dict()
-
-    loss_function_dict['similarity_loss'] = getattr(loss, config['LossConfig']['Reg']['component']['similarity_loss'])()
-    loss_function_dict['segmentation_loss'] = getattr(loss,
-                                                      config['LossConfig']['Reg']['component']['segmentation_loss'])()
-
-    if config['LossConfig']['Reg']['component']['gradient_loss']:
-        loss_function_dict['gradient_loss'] = GradientLoss()
-    if config['LossConfig']['Reg']['component']['bending_energy_loss']:
-        loss_function_dict['bending_energy_loss'] = BendingEnergyLoss()
-
-    return loss_function_dict
-
-
-def get_seg_loss_function(config):
-    loss_function_dict = dict()
-    loss_function_dict['supervised_loss'] = getattr(loss, config['LossConfig']['Seg']['component']['supervised_loss'])()
-    loss_function_dict['anatomy_loss'] = getattr(loss, config['LossConfig']['Seg']['component']['anatomy_loss'])()
-    return loss_function_dict
-
-# def reg_test(config, basedir):
-#     outfile = open(os.path.join(basedir, "logs", "log.txt"), 'w', encoding='utf-8')
-#
-#     with open(config['TestConfig']['data_path'], 'r') as f:
-#         dataset_config = json.load(f)
-#     test_dataset = PairDataset(dataset_config, 'test_pair')
-#     print(f'test dataset size: {len(test_dataset)}')
-#     test_loader = DataLoader(test_dataset, batch_size=1, shuffle=False)
-#
-#     checkpoint = config['TestConfig']['Reg']['checkpoint']
-#
-#     copyfile(checkpoint, os.path.join(
-#         basedir, "checkpoint", "checkpoint.pth"))
-#
-#     reg_net = get_reg_model(config['ModelConfig']['Reg'], checkpoint)
-#     STN_bilinear = SpatialTransformer(dataset_config['image_size'], mode='bilinear')
-#     STN_nearest = SpatialTransformer(dataset_config['image_size'], mode='nearest')
-#
-#     print(f'gpu: {config["TestConfig"]["gpu"]}')
-#     device = torch.device("cuda:0" if len(config["TestConfig"]["gpu"]) > 0 else "cpu")
-#     reg_net.to(device)
-#     STN_bilinear.to(device)
-#     STN_nearest.to(device)
-#
-#     gpu_num = len(config["TestConfig"]["gpu"].split(","))
-#     if gpu_num > 1:
-#         reg_net = torch.nn.DataParallel(reg_net, device_ids=[i for i in range(gpu_num)])
-#         STN_bilinear = torch.nn.DataParallel(STN_bilinear, device_ids=[i for i in range(gpu_num)])
-#         STN_nearest = torch.nn.DataParallel(STN_nearest, device_ids=[i for i in range(gpu_num)])
-#
-#     reg_net.eval()
-#     test_metrics_dict = dict()
-#     for id1, volume1, label1, id2, volume2, label2 in tqdm(test_loader):
-#         volume1 = volume1.to(device)
-#         label1 = label1.to(device)
-#         volume2 = volume2.to(device)
-#         label2 = label2.to(device)
-#
-#         dvf = reg_net(volume1, volume2)
-#
-#         warp_volume1 = STN_bilinear(volume1, dvf)
-#         warp_label1 = STN_nearest(label1.float(), dvf).type(torch.uint8)
-#
-#         axis_order = (0, label1.dim() - 1) + tuple(range(1, label1.dim() - 1))
-#         warp_label1_one_hot = F.one_hot(warp_label1.squeeze(dim=1).long()).permute(axis_order).contiguous()
-#         label2_one_hot = F.one_hot(label2.squeeze(dim=1).long()).permute(axis_order).contiguous()
-#         metric_dict = compute_reg_metric(dvf, warp_volume1, warp_label1_one_hot, volume2, label2_one_hot)
-#         update_dict(test_metrics_dict, metric_dict)
-#
-#         for key, value in metric_dict.items():
-#             outfile.write(f"{id1[0]}_{id2[0]} {key}: {value}\n")
-#
-#         if config["TestConfig"]["save_image"]:
-#             output_dir = os.path.join(basedir, "images")
-#             write_image(output_dir, id1[0] + '(warped)_' + id2[0], warp_volume1[0], 'volume')
-#             write_image(output_dir, id1[0] + '(warped)_' + id2[0], warp_label1[0], 'label')
-#
-#     mean_test_metric_dict = mean_dict(test_metrics_dict)
-#     std_metric_dict = std_dict(test_metrics_dict)
-#     for key in mean_test_metric_dict.keys():
-#         outfile.write(f"mean {key}: {mean_test_metric_dict[key]}, std {key}: {std_metric_dict[key]}\n")
-#         print(f"mean {key}: {mean_test_metric_dict[key]}, std {key}: {std_metric_dict[key]}")
-#     outfile.close()
-#
-#
-# def seg_test(config, basedir):
-#     outfile = open(os.path.join(basedir, "logs", "log.txt"), 'w', encoding='utf-8')
-#
-#     with open(config['TestConfig']['data_path'], 'r') as f:
-#         dataset_config = json.load(f)
-#
-#     test_dataset = SingleDataset(dataset_config, 'test')
-#     print(f'test dataset size: {len(test_dataset)}')
-#     test_loader = DataLoader(test_dataset, batch_size=1, shuffle=False)
-#
-#     checkpoint = config['TestConfig']['Seg']['checkpoint']
-#
-#     copyfile(checkpoint, os.path.join(basedir, "checkpoint", "checkpoint.pth"))
-#
-#     seg_net = get_seg_model(config['ModelConfig']['Seg'], dataset_config['region_number'] + 1, checkpoint)
-#
-#     total = sum([param.nelement() for param in seg_net.parameters()])
-#     print("Number of parameter: %.2fM" % (total / 1e6))
-#
-#     print(f'gpu: {config["TestConfig"]["gpu"]}')
-#     device = torch.device("cuda:0" if len(config["TestConfig"]["gpu"]) > 0 else "cpu")
-#
-#     gpu_num = len(config["TestConfig"]["gpu"].split(","))
-#     seg_net.to(device)
-#     if gpu_num > 1:
-#         seg_net = torch.nn.DataParallel(seg_net, device_ids=[i for i in range(gpu_num)])
-#
-#     seg_net.eval()
-#     test_metrics = []
-#     for id, volume, label in tqdm(test_loader):
-#         volume = volume.to(device)
-#         label = label.to(device)
-#
-#         predict = seg_net(volume)
-#
-#         predict_softmax = F.softmax(predict, dim=1)
-#
-#         axis_order = (0, label.dim() - 1) + tuple(range(1, label.dim() - 1))
-#         label_one_hot = F.one_hot(label.squeeze(dim=1).long()).permute(axis_order).contiguous()
-#
-#         predict_one_hot = F.one_hot(torch.argmax(predict, dim=1).long()).permute(axis_order).contiguous()
-#
-#         dice = dice_metric(predict_one_hot, label_one_hot)
-#
-#         test_metrics.append(dice.item())
-#         outfile.write(f"{id[0]}  dice: {dice}\n")
-#         if config["TestConfig"]["save_image"]:
-#             predict_argmax = torch.argmax(predict_softmax, dim=1, keepdim=True)
-#             output_dir = os.path.join(basedir, "images")
-#             write_image(output_dir, id[0], predict_argmax[0], 'label')
-#
-#     mean_metric = np.mean(test_metrics)
-#     std_metric = np.std(test_metrics)
-#     outfile.write(f"mean test dice: {mean_metric}, std test dice: {std_metric}\n")
-#     outfile.close()
-#     print(f"mean test dice: {mean_metric}, std test dice: {std_metric}")

@@ -2,7 +2,7 @@ import json
 import numpy as np
 
 
-def LPBA40_M(M, dataset_config, output_path):
+def generate_segmentation_available(M, dataset_config, output_path):
     train_data_names = np.array(dataset_config['train'])
 
     segmentation_available = {name: False for name in train_data_names}
@@ -17,11 +17,31 @@ def LPBA40_M(M, dataset_config, output_path):
 
 if __name__ == '__main__':
     np.random.seed(0)
+
     data_path = '../../datasets/json/LPBA40.json'
     with open(data_path, 'r') as f:
         dataset_config = json.load(f)
     train_size = dataset_config['train_size']
-    M_list = [1,int(train_size * 0.5), int(train_size * 1.0)]
+    M_list = [0, 1, int(train_size * 0.5), int(train_size * 1.0)]
     for M in M_list:
         output_path = '../../datasets/json/LPBA40_' + str(M) + '.json'
-        LPBA40_M(M=M, dataset_config=dataset_config, output_path=output_path)
+        generate_segmentation_available(M=M, dataset_config=dataset_config, output_path=output_path)
+
+    # data_path = '../../datasets/json/soma_nuclei.json'
+    # with open(data_path, 'r') as f:
+    #     dataset_config = json.load(f)
+    # train_size = dataset_config['train_size']
+    # M_list = [0, 1, int(train_size * 0.5), int(train_size * 1.0)]
+    # for M in M_list:
+    #     output_path = '../../datasets/json/soma_nuclei_' + str(M) + '.json'
+    #     generate_segmentation_available(M=M, dataset_config=dataset_config, output_path=output_path)
+
+
+    # data_path = '../../datasets/json/OASIS.json'
+    # with open(data_path, 'r') as f:
+    #     dataset_config = json.load(f)
+    # train_size = dataset_config['train_size']
+    # M_list = [0, 1, int(train_size * 0.5), int(train_size * 1.0)]
+    # for M in M_list:
+    #     output_path = '../../datasets/json/OASIS_' + str(M) + '.json'
+    #     generate_segmentation_available(M=M, dataset_config=dataset_config, output_path=output_path)

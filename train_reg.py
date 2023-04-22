@@ -11,7 +11,7 @@ from util.Optimizer import Optimizer
 from util.ModelSaver import ModelSaver
 from util.data_util.dataset import PairDataset
 from util.visual.tensorboard_visual import visual_gradient, tensorboard_visual_registration, tensorboard_visual_dvf, \
-    tensorboard_visual_det
+    tensorboard_visual_det, tensorboard_visual_RGB_dvf, tensorboard_visual_deformation_2
 from util.util import update_dict
 from util.util import mean_dict
 from util.loss.GradientLoss import GradientLoss
@@ -94,21 +94,19 @@ def train_reg(config, basedir):
 
             dvf = reg_net(volume1, volume2)
 
-            warp_volume1 = STN_bilinear(volume1, dvf)
-            # grid_sample_3d does not implement about int/uint8.
-            warp_label1 = STN_nearest(label1.float(), dvf).type(torch.uint8)
-
-            axis_order = (0, label1.dim() - 1) + tuple(range(1, label1.dim() - 1))
-            warp_label1_one_hot = F.one_hot(warp_label1.squeeze(dim=1).long()).permute(axis_order).contiguous()
-            label2_one_hot = F.one_hot(label2.squeeze(dim=1).long()).permute(axis_order).contiguous()
-
-            loss_dict = compute_reg_loss(config, dvf, loss_function_dict, warp_volume1, warp_label1_one_hot,
-                                         volume2, label2_one_hot)
+            loss_dict = compute_reg_loss(config, dvf, loss_function_dict, STN_bilinear, volume1, label1, volume2,
+                                         label2)
 
             loss_dict['total_loss'].backward()
             optimizer.step()
             update_dict(train_losses_dict, loss_dict)
 
+            warp_volume1 = STN_bilinear(volume1, dvf)
+            warp_label1 = STN_nearest(label1.float(), dvf)
+
+            axis_order = (0, label1.dim() - 1) + tuple(range(1, label1.dim() - 1))
+            warp_label1_one_hot = F.one_hot(warp_label1.squeeze(dim=1).long()).permute(axis_order).contiguous()
+            label2_one_hot = F.one_hot(label2.squeeze(dim=1).long()).permute(axis_order).contiguous()
             metric_dict = compute_reg_metric(dvf.clone().detach(), warp_volume1.clone().detach(),
                                              warp_label1_one_hot.clone().detach(),
                                              volume2.clone().detach(), label2_one_hot.clone().detach())
@@ -124,7 +122,7 @@ def train_reg(config, basedir):
 
         for metric_type, metric_value in mean_train_metric_dict.items():
             writer.add_scalar("train/metric/" + metric_type, metric_value, epoch)
-        print(f"training dice: {mean_train_loss_dict['dice']}")
+        print(f"training dice: {mean_train_metric_dict['dice']}")
         writer.add_scalar("lr", optimizer.get_cur_lr(), epoch)
         visual_gradient(reg_net, writer, epoch)
 
@@ -138,48 +136,54 @@ def train_reg(config, basedir):
             reg_net.eval()
             val_losses_dict = dict()
             val_metrics_dict = dict()
-            for i, (id1, volume1, label1, id2, volume2, label2) in tqdm(enumerate(val_dataloader)):
-                volume1 = volume1.to(device)
-                label1 = label1.to(device)
-                volume2 = volume2.to(device)
-                label2 = label2.to(device)
-                dvf = reg_net(volume1, volume2)
-                warp_volume1 = STN_bilinear(volume1, dvf)
-                warp_label1 = STN_nearest(label1.float(), dvf).type(torch.uint8)
+            with torch.no_grad():
+                for id1, volume1, label1, id2, volume2, label2 in tqdm(val_dataloader):
+                    volume1 = volume1.to(device)
+                    label1 = label1.to(device)
+                    volume2 = volume2.to(device)
+                    label2 = label2.to(device)
+                    dvf = reg_net(volume1, volume2)
 
-                axis_order = (0, label1.dim() - 1) + tuple(range(1, label1.dim() - 1))
-                warp_label1_one_hot = F.one_hot(warp_label1.squeeze(dim=1).long()).permute(axis_order).contiguous()
-                label2_one_hot = F.one_hot(label2.squeeze(dim=1).long()).permute(axis_order).contiguous()
+                    loss_dict = compute_reg_loss(config, dvf, loss_function_dict, STN_bilinear, volume1, label1,
+                                                 volume2, label2)
 
-                loss_dict = compute_reg_loss(config, dvf, loss_function_dict, warp_volume1, warp_label1_one_hot,
-                                             volume2, label2_one_hot)
-                update_dict(val_losses_dict, loss_dict)
+                    update_dict(val_losses_dict, loss_dict)
 
-                metric_dict = compute_reg_metric(dvf.clone().detach(), warp_volume1.clone().detach(),
-                                                 warp_label1_one_hot.clone().detach(),
-                                                 volume2.clone().detach(), label2_one_hot.clone().detach())
-                update_dict(val_metrics_dict, metric_dict)
+                    warp_volume1 = STN_bilinear(volume1, dvf)
+                    warp_label1 = STN_nearest(label1.float(), dvf).type(torch.uint8)
 
-                tensorboard_visual_registration(mode='val', name=id1[0] + '_' + id2[0] + '/img', writer=writer,
-                                                step=epoch, fix=volume2[0][0].detach().cpu(),
-                                                mov=volume1[0][0].detach().cpu(),
-                                                reg=warp_volume1[0][0].detach().cpu())
-                tensorboard_visual_registration(mode='val', name=id1[0] + '_' + id2[0] + '/seg', writer=writer,
-                                                step=epoch, fix=label2[0][0].detach().cpu(),
-                                                mov=label1[0][0].detach().cpu(), reg=warp_label1[0][0].detach().cpu())
+                    axis_order = (0, label1.dim() - 1) + tuple(range(1, label1.dim() - 1))
+                    warp_label1_one_hot = F.one_hot(warp_label1.squeeze(dim=1).long()).permute(axis_order).contiguous()
+                    label2_one_hot = F.one_hot(label2.squeeze(dim=1).long()).permute(axis_order).contiguous()
 
-                tag = 'val/' + id1[0] + '_' + id2[0]
+                    metric_dict = compute_reg_metric(dvf.clone().detach(), warp_volume1.clone().detach(),
+                                                     warp_label1_one_hot.clone().detach(),
+                                                     volume2.clone().detach(), label2_one_hot.clone().detach())
+                    update_dict(val_metrics_dict, metric_dict)
 
-                tensorboard_visual_deformation(name=tag + '/deformation', dvf=dvf[0].detach().cpu(),
-                                               grid_spacing=dvf.shape[-1] // 30, writer=writer, step=epoch,
-                                               linewidth=1, color='darkblue')
+                    tensorboard_visual_registration(mode='val', name=id1[0] + '_' + id2[0] + '/img', writer=writer,
+                                                    step=epoch, fix=volume2[0][0].detach().cpu(),
+                                                    mov=volume1[0][0].detach().cpu(),
+                                                    reg=warp_volume1[0][0].detach().cpu())
+                    tensorboard_visual_registration(mode='val', name=id1[0] + '_' + id2[0] + '/seg', writer=writer,
+                                                    step=epoch, fix=label2[0][0].detach().cpu(),
+                                                    mov=label1[0][0].detach().cpu(),
+                                                    reg=warp_label1[0][0].detach().cpu())
 
-                tensorboard_visual_dvf(name=tag + '/dvf', dvf=dvf[0].detach().cpu(), writer=writer, step=epoch)
+                    tag = 'val/' + id1[0] + '_' + id2[0]
 
-                det = jacobian_determinant(dvf[0].detach().cpu())
+                    tensorboard_visual_deformation(name=tag + '/deformation', dvf=dvf[0].detach().cpu(),
+                                                   grid_spacing=dvf.shape[-1] // 50, writer=writer, step=epoch,
+                                                   linewidth=1, color='darkblue')
 
-                tensorboard_visual_det(name=tag + '/det', det=det, writer=writer, step=epoch, normalize_by='slice',
-                                       threshold=0, cmap='gray')
+                    tensorboard_visual_dvf(name=tag + '/dvf', dvf=dvf[0].detach().cpu(), writer=writer, step=epoch)
+                    tensorboard_visual_RGB_dvf(name=tag + '/rgb_dvf', dvf=dvf[0].detach().cpu(), writer=writer,
+                                               step=epoch)
+
+                    det = jacobian_determinant(dvf[0].detach().cpu())
+
+                    tensorboard_visual_det(name=tag + '/det', det=det, writer=writer, step=epoch, normalize_by='slice',
+                                           threshold=0, cmap='gray')
 
             mean_val_loss_dict = mean_dict(val_losses_dict)
             mean_val_metric_dict = mean_dict(val_metrics_dict)
@@ -187,39 +191,73 @@ def train_reg(config, basedir):
             print(f"Epoch {epoch}/{config['TrainConfig']['epoch']}:")
             for loss_type, loss_value in mean_val_loss_dict.items():
                 writer.add_scalar("val/loss/" + loss_type, loss_value, epoch)
-            print(f"val total loss: {mean_val_loss_dict['dice']}")
+            print(f"val total loss: {mean_val_loss_dict['total_loss']}")
             for metric_type, metric_value in mean_val_metric_dict.items():
                 writer.add_scalar("val/metric/" + metric_type, metric_value, epoch)
             print(f"val dice: {mean_val_metric_dict['dice']}")
 
             if mean_val_metric_dict['dice'] > best_val_dice_metric:
                 best_val_dice_metric = mean_val_metric_dict['dice']
-                model_saver.save(os.path.join(basedir, "checkpoint", "best_epoch.pth"),
-                                 {"model": reg_net.state_dict(), "optim": optimizer.state_dict()})
+                if gpu_num > 1:
+                    model_saver.save(os.path.join(basedir, "checkpoint", "best_epoch.pth"),
+                                     {"model": reg_net.module.state_dict(), "optim": optimizer.state_dict()})
+                else:
+                    model_saver.save(os.path.join(basedir, "checkpoint", "best_epoch.pth"),
+                                     {"model": reg_net.state_dict(), "optim": optimizer.state_dict()})
+    if gpu_num > 1:
+        model_saver.save(
+            os.path.join(basedir, "checkpoint", "last_epoch.pth"),
+            {"model": reg_net.module.state_dict(), "optim": optimizer.state_dict()})
+    else:
+        model_saver.save(
+            os.path.join(basedir, "checkpoint", "last_epoch.pth"),
+            {"model": reg_net.state_dict(), "optim": optimizer.state_dict()})
 
-    model_saver.save(
-        os.path.join(basedir, "checkpoint", "last_epoch.pth"),
-        {"model": reg_net.state_dict(), "optim": optimizer.state_dict()})
 
-
-def compute_reg_loss(config, dvf, loss_function_dict, warp_volume1, warp_label1_one_hot, volume2, label2_one_hot):
+def compute_reg_loss(config, dvf, loss_function_dict, STN_bilinear, volume1, label1, volume2, label2):
     loss_dict = {}
 
-    loss_dict['similarity_loss'] = loss_function_dict['similarity_loss'](warp_volume1, volume2)
+    if config['LossConfig']['similarity_loss']['use']:
+        loss_dict['similarity_loss'] = loss_function_dict['similarity_loss'](STN_bilinear(volume1, dvf), volume2)
 
-    loss_dict['segmentation_loss'] = loss_function_dict['segmentation_loss'](warp_label1_one_hot, label2_one_hot)
+    if config['LossConfig']['segmentation_loss']['use']:
+        warp_label1 = STN_bilinear(label1.float(), dvf)
+        loss_dict['segmentation_loss'] = loss_function_dict['segmentation_loss'](warp_label1, label2)
 
-    if config['LossConfig']['component']['gradient_loss']:
+    if config['LossConfig']['gradient_loss']['use']:
         loss_dict['gradient_loss'] = loss_function_dict['gradient_loss'](dvf)
 
-    if config['LossConfig']['component']['bending_energy_loss']:
+    if config['LossConfig']['bending_energy_loss']['use']:
         loss_dict['bending_energy_loss'] = loss_function_dict['bending_energy_loss'](dvf)
 
     total_loss = 0.
     for loss_type in loss_dict.keys():
-        total_loss = total_loss + config['LossConfig']['weight'][loss_type] * loss_dict[loss_type]
+        total_loss = total_loss + config['LossConfig'][loss_type]['weight'] * loss_dict[loss_type]
     loss_dict['total_loss'] = total_loss
+
     return loss_dict
+
+
+def get_loss_function(config):
+    loss_function_dict = dict()
+
+    if config['LossConfig']['similarity_loss']['use']:
+        loss_function_dict['similarity_loss'] = getattr(loss, config['LossConfig']['similarity_loss']['type'])()
+
+    if config['LossConfig']['segmentation_loss']['use']:
+        loss_function_dict['segmentation_loss'] = getattr(loss,
+                                                          config['LossConfig']['segmentation_loss']['type'])(
+            **config['LossConfig']['segmentation_loss']['params'])
+
+    if config['LossConfig']['gradient_loss']['use']:
+        loss_function_dict['gradient_loss'] = getattr(loss,
+                                                      config['LossConfig']['gradient_loss']['type'])()
+
+    if config['LossConfig']['bending_energy_loss']['use']:
+        loss_function_dict['bending_energy_loss'] = getattr(loss,
+                                                            config['LossConfig']['bending_energy_loss']['type'])()
+
+    return loss_function_dict
 
 
 def compute_reg_metric(dvf, warp_volume1, warp_label1, volume2, label2):
@@ -229,16 +267,3 @@ def compute_reg_metric(dvf, warp_volume1, warp_label1, volume2, label2):
     metric_dict['folds_count'] = folds_count_metric(dvf).item()
     metric_dict['mse'] = mse_metric(warp_volume1, volume2).item()
     return metric_dict
-
-
-def get_loss_function(config):
-    loss_function_dict = dict()
-
-    loss_function_dict['similarity_loss'] = getattr(loss, config['LossConfig']['component']['similarity_loss'])()
-    loss_function_dict['segmentation_loss'] = getattr(loss, config['LossConfig']['component']['segmentation_loss'])()
-
-    if config['LossConfig']['component']['gradient_loss']:
-        loss_function_dict['gradient_loss'] = GradientLoss()
-    if config['LossConfig']['component']['bending_energy_loss']:
-        loss_function_dict['bending_energy_loss'] = BendingEnergyLoss()
-    return loss_function_dict

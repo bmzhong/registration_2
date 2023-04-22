@@ -1,37 +1,47 @@
+import monai
 import numpy as np
 from preprocess.preprocess_hdf5.hdf5_utils import *
 
 
-def write_OASIS_1():
-    output_path = '../../datasets/hdf5/OASIS_1.h5'
+def write_OASIS_1(image_size, scale_factor, source_path, output_path):
     if os.path.exists(output_path):
         os.remove(output_path)
     file = h5py.File(output_path, 'w')
-    root_path = r'G:\biomdeical\registration\public_data\OASIS\neurite-oasis.v1.0'
-    image_size = [160, 192, 224]
-    scale_factor = 255.
+
     region_number = 4
+    volume_resize = monai.transforms.Resize(spatial_size=image_size, mode='trilinear', align_corners=False)
+    label_resize = monai.transforms.Resize(spatial_size=image_size, mode='nearest', align_corners=None)
     temp = []
-    for dir_name in os.listdir(root_path):
-        img_dir = os.path.join(root_path, dir_name)
+    for dir_name in tqdm(os.listdir(source_path)):
+        img_dir = os.path.join(source_path, dir_name)
         if os.path.isdir(img_dir):
             volume_name = 'norm.nii.gz'
             volume_path = os.path.join(img_dir, volume_name)
             label_name = 'seg4.nii.gz'
             label_path = os.path.join(img_dir, label_name)
             volume = sitk.ReadImage(volume_path)
-            volume = resize_image_itk(volume, image_size, sitk.sitkLinear)
+            # volume = resize_image_itk(volume, image_size, sitk.sitkLinear)
             volume = sitk.GetArrayFromImage(volume)
             volume = volume.astype(np.float64)
+
+            volume = volume[np.newaxis, ...]
+            volume = volume_resize(volume)
+            volume = volume.squeeze(dim=0)
+
             volume = ((volume - volume.min()) / (volume.max() - volume.min())) * scale_factor
 
             volume = volume.astype(np.float32)
             label = sitk.ReadImage(label_path)
-            label = resize_image_itk(label, image_size, sitk.sitkNearestNeighbor)
+            # label = resize_image_itk(label, image_size, sitk.sitkNearestNeighbor)
             label = sitk.GetArrayFromImage(label)
+
+            label = label[np.newaxis, ...]
+            label = label_resize(label)
+            label = label.squeeze(dim=0)
+
             label.astype(np.uint8)
 
-            print(np.unique(label))
+            # print(np.unique(label))
             temp.append(len(np.unique(label)))
 
             image_group = file.create_group(dir_name)
@@ -49,7 +59,12 @@ def write_OASIS_1():
 
 
 if __name__ == '__main__':
-    write_OASIS_1()
-    hdf5_path = '../../datasets/hdf5/OASIS_1.h5'
+    image_size = [160, 160, 160]
+    scale_factor = 1.
+    output_path = '../../datasets/hdf5/OASIS.h5'
+    source_path = r'G:\biomdeical\registration\public_data\OASIS\neurite-oasis.v1.0'
+    write_OASIS_1(image_size, scale_factor, source_path, output_path)
+
+    hdf5_path = '../../datasets/hdf5/OASIS.h5'
     output_dir = r'G:\biomdeical\registration\data\datasets'
     extract_hdf5(hdf5_path, output_dir)

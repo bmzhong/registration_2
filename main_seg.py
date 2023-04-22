@@ -7,7 +7,7 @@ from shutil import copyfile
 import yaml
 from train_seg import train_seg
 from test_seg import test_seg
-
+import torch
 warnings.filterwarnings("ignore")
 
 
@@ -47,8 +47,9 @@ if __name__ == '__main__':
     if args.train:
         os.environ["CUDA_VISIBLE_DEVICES"] = config["TrainConfig"]["gpu"]
         train_seg(config, basedir)
-
+        torch.cuda.empty_cache()
         checkpoint = os.path.join(basedir, "checkpoint", 'best_epoch.pth')
+        print(checkpoint)
         test_basedir = get_basedir(os.path.join(basedir, 'test'), config["TrainConfig"]["start_new_model"])
         test_seg(config, test_basedir, checkpoint=checkpoint)
 

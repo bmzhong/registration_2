@@ -34,9 +34,9 @@ class VoxelMorpher(nn.Module):
         conv_fn = getattr(nn, 'Conv%dd' % dim)
         self.flow = conv_fn(dec_nf[-1], dim, kernel_size=3, padding=1)
         # Make flow weights + bias small. Not sure this is necessary.
-        nd = Normal(0, 1e-5)
-        self.flow.weight = nn.Parameter(nd.sample(self.flow.weight.shape))
-        self.flow.bias = nn.Parameter(torch.zeros(self.flow.bias.shape))
+        # nd = Normal(0, 1e-5)
+        # self.flow.weight = nn.Parameter(nd.sample(self.flow.weight.shape))
+        # self.flow.bias = nn.Parameter(torch.zeros(self.flow.bias.shape))
         self.batch_norm = getattr(nn, "BatchNorm{0}d".format(dim))(3)
 
     def conv_block(self, dim, in_channels, out_channels, kernel_size=3, stride=1, padding=1, batchnorm=False):

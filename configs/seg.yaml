@@ -1,8 +1,10 @@
+# seg.yaml
+
 TrainConfig:
   start_new_model: True
   max_save_num: 2                 # numbers that checkpoint files saved; default 2
   gpu: "0"
-  data_path: "datasets/json/LPBA40.json"
+  data_path: "datasets/json/LPBA40_test.json"
   epoch: 50
   batchsize: 2
   checkpoint: ""
@@ -11,7 +13,7 @@ TrainConfig:
 
 TestConfig:
   data_path: "datasets/json/LPBA40_test.json"
-  checkpoint: "output/seg/debug/debug1/checkpoint/last_epoch.pth"
+  checkpoint: ""
   save_image: True
   gpu: "0"
 

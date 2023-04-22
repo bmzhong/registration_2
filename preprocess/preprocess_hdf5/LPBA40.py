@@ -98,7 +98,7 @@ if __name__ == '__main__':
     source_path = r'G:\biomdeical\registration\public_data\LPBA40\LPBA40_Subjects_Delineation_Space_MRI_and' \
                   r'_label_files\LPBA40subjects.delineation_space\LPBA40\delineation_space'
     output_path = '../../datasets/hdf5/LPBA40.h5'
-    image_size = [160, 160, 160]
+    image_size = [128, 128, 128]
     scale_factor = 1.
     write_LPBA40(image_size, source_path, output_path, scale_factor)
     hdf5_path = '../../datasets/hdf5/LPBA40.h5'

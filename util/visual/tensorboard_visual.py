@@ -9,8 +9,8 @@ import numpy as np
 import torch.nn.functional as F
 import SimpleITK as sitk
 import matplotlib.pyplot as plt
-from util.visual.visual_registration import preview_3D_deformation, preview_3D_vector_field
-from util.visual.visual_image  import preview_image
+from util.visual.visual_registration import preview_3D_deformation, preview_3D_vector_field, RGB_dvf, PlotGrid_3d
+from util.visual.visual_image import preview_image
 
 
 def tensorboard_visual_segmentation(mode, name, writer, step, volume, predict, target, interval=10):
@@ -37,7 +37,6 @@ def tensorboard_visual_registration(mode, name, writer, step, fix, mov, reg, int
     predict:  D, H, W
     target:   D, H, W
     """
-
 
     title_name = name + '_fix, mov, reg'
     img_list = [fix, mov, reg]
@@ -75,7 +74,7 @@ def visual_img_list(tag, title_name, writer, step, img_list, interval):
 
 def create_header(shape, name):
     header = np.zeros((100, shape[2], 1), dtype=np.uint8) + 255
-    header = cv2.putText(header, name, (10, header.shape[0] // 2), cv2.FONT_HERSHEY_SIMPLEX, 0.40, 0, 2)
+    header = cv2.putText(header, name, (10, header.shape[0] // 2), cv2.FONT_HERSHEY_SIMPLEX, 0.40, 0, 1)
     header = header.astype(np.float32) / 255
     header = np.transpose(header, (2, 0, 1))
     header = torch.Tensor(header)
@@ -89,6 +88,8 @@ def visual_gradient(model: Module, writer: SummaryWriter, step: int):
 
 
 def tensorboard_visual_deformation(name, dvf, grid_spacing, writer, step, **kwargs):
+    if grid_spacing < 1:
+        grid_spacing = 1
     figure = preview_3D_deformation(dvf, grid_spacing, **kwargs)
     plt.suptitle(name, fontsize=25)
     figure.tight_layout()
@@ -104,6 +105,20 @@ def tensorboard_visual_dvf(name, dvf, writer, step):
 
 def tensorboard_visual_det(name, det, writer, step, **kwargs):
     figure = preview_image(det, **kwargs)
+    plt.suptitle(name, fontsize=25)
+    figure.tight_layout()
+    writer.add_figure(name, figure, step)
+
+
+def tensorboard_visual_RGB_dvf(name, dvf, writer, step):
+    figure = RGB_dvf(dvf)
+    plt.suptitle(name, fontsize=25)
+    figure.tight_layout()
+    writer.add_figure(name, figure, step)
+
+
+def tensorboard_visual_deformation_2(name, dvf, writer, step):
+    figure = PlotGrid_3d(dvf)
     plt.suptitle(name, fontsize=25)
     figure.tight_layout()
     writer.add_figure(name, figure, step)

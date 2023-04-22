@@ -3,6 +3,7 @@ import h5py
 import SimpleITK as sitk
 import os
 
+from tqdm import tqdm
 
 
 def resize_image_itk(itkimage, newSize, resamplemethod=sitk.sitkLinear):
@@ -28,7 +29,7 @@ def resize_image_itk(itkimage, newSize, resamplemethod=sitk.sitkLinear):
 def extract_hdf5(hdf5_path, output_dir):
     datasets = h5py.File(hdf5_path, 'r')
     output_dir = os.path.join(output_dir, os.path.basename(hdf5_path).split('.')[0])
-    for key1 in datasets.keys():
+    for key1 in tqdm(datasets.keys()):
         for key2 in datasets[key1].keys():
             array = datasets[key1][key2][:]
             image = sitk.GetImageFromArray(array)

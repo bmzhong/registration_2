@@ -20,7 +20,7 @@ def dice_coefficient(predict, target):
     return (2. * intersection) / (predict.sum() + target.sum())
 
 
-def dice_metric(predict, target, background=True):
+def dice_metric(predict, target, background=False):
     """
     predict: B, C, D, H, W
     target:  B, C, D, H, W

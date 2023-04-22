@@ -26,10 +26,14 @@ def create_train_dataset(dataset_config, config, segmentation_available):
                           segmentation_available=segmentation_available)
     }
     subdivide_dataloader_dict = {
-        '00': DataLoader(subdivide_dataset_dict['00'], batch_size=config['TrainConfig']['batchsize'], shuffle=True),
-        '01': DataLoader(subdivide_dataset_dict['01'], batch_size=config['TrainConfig']['batchsize'], shuffle=True),
-        '10': DataLoader(subdivide_dataset_dict['10'], batch_size=config['TrainConfig']['batchsize'], shuffle=True),
-        '11': DataLoader(subdivide_dataset_dict['11'], batch_size=config['TrainConfig']['batchsize'], shuffle=True)
+        '00': DataLoader(subdivide_dataset_dict['00'], batch_size=config['TrainConfig']['batchsize'],
+                         shuffle=True if len(subdivide_dataset_dict['00']) > 0 else False),
+        '01': DataLoader(subdivide_dataset_dict['01'], batch_size=config['TrainConfig']['batchsize'],
+                         shuffle=True if len(subdivide_dataset_dict['01']) > 0 else False),
+        '10': DataLoader(subdivide_dataset_dict['10'], batch_size=config['TrainConfig']['batchsize'],
+                         shuffle=True if len(subdivide_dataset_dict['10']) > 0 else False),
+        '11': DataLoader(subdivide_dataset_dict['11'], batch_size=config['TrainConfig']['batchsize'],
+                         shuffle=True if len(subdivide_dataset_dict['11']) > 0 else False)
     }
     reg_batch_generator_train = create_batch_generator(subdivide_dataloader_dict)
     seg_availabilities = ['00', '01', '10', '11']

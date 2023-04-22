@@ -128,31 +128,32 @@ def train_seg(config, basedir):
             seg_net.eval()
             val_losses = []
             val_metrics = []
-            for i, (id, volume, label) in tqdm(enumerate(val_dataloader)):
-                volume = volume.to(device)
-                label = label.to(device)
+            with torch.no_grad():
+                for id, volume, label in tqdm(val_dataloader):
+                    volume = volume.to(device)
+                    label = label.to(device)
 
-                predict = seg_net(volume)
+                    predict = seg_net(volume)
 
-                predict_softmax = F.softmax(predict, dim=1)
+                    predict_softmax = F.softmax(predict, dim=1)
 
-                axis_order = (0, label.dim() - 1) + tuple(range(1, label.dim() - 1))
-                label_one_hot = F.one_hot(label.squeeze(dim=1).long()).permute(axis_order).contiguous()
+                    axis_order = (0, label.dim() - 1) + tuple(range(1, label.dim() - 1))
+                    label_one_hot = F.one_hot(label.squeeze(dim=1).long()).permute(axis_order).contiguous()
 
-                loss = loss_function(predict_softmax, label_one_hot.float())
-                val_losses.append(loss.item())
+                    loss = loss_function(predict_softmax, label_one_hot.float())
+                    val_losses.append(loss.item())
 
-                predict_one_hot = F.one_hot(torch.argmax(predict, dim=1).long()).permute(axis_order).contiguous()
+                    predict_one_hot = F.one_hot(torch.argmax(predict, dim=1).long()).permute(axis_order).contiguous()
 
-                dice = dice_metric(predict_one_hot.clone().detach(), label_one_hot.clone().detach(), background=True)
+                    dice = dice_metric(predict_one_hot.clone().detach(), label_one_hot.clone().detach(), background=True)
 
-                val_metrics.append(dice.item())
+                    val_metrics.append(dice.item())
 
-                predict_argmax = torch.argmax(predict_softmax, dim=1, keepdim=True)
-                tensorboard_visual_segmentation(mode='val', name=id[0], writer=writer, step=epoch,
-                                                volume=volume[0][0].detach().cpu(),
-                                                predict=predict_argmax[0][0].detach().cpu(),
-                                                target=label[0][0].detach().cpu())
+                    predict_argmax = torch.argmax(predict_softmax, dim=1, keepdim=True)
+                    tensorboard_visual_segmentation(mode='val', name=id[0], writer=writer, step=epoch,
+                                                    volume=volume[0][0].detach().cpu(),
+                                                    predict=predict_argmax[0][0].detach().cpu(),
+                                                    target=label[0][0].detach().cpu())
             print(f"Epoch {epoch}/{config['TrainConfig']['epoch']}:")
             mean_loss = np.mean(val_losses)
             mean_metric = np.mean(val_metrics)
@@ -163,9 +164,18 @@ def train_seg(config, basedir):
 
             if mean_metric > best_val_metric:
                 best_val_metric = mean_metric
-                model_saver.save(os.path.join(basedir, "checkpoint", "best_epoch.pth"),
-                                 {"model": seg_net.state_dict(), "optim": optimizer.state_dict()})
+                if gpu_num>1:
+                    model_saver.save(os.path.join(basedir, "checkpoint", "best_epoch.pth"),
+                                    {"model": seg_net.module.state_dict(), "optim": optimizer.state_dict()})
+                else:                   
+                    model_saver.save(os.path.join(basedir, "checkpoint", "best_epoch.pth"),
+                                    {"model": seg_net.state_dict(), "optim": optimizer.state_dict()})
+    if gpu_num >1:
+        model_saver.save(
+            os.path.join(basedir, "checkpoint", 'last_epoch.pth'),
+            {"model": seg_net.module.state_dict(), "optim": optimizer.state_dict()})
+    else:
+        model_saver.save(os.path.join(basedir, "checkpoint", "best_epoch.pth"),
+            {"model": seg_net.state_dict(), "optim": optimizer.state_dict()})
 
-    model_saver.save(
-        os.path.join(basedir, "checkpoint", 'last_epoch.pth'),
-        {"model": seg_net.state_dict(), "optim": optimizer.state_dict()})
+    del seg_net

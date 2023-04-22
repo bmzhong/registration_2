@@ -1,6 +1,14 @@
+import math
+
 import monai
 import numpy as np
 import matplotlib.pyplot as plt
+import copy
+
+import torch
+from matplotlib.collections import LineCollection
+
+from util.visual.visual_image import preview_image, preview_image_RGB
 
 
 def plot_2D_deformation(vector_field, grid_spacing, **kwargs):
@@ -108,4 +116,71 @@ def preview_3D_vector_field(vector_field, figsize=(18, 6), is_show=False, downsa
     return figure
 
 
+def RenderDVF(dvf, coef=20, thresh=1.):
+    dvf = copy.deepcopy(dvf)
+    dvf = np.abs(dvf)
+    dvf = np.exp(-dvf / coef)
+    dvf = dvf * thresh
+    return dvf
 
+
+def RGB_dvf(vector_field, is_show=False, figsize=(18, 6)):
+    dvf = RenderDVF(vector_field)
+    axis_order = tuple(range(1, dvf.dim())) + (0,)
+    dvf = dvf.permute(axis_order).contiguous()
+    figure = preview_image_RGB(dvf, is_show=is_show, figsize=figsize)
+    return figure
+
+
+def PlotFlow(pts, div=2, cmap="YlGnBu", norm=plt.Normalize(vmin=50, vmax=77)):
+    pts = np.array(pts)
+    segments = [(j / div, (j + 1) / div) for j in range(div)]
+    lines = []
+    for i in range(len(pts) - 1):
+        a, b = pts[i], pts[i + 1]
+        for sa, sb in segments:
+            pa = a * (1 - sa) + b * sa
+            pb = a * (1 - sb) + b * sb
+
+            lines.append((pa, pb))
+    lc = LineCollection(np.array(lines), cmap=cmap, norm=norm, linewidth=1, alpha=1)
+    plt.gca().add_collection(lc)
+
+
+def PlotGrid_2d(deformation_2d):
+    deformation_2d = deformation_2d.numpy()
+    w, h = deformation_2d.shape[:-1]
+    plt.axis((0, w, 0, h))
+    plt.axis("off")
+    for i in range(0, w, 1):
+        PlotFlow([d for d in deformation_2d[i, :] if not math.isnan(d[0])])
+    for i in range(0, h, 1):
+        PlotFlow([d for d in deformation_2d[:, i] if not math.isnan(d[0])])
+
+
+def PlotGrid_3d(dvf=None, is_show=False, figsize=(18, 6)):
+    if dvf is None:
+        dvf = np.concatenate([np.indices((128, 128)).transpose(1, 2, 0), np.ones((128, 128, 1)) * 64], axis=-1)
+
+    size = dvf.shape[1:]
+    vectors = [torch.arange(0, s) for s in size]
+    grids = torch.meshgrid(vectors)
+    grid = torch.stack(grids)  # y, x, z
+    grid = grid.float()
+    deformation_space = dvf + grid
+
+    x, y, z = np.array(deformation_space.shape[1:]) // 2
+
+    deformation_space = deformation_space.permute((1, 2, 3, 0)).contiguous()
+
+    figure = plt.figure(figsize=figsize)
+    plt.subplot(1, 3, 1)
+    PlotGrid_2d(deformation_space[x, :, :, [1, 2]])
+    plt.subplot(1, 3, 2)
+    PlotGrid_2d(deformation_space[:, y, :, [0, 2]])
+    plt.subplot(1, 3, 3)
+    PlotGrid_2d(deformation_space[:, :, z, [0, 1]])
+    figure.tight_layout()
+    if is_show:
+        plt.show()
+    return figure

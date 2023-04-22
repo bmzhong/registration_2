@@ -25,10 +25,10 @@ class NCCLoss(nn.Module):
         assert ndims in [1, 2, 3], "volumes should be 1 to 3 dimensions. found: %d" % ndims
 
         # set window size
-        win = [9] * ndims if self.win is None else self.win
+        win = [4] * ndims if self.win is None else self.win
 
         # compute filters
-        sum_filt = torch.ones([1, 1, *win]).to("cuda")
+        sum_filt = torch.ones([1, 1, *win]).to(y_pred.data.device)
 
         pad_no = math.floor(win[0] / 2)
 

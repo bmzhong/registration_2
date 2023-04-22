@@ -50,30 +50,31 @@ def test_seg(config, basedir, checkpoint=None, model_config=None):
 
     seg_net.eval()
     test_metrics = []
-    for id, volume, label in tqdm(test_loader):
-        volume = volume.to(device)
-        label = label.to(device)
+    with torch.no_grad():
+        for id, volume, label in tqdm(test_loader):
+            volume = volume.to(device)
+            label = label.to(device)
 
-        predict = seg_net(volume)
+            predict = seg_net(volume)
 
-        predict_softmax = F.softmax(predict, dim=1)
+            predict_softmax = F.softmax(predict, dim=1)
 
-        axis_order = (0, label.dim() - 1) + tuple(range(1, label.dim() - 1))
-        label_one_hot = F.one_hot(label.squeeze(dim=1).long()).permute(axis_order).contiguous()
+            axis_order = (0, label.dim() - 1) + tuple(range(1, label.dim() - 1))
+            label_one_hot = F.one_hot(label.squeeze(dim=1).long()).permute(axis_order).contiguous()
 
-        predict_one_hot = F.one_hot(torch.argmax(predict, dim=1).long()).permute(axis_order).contiguous()
+            predict_one_hot = F.one_hot(torch.argmax(predict, dim=1).long()).permute(axis_order).contiguous()
 
-        dice = dice_metric(predict_one_hot, label_one_hot)
+            dice = dice_metric(predict_one_hot, label_one_hot)
 
-        test_metrics.append(dice.item())
-        outfile.write(f'{id[0]}  dice: {dice} \n')
-        if config["TestConfig"]["save_image"]:
-            predict_argmax = torch.argmax(predict_softmax, dim=1, keepdim=True)
-            output_dir = os.path.join(basedir, "images",id[0])
-            write_image(output_dir, id[0], predict_argmax[0][0], 'label')
-            save_image_figure(output_dir, id[0] + '_image_slice', volume[0][0].detach().cpu())
-            save_image_figure(output_dir, id[0] + '_label_slice', label[0][0].detach().cpu())
-            save_image_figure(output_dir, id[0] + '_predict_slice', predict_argmax[0][0].detach().cpu())
+            test_metrics.append(dice.item())
+            outfile.write(f'{id[0]}  dice: {dice} \n')
+            if config["TestConfig"]["save_image"]:
+                predict_argmax = torch.argmax(predict_softmax, dim=1, keepdim=True)
+                output_dir = os.path.join(basedir, "images",id[0])
+                write_image(output_dir, id[0], predict_argmax[0][0], 'label')
+                save_image_figure(output_dir, id[0] + '_image_slice', volume[0][0].detach().cpu())
+                save_image_figure(output_dir, id[0] + '_label_slice', label[0][0].detach().cpu())
+                save_image_figure(output_dir, id[0] + '_predict_slice', predict_argmax[0][0].detach().cpu())
 
     mean_metric = np.mean(test_metrics)
     std_metric = np.std(test_metrics)
