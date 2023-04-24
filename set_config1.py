@@ -1,21 +1,101 @@
 import argparse
+import os
+
+import yaml
+
 
 def get_args():
     parser = argparse.ArgumentParser()
 
-    parser.add_argument("--config_path", "-t", action="store_true",
-                        help="train mode, you must give the --output and --config")
-    parser.add_argument("--test", action="store_true",
-                        help="test mode, you must give the --output and --config")
-    parser.add_argument('--output', '-o', type=str, default=None,
-                        help='if the mode is train: the dir to store the file;'
-                             'if the mode is eval or ave: the path of output')
-    parser.add_argument('--config', '-c', type=str, default=None,
-                        help='used in all the modes, the path of the config yaml')
+    parser.add_argument("--config_path", type=str)
+    parser.add_argument("--output_path", type=str)
 
-    parser.add_argument('--checkpoint', type=str, default=None,
-                        help='used in the test mode, the path of the checkpoint')
+    parser.add_argument("--train_data_path", type=str, default=None)
+    parser.add_argument("--train_gpu", type=str, default=None)
+    parser.add_argument("--epoch", type=int, default=None)
+    parser.add_argument("--batchsize", type=int, default=None)
+
+    parser.add_argument("--test_data_path", type=str, default=None)
+    parser.add_argument("--test_gpu", type=str, default=None)
+    parser.add_argument("--save_image", type=str, default=None)
+
+    parser.add_argument("--lr", type=float, default=None)
+    parser.add_argument("--step_size", type=int, default=None)
+
+    parser.add_argument("--similarity_loss_use", type=bool, default=None)
+    parser.add_argument("--similarity_loss_type", type=str, default=None)
+    parser.add_argument("--similarity_loss_weight", type=float, default=None)
+
+    parser.add_argument("--segmentation_loss_use", action='store_true', default=None)
+    parser.add_argument("--segmentation_loss_type", type=str, default=None)
+    parser.add_argument("--segmentation_loss_weight", type=float, default=None)
+
+    parser.add_argument("--gradient_loss_use", action='store_true', default=None)
+    parser.add_argument("--gradient_loss_weight", type=float, default=None)
 
     args = parser.parse_args()
 
     return args
+
+
+if __name__ == '__main__':
+    args = get_args()
+    with open(args.config_path, "r", encoding='UTF-8') as f:
+        config = yaml.load(f, Loader=yaml.FullLoader)
+
+    if args.train_data_path is not None:
+        config['TrainConfig']['data_path'] = args.train_data_path
+
+    if args.train_gpu is not None:
+        config['TrainConfig']['gpu'] = args.train_gpu
+
+    if args.epoch is not None:
+        config['TrainConfig']['epoch'] = args.epoch
+
+    if args.batchsize is not None:
+        config['TrainConfig']['batchsize'] = args.batchsize
+
+    if args.test_data_path is not None:
+        config['TestConfig']['data_path'] = args.test_data_path
+
+    if args.test_gpu is not None:
+        config['TestConfig']['gpu'] = args.test_gpu
+
+    if args.save_image is not None:
+        config['TestConfig']['save_image'] = args.save_image
+
+    if args.lr is not None:
+        config['OptimConfig']['optimizer']['params']['lr'] = args.lr
+
+    if args.step_size is not None:
+        config['OptimConfig']['lr_scheduler']['params']['step_size'] = args.step_size
+
+    if args.similarity_loss_use is not None:
+        config['LossConfig']['similarity_loss']['use'] = args.similarity_loss_use
+
+    if args.similarity_loss_type is not None:
+        config['LossConfig']['similarity_loss']['type'] = args.similarity_loss_type
+
+    if args.similarity_loss_weight is not None:
+        config['LossConfig']['similarity_loss']['weight'] = args.similarity_loss_weight
+
+    if args.segmentation_loss_use is not None:
+        config['LossConfig']['segmentation_loss']['use'] = args.segmentation_loss_use
+
+    if args.segmentation_loss_type is not None:
+        config['LossConfig']['segmentation_loss']['type'] = args.segmentation_loss_type
+
+    if args.segmentation_loss_weight is not None:
+        config['LossConfig']['segmentation_loss']['weight'] = args.segmentation_loss_weight
+
+    if args.gradient_loss_use is True:
+        config['LossConfig']['gradient_loss']['use'] = args.gradient_loss_use
+
+    if args.gradient_loss_weight is not None:
+        config['LossConfig']['gradient_loss']['weight'] = args.gradient_loss_weight
+
+    basedir = os.path.dirname(args.output_path)
+    os.makedirs(basedir, exist_ok=True)
+
+    with open(args.output_path, 'w', encoding='utf-8') as f:
+        yaml.dump(data=config, stream=f, allow_unicode=True, sort_keys=False)

@@ -109,6 +109,59 @@ def write_json(hdf5_path, output_path, train_size, val_size, test_size, sampling
         json.dump(json_data, f, indent=4)
 
 
+def write_soma_nuclei_seretonin_json(hdf5_path, output_path):
+    h5_file = h5py.File(hdf5_path, 'r')
+    json_data = dict()
+    json_data['dataset_path'] = hdf5_path[hdf5_path.find('datasets'):]
+    json_data['dataset_size'] = int(h5_file.attrs['dataset_size'])
+    json_data['image_size'] = h5_file.attrs['image_size'].tolist()
+    json_data['normalize'] = h5_file.attrs['normalize'].tolist()
+    json_data['region_number'] = int(h5_file.attrs['region_number'])
+    if 'label_map' in h5_file.attrs.keys():
+        label_value_map = {str(temp[0]): int(temp[1]) for temp in h5_file.attrs['label_map']}
+    else:
+        label_value_map = {str(i): i for i in range(1, json_data['region_number'] + 1)}
+    json_data['label_map'] = label_value_map
+    image_names = list(h5_file.keys())
+    image_names.remove('allen')
+    train = image_names
+    val = ['190312_488_LP70_ET50_Z08_HF0_17-26-21_new',
+           '190313_488_LP70_ET50_Z08_HF0_01-04-17',
+           '181208_15_21_38']
+    test = ['181207_10_39_06',
+            '180725_20180724C2_LEFT_488_100ET_20-02-09',
+            '190313_488_LP70_ET50_Z08_HF0_01-04-17',
+            '180921_O11_488_LEFT_16-07-16',
+            '190312_488_LP70_ET50_Z08_HF0_17-26-21',
+            '180724_20180723O2_LEFT_488-2_100ET_16-13-41',
+            '181207_18_26_44',
+            '181208_15_21_38',
+            '190524_488_ET50_0HF_LP70_18-43-49']
+
+    train_pairs = [[img, 'allen'] for img in train]
+    val_pairs = [[img, 'allen'] for img in val]
+    test_pairs = [[img, 'allen'] for img in test]
+    train = train + ['allen']
+    json_data['train_size'] = len(train)
+    json_data['val_size'] = len(val)
+    json_data['test_size'] = len(test)
+
+    json_data['train_pairs_size'] = len(train_pairs)
+    json_data['val_pairs_size'] = len(val_pairs)
+    json_data['test_pairs_size'] = len(test_pairs)
+
+    json_data['train'] = train
+    json_data['val'] = val
+    json_data['test'] = test
+
+    json_data['train_pair'] = train_pairs
+    json_data['val_pair'] = val_pairs
+    json_data['test_pair'] = test_pairs
+
+    with open(output_path, 'w') as f:
+        json.dump(json_data, f, indent=4)
+
+
 def write_soma_nuclei_json(hdf5_path, output_path):
     h5_file = h5py.File(hdf5_path, 'r')
     json_data = dict()
@@ -151,6 +204,7 @@ def write_soma_nuclei_json(hdf5_path, output_path):
 
     with open(output_path, 'w') as f:
         json.dump(json_data, f, indent=4)
+
 
 def write_LPBA40_json(hdf5_path, output_path):
     h5_file = h5py.File(hdf5_path, 'r')
@@ -195,6 +249,7 @@ def write_LPBA40_json(hdf5_path, output_path):
     with open(output_path, 'w') as f:
         json.dump(json_data, f, indent=4)
 
+
 if __name__ == '__main__':
     seed = 0
     random.seed(seed)
@@ -219,6 +274,10 @@ if __name__ == '__main__':
     # soma_nuclei_4_output_path = '../../datasets/json/soma_nuclei.json'
     # write_soma_nuclei_json(soma_nuclei_4_path, soma_nuclei_4_output_path)
 
-    LPBA40_path = '../../datasets/hdf5/LPBA40.h5'
-    LPBA40_output_path = '../../datasets/json/LPBA40.json'
-    write_LPBA40_json(LPBA40_path, LPBA40_output_path)
+    # LPBA40_path = '../../datasets/hdf5/LPBA40.h5'
+    # LPBA40_output_path = '../../datasets/json/LPBA40.json'
+    # write_LPBA40_json(LPBA40_path, LPBA40_output_path)
+
+    seretonin_path = '../../datasets/hdf5/soma_nuclei_seretonin.h5'
+    seretonin_output_path = '../../datasets/json/soma_nuclei_seretonin.json'
+    write_soma_nuclei_seretonin_json(seretonin_path, seretonin_output_path)

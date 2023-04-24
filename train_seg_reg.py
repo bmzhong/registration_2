@@ -242,6 +242,7 @@ def train_seg_reg(config, basedir):
                 seg_optimizer.zero_grad()
 
                 dvf = reg_net(volume1, volume2)
+
                 label1_predict = seg_net(volume1)
                 label2_predict = seg_net(volume2)
 

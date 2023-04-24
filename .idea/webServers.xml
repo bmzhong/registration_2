@@ -16,6 +16,13 @@
           </advancedOptions>
         </fileTransfer>
       </webServer>
+      <webServer id="fa240739-8f93-4006-8827-0f4493a367f8" name="202.117.21.79">
+        <fileTransfer rootFolder="/media/root/e8449930-91ce-40a4-a5c5-87d4d2cd1568/zbm/registration/code/registration_2" accessType="SFTP" host="202.117.21.79" port="22" sshConfigId="5ca29eaa-8301-4046-b533-7f0e367d532a" sshConfig="zhongbaoming@202.117.21.79:22 password">
+          <advancedOptions>
+            <advancedOptions controlEncoding="UTF-8" dataProtectionLevel="Private" passiveMode="true" shareSSLContext="true" />
+          </advancedOptions>
+        </fileTransfer>
+      </webServer>
     </option>
   </component>
 </project>

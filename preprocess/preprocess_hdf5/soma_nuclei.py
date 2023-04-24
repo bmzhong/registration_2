@@ -68,10 +68,10 @@ def merge_soma_nuclei_label(root_path, preprocess_dir):
     # preprocess_dir = r'G:\biomdeical\registration\data\preprocess\merge_label'
     constrain_names = ['bs', 'cbx', 'cp', 'csc', 'ctx', 'hpf']
     constrain_label_value_map = {'bs': 8, 'cbx': 9, 'cp': 6, 'csc': 7, 'ctx': 10, 'hpf': 5}
-    for dir_name in os.listdir(root_path):
+    for dir_name in tqdm(os.listdir(root_path)):
         img_dir = os.path.join(root_path, dir_name)
         if os.path.isdir(img_dir):
-            volume_path = os.path.join(img_dir, dir_name + '.tiff')
+            volume_path = os.path.join(img_dir, dir_name + '_process.tiff')
             volume = sitk.ReadImage(volume_path)
             volume = sitk.GetArrayFromImage(volume)
             label = np.zeros(volume.shape, dtype=int)
@@ -211,13 +211,13 @@ def write_soma_nuclei(image_size, source_path, allen_path, output_path, scale_fa
 
 
 if __name__ == '__main__':
-    # root_path = r'G:\biomdeical\registration\data\soma_nuclei\data\moving'
-    # preprocess_dir = r'G:\biomdeical\registration\data\preprocess\merge_label\allen'
+    # root_path = r'G:\biomdeical\registration\data\soma_nuclei\data_4\moving'
+    # preprocess_dir = r'G:\biomdeical\registration\data\preprocess\merge_label\allen_4'
     # merge_soma_nuclei_label(root_path, preprocess_dir)
 
-    # root_path = r'G:\biomdeical\registration\data\soma_nuclei\data\fix'
-    # preprocess_dir = r'G:\biomdeical\registration\data\preprocess\merge_label\soma_nuclei\soma_nuclei'
-    # merge_soma_nuclei_label(root_path, preprocess_dir)
+    root_path = r'G:\biomdeical\registration\data\soma_nuclei\data\fix'
+    preprocess_dir = r'G:\biomdeical\registration\data\preprocess\merge_label\soma_nuclei\soma_nuclei'
+    merge_soma_nuclei_label(root_path, preprocess_dir)
 
     # scale_factor = 4
     # root_path = r'G:\biomdeical\registration\data\preprocess\merge_label\soma_nuclei\soma_nuclei'

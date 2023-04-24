@@ -221,8 +221,11 @@ def compute_reg_loss(config, dvf, loss_function_dict, STN_bilinear, volume1, lab
         loss_dict['similarity_loss'] = loss_function_dict['similarity_loss'](STN_bilinear(volume1, dvf), volume2)
 
     if config['LossConfig']['segmentation_loss']['use']:
-        warp_label1 = STN_bilinear(label1.float(), dvf)
-        loss_dict['segmentation_loss'] = loss_function_dict['segmentation_loss'](warp_label1, label2)
+        loss_dict['segmentation_loss'] = 0.
+        num_classes = torch.max(label1)
+        for i in range(1, num_classes):
+            loss_dict['segmentation_loss'] = loss_dict['segmentation_loss'] + loss_function_dict['segmentation_loss'](
+                STN_bilinear((label1 == i).float(), dvf), (label2 == i).float())
 
     if config['LossConfig']['gradient_loss']['use']:
         loss_dict['gradient_loss'] = loss_function_dict['gradient_loss'](dvf)
@@ -246,8 +249,7 @@ def get_loss_function(config):
 
     if config['LossConfig']['segmentation_loss']['use']:
         loss_function_dict['segmentation_loss'] = getattr(loss,
-                                                          config['LossConfig']['segmentation_loss']['type'])(
-            **config['LossConfig']['segmentation_loss']['params'])
+                                                          config['LossConfig']['segmentation_loss']['type'])()
 
     if config['LossConfig']['gradient_loss']['use']:
         loss_function_dict['gradient_loss'] = getattr(loss,

@@ -1,0 +1,51 @@
+TrainConfig:
+  start_new_model: true
+  max_save_num: 2
+  gpu: '0'
+  data_path: datasets/json/LPBA40_test.json
+  epoch: 50
+  batchsize: 8
+  checkpoint: ''
+  val_interval: 1
+TestConfig:
+  checkpoint: output/reg/debug/debug1/checkpoint/best_epoch.pth
+  data_path: datasets/json/LPBA40_test.json
+  save_image: true
+  gpu: '0'
+ModelConfig:
+  type: VoxelMorpher
+OptimConfig:
+  load_checkpoint: false
+  optimizer:
+    type: Adam
+    params:
+      lr: 0.0004
+  lr_scheduler:
+    type: StepLR
+    params:
+      step_size: 1500
+      gamma: 0.5
+      warmup: true
+      warmup_steps: 100
+LossConfig:
+  similarity_loss:
+    use: true
+    type: NCCLoss
+    weight: 1.0
+  segmentation_loss:
+    use: true
+    type: MonAIDiceLoss
+    params:
+      include_background: true
+      to_onehot_y: false
+      softmax: false
+      reduction: mean
+    weight: 1
+  gradient_loss:
+    use: true
+    type: GradientLoss
+    weight: 10.0
+  bending_energy_loss:
+    use: false
+    type: BendingEnergyLoss
+    weight: 1

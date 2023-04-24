@@ -5,7 +5,7 @@ import torch.nn.functional as F
 
 
 class DiceLoss(nn.Module):
-    def __init__(self, background=True, weight=None, smooth=1e-4):
+    def __init__(self, background=False, weight=None, smooth=1e-4):
         super(DiceLoss, self).__init__()
         self.background = background
         self.weight = weight
@@ -51,7 +51,6 @@ class DiceLoss(nn.Module):
         intersection = (predict * target).sum()
 
         return (2. * intersection + self.smooth) / (predict.sum() + target.sum() + self.smooth)
-
 
 # if __name__ == '__main__':
 # dice_loss = BinaryDiceLoss()

@@ -1,4 +1,5 @@
 from util.loss.DiceLoss import DiceLoss
+from util.loss.DiceLoss2 import DiceLoss2
 from util.loss.MSELoss import MSELoss
 from util.loss.NCCLoss import NCCLoss
 from util.loss.GradientLoss import GradientLoss

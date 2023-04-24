@@ -1,0 +1,133 @@
+import monai
+import numpy as np
+
+import h5py
+import SimpleITK as sitk
+import os
+
+import torch
+# from torchvision.transforms import functional as F
+from torchvision.transforms import Resize
+from collections import Counter
+
+from tqdm import tqdm
+
+from hdf5_utils import *
+
+
+def merge_soma_nuclei_seretonin_label(root_path, preprocess_dir):
+    # root_path = r'G:\biomdeical\registration\data\soma_nuclei\data\fix\180706_RIGHT_488_40ET_18-05-05\180706_RIGHT_488_40ET_18-05-05.tiff'
+    # root_path = r'G:\biomdeical\registration\data\soma_nuclei\data\fix'
+    # preprocess_dir = r'G:\biomdeical\registration\data\preprocess\merge_label'
+    constrain_names = ['bs', 'cb', 'cbx', 'ctx', 'cp', 'hpf']
+    # constrain_label_value_map = {'bs': 8, 'cbx': 9, 'cp': 6, 'csc': 7, 'ctx': 10, 'hpf': 5}
+    constrain_label_value_map = {'bs': 8, 'cb': 11, 'cbx': 9, 'ctx': 10, 'cp': 6, 'hpf': 5}
+    for dir_name in tqdm(os.listdir(root_path)):
+        img_dir = os.path.join(root_path, dir_name)
+        if os.path.isdir(img_dir):
+            volume_path = os.path.join(img_dir, dir_name + '_process.tiff')
+            volume = sitk.ReadImage(volume_path)
+            volume = sitk.GetArrayFromImage(volume)
+            label = np.zeros(volume.shape, dtype=int)
+            for constrain_name in constrain_names:
+                constrain_path = os.path.join(img_dir, dir_name + '_' + constrain_name + '.tiff')
+                constrain = sitk.ReadImage(constrain_path)
+                constrain = sitk.GetArrayFromImage(constrain)
+                assert len(np.unique(constrain)) == 2, 'label value error'
+                label_value = np.unique(constrain)[-1]
+
+                if label_value != constrain_label_value_map[constrain_name]:
+                    print(f'{dir_name}: the label value of {constrain_name} is {label_value}, but it '
+                          f'should be {constrain_label_value_map[constrain_name]}')
+                    label_value = constrain_label_value_map[constrain_name]
+                label[constrain > 0] = label_value
+
+            print(np.unique(label.reshape(-1).tolist()))
+            volume = sitk.GetImageFromArray(volume)
+            label = sitk.GetImageFromArray(label)
+            preprocess_out_path = os.path.join(preprocess_dir, dir_name)
+            os.makedirs(preprocess_out_path, exist_ok=True)
+            sitk.WriteImage(volume, os.path.join(preprocess_out_path, dir_name + '.nii.gz'))
+            sitk.WriteImage(label, os.path.join(preprocess_out_path, dir_name + '_label.nii.gz'))
+        if 'allen' in dir_name:
+            break
+
+
+def get_soma_nuclei_seretonin_label_map():
+    root_path = r'G:\biomdeical\registration\data\preprocess\merge_label\soma_nuclei_seretonin\soma_nuclei_' \
+                r'seretonin\180724_20180723O2_LEFT_488-2_100ET_16-13-41\180724_20180723O2_LEFT_488-2_100ET_16-13-41_label.nii.gz'
+    label = sitk.ReadImage(root_path)
+    label = sitk.GetArrayFromImage(label)
+    label_unique = list(np.unique(label))
+    label_unique.sort()
+    label_map = dict()
+    for i in range(len(label_unique)):
+        label_map[label_unique[i]] = i
+    print(label_map)
+    return label_map
+
+
+def write_soma_nuclei(image_size, source_path, allen_path, output_path, scale_factor):
+    file = h5py.File(output_path, 'w')
+    label_map = get_soma_nuclei_seretonin_label_map()
+    # volume_resize = monai.transforms.Resize(spatial_size=image_size, mode='trilinear', align_corners=False)
+    # label_resize = monai.transforms.Resize(spatial_size=image_size, mode='nearest', align_corners=None)
+    for dir_name in tqdm(['allen'] + os.listdir(source_path)):
+        if dir_name == 'allen':
+            img_dir = allen_path
+        else:
+            img_dir = os.path.join(source_path, dir_name)
+        if os.path.isdir(img_dir):
+            volume_name = dir_name + '.nii.gz'
+            volume_path = os.path.join(img_dir, volume_name)
+            label_name = dir_name + '_label.nii.gz'
+            label_path = os.path.join(img_dir, label_name)
+
+            volume = sitk.ReadImage(volume_path)
+            # volume = resize_image_itk(volume, image_size, sitk.sitkLinear)
+            volume = sitk.GetArrayFromImage(volume)
+            volume = volume.astype(np.float64)
+            # volume = volume[np.newaxis, ...]
+            # volume = volume_resize(volume)
+            # volume = volume.squeeze(dim=0)
+            volume = ((volume - volume.min()) / (volume.max() - volume.min())) * scale_factor
+            volume = volume.astype(np.float32)
+
+            label = sitk.ReadImage(label_path)
+            # label = resize_image_itk(label, image_size, sitk.sitkLinear)
+            label = sitk.GetArrayFromImage(label)
+            # label = label[np.newaxis, ...]
+            # label = label_resize(label)
+            # label = label.squeeze(dim=0)
+
+            assert len(np.unique(label)) == len(label_map), 'label number error'
+            for origin_label, target_label in label_map.items():
+                label[label == origin_label] = target_label
+            label.astype(np.uint8)
+
+            image_group = file.create_group(dir_name)
+            image_group.create_dataset(name='volume', data=volume)
+            image_group.create_dataset(name='label', data=label)
+    file.attrs['label_map'] = [[origin_label, target_label] for origin_label, target_label in label_map.items()]
+    file.attrs['image_size'] = image_size
+    file.attrs['dataset_size'] = len(file.keys())
+    file.attrs['region_number'] = len(label_map) - 1
+    file.attrs['normalize'] = [0, scale_factor]
+    file.close()
+
+
+if __name__ == '__main__':
+    # root_path = r'G:\biomdeical\registration\data\soma_nuclei_seretonin\data\fix'
+    # preprocess_dir = r'G:\biomdeical\registration\data\preprocess\merge_label\soma_nuclei_seretonin\soma_nuclei_seretonin'
+
+    # root_path = r'G:\biomdeical\registration\data\soma_nuclei\data_4\moving'
+    # preprocess_dir = r'G:\biomdeical\registration\data\preprocess\merge_label\allen_seretonin\allen_4'
+    # merge_soma_nuclei_seretonin_label(root_path, preprocess_dir)
+
+    # image_size = [132, 114, 80]
+    image_size = [80, 114, 132]
+    scale_factor = 1.
+    source_path = r'G:\biomdeical\registration\data\preprocess\merge_label\soma_nuclei_seretonin\soma_nuclei_seretonin_4'
+    allen_path = r'G:\biomdeical\registration\data\preprocess\merge_label\allen_seretonin\allen_4'
+    output_path = '../../datasets/hdf5/soma_nuclei_seretonin.h5'
+    write_soma_nuclei(image_size, source_path, allen_path, output_path, scale_factor)

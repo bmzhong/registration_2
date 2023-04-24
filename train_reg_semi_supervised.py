@@ -87,10 +87,10 @@ def train_reg_semi_supervised(config, basedir):
         with tqdm(total=num_batches_to_sample) as pbar:
             for id1, volume1, label1, id2, volume2, label2 in reg_batch_generator_train(num_batches_to_sample):
                 volume1 = volume1.to(device)
-                label1 = label1.to(device) if label1 != [] is not None else label1
+                label1 = label1.to(device) if label1 != [] else label1
 
                 volume2 = volume2.to(device)
-                label2 = label2.to(device) if label2 != [] is not None else label2
+                label2 = label2.to(device) if label2 != [] else label2
 
                 optimizer.zero_grad()
 
@@ -207,8 +207,11 @@ def compute_reg_loss2(config, dvf, loss_function_dict, STN_bilinear, volume1, la
         loss_dict['similarity_loss'] = loss_function_dict['similarity_loss'](STN_bilinear(volume1, dvf), volume2)
 
     if label1 != [] and label2 != [] and config['LossConfig']['segmentation_loss']['use']:
-        warp_label1 = STN_bilinear(label1.float(), dvf)
-        loss_dict['segmentation_loss'] = loss_function_dict['segmentation_loss'](warp_label1, label2)
+        loss_dict['segmentation_loss'] = 0.
+        num_classes = torch.max(label1)
+        for i in range(1, num_classes):
+            loss_dict['segmentation_loss'] = loss_dict['segmentation_loss'] + loss_function_dict['segmentation_loss'](
+                STN_bilinear((label1 == i).float(), dvf), (label2 == i).float())
 
     if config['LossConfig']['gradient_loss']['use']:
         loss_dict['gradient_loss'] = loss_function_dict['gradient_loss'](dvf)
@@ -232,8 +235,7 @@ def get_loss_function(config):
 
     if config['LossConfig']['segmentation_loss']['use']:
         loss_function_dict['segmentation_loss'] = getattr(loss,
-                                                          config['LossConfig']['segmentation_loss']['type'])(
-            **config['LossConfig']['segmentation_loss']['params'])
+                                                          config['LossConfig']['segmentation_loss']['type'])()
 
     if config['LossConfig']['gradient_loss']['use']:
         loss_function_dict['gradient_loss'] = getattr(loss,
