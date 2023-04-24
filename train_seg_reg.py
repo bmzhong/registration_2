@@ -396,20 +396,31 @@ def compute_reg_loss1(config, dvf, reg_loss_function_dict, seg_net, STN_bilinear
 
 def anatomy_loss(dvf, STN_bilinear, seg_net, segmentation_loss_function, volume1, label1, volume2, label2):
     if label1 != []:
-        axis_order = (0, label1.dim() - 1) + tuple(range(1, label1.dim() - 1))
-        label1_new = F.one_hot(label1.squeeze(dim=1).long()).permute(axis_order).contiguous()
+        label1_new = label1
+        # axis_order = (0, label1.dim() - 1) + tuple(range(1, label1.dim() - 1))
+        # label1_new = F.one_hot(label1.squeeze(dim=1).long()).permute(axis_order).contiguous()
     else:
         label1_new = seg_net(volume1)
         label1_new = F.softmax(label1_new, dim=1)
+        label1_new = torch.argmax(label1_new, dim=1, keepdim=True)
 
     if label2 != []:
-        axis_order = (0, label2.dim() - 1) + tuple(range(1, label2.dim() - 1))
-        label2_new = F.one_hot(label2.squeeze(dim=1).long()).permute(axis_order).contiguous()
+        label2_new = label2
+        # axis_order = (0, label2.dim() - 1) + tuple(range(1, label2.dim() - 1))
+        # label2_new = F.one_hot(label2.squeeze(dim=1).long()).permute(axis_order).contiguous()
     else:
         label2_new = seg_net(volume2)
         label2_new = F.softmax(label2_new, dim=1)
+        label2_new = torch.argmax(label2_new, dim=1, keepdim=True)
 
-    return segmentation_loss_function(STN_bilinear(label1_new.float(), dvf), label2_new)
+    seg_loss = 0.
+    num_classes = torch.max(label1_new)
+
+    for i in range(1, num_classes):
+        seg_loss = seg_loss + segmentation_loss_function(STN_bilinear((label1_new == i).float(), dvf),
+                                                         (label2_new == i).float())
+    return seg_loss
+    # return segmentation_loss_function(STN_bilinear(label1_new.float(), dvf), label2_new)
 
 
 def get_reg_loss_function(config):
@@ -420,8 +431,7 @@ def get_reg_loss_function(config):
 
     if config['LossConfig']['Reg']['segmentation_loss']['use']:
         loss_function_dict['segmentation_loss'] = getattr(loss,
-                                                          config['LossConfig']['Reg']['segmentation_loss']['type'])(
-            **config['LossConfig']['Reg']['segmentation_loss']['params'])
+                                                          config['LossConfig']['Reg']['segmentation_loss']['type'])()
 
     if config['LossConfig']['Reg']['gradient_loss']['use']:
         loss_function_dict['gradient_loss'] = getattr(loss,

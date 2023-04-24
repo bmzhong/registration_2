@@ -15,7 +15,6 @@ TrainConfig:
     val_interval: 5
   Reg:
     gpu: "0"
-    batchsize: 1
     reg_step_per_epoch: 20
     checkpoint: ""
     val_interval: 5

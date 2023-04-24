@@ -17,7 +17,7 @@ def get_args():
 
     parser.add_argument("--test_data_path", type=str, default=None)
     parser.add_argument("--test_gpu", type=str, default=None)
-    parser.add_argument("--save_image", type=str, default=None)
+    parser.add_argument("--save_image", action='store_true', default=None)
 
     parser.add_argument("--lr", type=float, default=None)
     parser.add_argument("--step_size", type=int, default=None)
