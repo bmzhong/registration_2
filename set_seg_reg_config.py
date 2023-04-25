@@ -123,7 +123,7 @@ if __name__ == '__main__':
         config['OptimConfig']['Reg']['optimizer']['params']['lr'] = args.reg_lr
 
     if args.reg_step_size is not None:
-        config['OptimConfig']['Reg']['optimizer']['params']['lr'] = args.reg_step_size
+        config['OptimConfig']['Reg']['lr_scheduler']['params']['step_size'] = args.reg_step_size
 
     if args.similarity_loss_use is not None:
         config['LossConfig']['Reg']['similarity_loss']['use'] = args.similarity_loss_use
@@ -152,8 +152,8 @@ if __name__ == '__main__':
     if args.supervised_loss_weight is not None:
         config['LossConfig']['Seg']['supervised_loss']['weight'] = args.supervised_loss_weight
 
-    if args.anatomy_loss is not None:
-        config['LossConfig']['Seg']['anatomy_loss']['weight'] = args.anatomy_loss
+    if args.anatomy_loss_weight is not None:
+        config['LossConfig']['Seg']['anatomy_loss']['weight'] = args.anatomy_loss_weight
 
     basedir = os.path.dirname(args.output_path)
     os.makedirs(basedir, exist_ok=True)
