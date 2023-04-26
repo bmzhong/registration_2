@@ -5,5 +5,5 @@ __pycache__
 *.pth
 *.nii.gz
 output
-.sh
+*.sh
 test.py
