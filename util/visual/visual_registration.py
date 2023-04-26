@@ -27,7 +27,8 @@ def plot_2D_deformation(vector_field, grid_spacing, **kwargs):
     # precedes the axis used for "columns"
     phi = lambda pt: pt + vector_field[:, pt[1], pt[0]].numpy()  # deformation mapping
 
-    _, xmax, ymax = vector_field.shape
+    # _, xmax, ymax = vector_field.shape
+    _, ymax, xmax = vector_field.shape
     xvals = np.arange(0, xmax, grid_spacing)
     yvals = np.arange(0, ymax, grid_spacing)
     for x in xvals:

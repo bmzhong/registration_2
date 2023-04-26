@@ -1,10 +1,16 @@
 import logging
 import os
 import matplotlib.pyplot as plt
-import time
-a=time.asctime()
-print(a)
-print(type(a))
+import numpy as np
+
+a = np.arange(20).reshape((4, 5))
+plt.imshow(a)
+plt.show()
+
+# import time
+# a=time.asctime()
+# print(a)
+# print(type(a))
 
 # def test(d=1):
 #     figure=plt.figure(figsize=(10, 10))

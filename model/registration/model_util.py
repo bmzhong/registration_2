@@ -9,6 +9,7 @@ def get_reg_model(model_config, checkpoint=None):
     if model_config['type'] == 'VoxelMorpher':
         nf_enc = [16, 32, 32, 32]
         nf_dec = [32, 32, 32, 32, 8, 8]
+        # nf_dec = [32, 32, 32, 32, 32, 16, 16]
         reg_net = VoxelMorpher(3, nf_enc, nf_dec)
     elif model_config['type'] == 'VoxelMorpher_2':
         reg_net = VoxelMorpher_2()

@@ -145,7 +145,8 @@ def train_seg(config, basedir):
 
                     predict_one_hot = F.one_hot(torch.argmax(predict, dim=1).long()).permute(axis_order).contiguous()
 
-                    dice = dice_metric(predict_one_hot.clone().detach(), label_one_hot.clone().detach(), background=True)
+                    dice = dice_metric(predict_one_hot.clone().detach(), label_one_hot.clone().detach(),
+                                       background=True)
 
                     val_metrics.append(dice.item())
 
@@ -164,18 +165,18 @@ def train_seg(config, basedir):
 
             if mean_metric > best_val_metric:
                 best_val_metric = mean_metric
-                if gpu_num>1:
+                if gpu_num > 1:
                     model_saver.save(os.path.join(basedir, "checkpoint", "best_epoch.pth"),
-                                    {"model": seg_net.module.state_dict(), "optim": optimizer.state_dict()})
-                else:                   
+                                     {"model": seg_net.module.state_dict(), "optim": optimizer.state_dict()})
+                else:
                     model_saver.save(os.path.join(basedir, "checkpoint", "best_epoch.pth"),
-                                    {"model": seg_net.state_dict(), "optim": optimizer.state_dict()})
-    if gpu_num >1:
+                                     {"model": seg_net.state_dict(), "optim": optimizer.state_dict()})
+    if gpu_num > 1:
         model_saver.save(
             os.path.join(basedir, "checkpoint", 'last_epoch.pth'),
             {"model": seg_net.module.state_dict(), "optim": optimizer.state_dict()})
     else:
-        model_saver.save(os.path.join(basedir, "checkpoint", "best_epoch.pth"),
-            {"model": seg_net.state_dict(), "optim": optimizer.state_dict()})
+        model_saver.save(os.path.join(basedir, "checkpoint", "last_epoch.pth"),
+                         {"model": seg_net.state_dict(), "optim": optimizer.state_dict()})
 
     del seg_net

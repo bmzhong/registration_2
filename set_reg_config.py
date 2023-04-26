@@ -45,7 +45,6 @@ if __name__ == '__main__':
 
     if args.train_data_path is not None:
         config['TrainConfig']['data_path'] = args.train_data_path
-
     if args.train_gpu is not None:
         config['TrainConfig']['gpu'] = args.train_gpu
 
