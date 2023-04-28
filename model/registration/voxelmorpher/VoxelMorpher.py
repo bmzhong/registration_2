@@ -1,6 +1,8 @@
+import numpy as np
 import torch
 import torch.nn as nn
 from torch.distributions.normal import Normal
+from torch.nn.functional import interpolate
 
 
 class VoxelMorpher(nn.Module):
@@ -65,6 +67,10 @@ class VoxelMorpher(nn.Module):
         for i in range(3):
             y = self.dec[i](y)
             y = self.upsample(y)
+            y_shape = np.array(y.shape[2:])
+            x_shape = np.array(x_enc[-(i + 2)].shape[2:])
+            if not (y_shape == x_shape).all():
+                y = interpolate(y, scale_factor=(x_shape / y_shape).tolist(), mode='trilinear')
             y = torch.cat([y, x_enc[-(i + 2)]], dim=1)
         # Two convs at full_size/2 res
         y = self.dec[3](y)
@@ -72,6 +78,10 @@ class VoxelMorpher(nn.Module):
         # Upsample to full res, concatenate and conv
         if self.full_size:
             y = self.upsample(y)
+            y_shape = np.array(y.shape[2:])
+            x_shape = np.array(x_enc[0].shape[2:])
+            if not (y_shape == x_shape).all():
+                y = interpolate(y, scale_factor=(x_shape / y_shape).tolist(), mode='trilinear')
             y = torch.cat([y, x_enc[0]], dim=1)
             y = self.dec[5](y)
         # Extra conv for vm2

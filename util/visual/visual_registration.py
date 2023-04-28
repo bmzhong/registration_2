@@ -25,7 +25,10 @@ def plot_2D_deformation(vector_field, grid_spacing, **kwargs):
     # the reason for this is that we want to match the the "matrix" or "image" style
     # conventions used by matplotlib imshow and quiver, where the axis used for "rows"
     # precedes the axis used for "columns"
-    phi = lambda pt: pt + vector_field[:, pt[1], pt[0]].numpy()  # deformation mapping
+
+    # phi = lambda pt: pt + vector_field[:, pt[1], pt[0]].numpy()  # deformation mapping
+
+    phi = lambda pt: pt + vector_field[[1, 0], pt[1], pt[0]].numpy()  # deformation mapping
 
     # _, xmax, ymax = vector_field.shape
     _, ymax, xmax = vector_field.shape

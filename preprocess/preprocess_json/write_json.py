@@ -255,8 +255,8 @@ if __name__ == '__main__':
     random.seed(seed)
     np.random.seed(seed)
 
-    # LPBA40_path = '../../datasets/hdf5/LPBA40.h5'
-    # LPBA40_output_path = '../../datasets/json/LPBA40.json'
+    # LPBA40_path = '../../datasets/hdf5/LPBA40_test1.h5'
+    # LPBA40_output_path = '../../datasets/json/LPBA40_test1.json'
     # write_json(LPBA40_path, LPBA40_output_path, train_size=0.7,
     #            val_size=0.1, test_size=0.2, sampling_ratio=1.)
 
@@ -274,10 +274,10 @@ if __name__ == '__main__':
     # soma_nuclei_4_output_path = '../../datasets/json/soma_nuclei.json'
     # write_soma_nuclei_json(soma_nuclei_4_path, soma_nuclei_4_output_path)
 
-    # LPBA40_path = '../../datasets/hdf5/LPBA40.h5'
-    # LPBA40_output_path = '../../datasets/json/LPBA40.json'
-    # write_LPBA40_json(LPBA40_path, LPBA40_output_path)
+    LPBA40_path = '../../datasets/hdf5/LPBA40_test1.h5'
+    LPBA40_output_path = '../../datasets/json/LPBA40_test1.json'
+    write_LPBA40_json(LPBA40_path, LPBA40_output_path)
 
-    seretonin_path = '../../datasets/hdf5/soma_nuclei_seretonin.h5'
-    seretonin_output_path = '../../datasets/json/soma_nuclei_seretonin.json'
-    write_soma_nuclei_seretonin_json(seretonin_path, seretonin_output_path)
+    # seretonin_path = '../../datasets/hdf5/soma_nuclei_seretonin.h5'
+    # seretonin_output_path = '../../datasets/json/soma_nuclei_seretonin.json'
+    # write_soma_nuclei_seretonin_json(seretonin_path, seretonin_output_path)
