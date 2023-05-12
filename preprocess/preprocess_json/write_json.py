@@ -62,11 +62,12 @@ def write_json(hdf5_path, output_path, train_size, val_size, test_size, sampling
     json_data['image_size'] = h5_file.attrs['image_size'].tolist()
     json_data['normalize'] = h5_file.attrs['normalize'].tolist()
     json_data['region_number'] = int(h5_file.attrs['region_number'])
-    if 'label_map' in h5_file.attrs.keys():
-        label_value_map = {str(temp[0]): int(temp[1]) for temp in h5_file.attrs['label_map']}
-    else:
-        label_value_map = {str(i): i for i in range(1, json_data['region_number'] + 1)}
-    json_data['label_map'] = label_value_map
+    json_data['atlas'] = ''
+    # if 'label_map' in h5_file.attrs.keys():
+    #     label_value_map = {str(temp[0]): int(temp[1]) for temp in h5_file.attrs['label_map']}
+    # else:
+    #     label_value_map = {str(i): i for i in range(1, json_data['region_number'] + 1)}
+    # json_data['label_map'] = label_value_map
     image_names = np.array(list(h5_file.keys()))
     train, val_test = train_test_split(image_names, train_size=train_size)
     val, test = train_test_split(val_test, test_size=test_size / (val_size + test_size))
@@ -75,16 +76,15 @@ def write_json(hdf5_path, output_path, train_size, val_size, test_size, sampling
     val = val.tolist()
     test = test.tolist()
 
-    train_pairs = [[img1, img2] if img1 != img2 else None for img1 in train for img2 in train]
-    val_pairs = [[img1, img2] if img1 != img2 else None for img1 in val for img2 in val]
-    test_pairs = [[img1, img2] if img1 != img2 else None for img1 in test for img2 in test]
-    train_pairs = list(filter(None, train_pairs))
-    val_pairs = list(filter(None, val_pairs))
-    test_pairs = list(filter(None, test_pairs))
+    train_pairs = [[img1, img2] for img1 in train for img2 in train if img1 != img2]
+    val_pairs = [[img1, img2] for img1 in val for img2 in val if img1 != img2]
+    test_pairs = [[img1, img2] for img1 in test for img2 in test if img1 != img2]
+
     if sampling_ratio < 1.0:
         train_pairs = random_sampling_pairs(train_pairs, sampling_ratio)
         val_pairs = random_sampling_pairs(val_pairs, sampling_ratio)
         test_pairs = random_sampling_pairs(test_pairs, sampling_ratio)
+
     # pairs_image_show(train_pairs)
     # pairs_image_show(val_pairs)
     # pairs_image_show(test_pairs)
@@ -214,11 +214,12 @@ def write_LPBA40_json(hdf5_path, output_path):
     json_data['image_size'] = h5_file.attrs['image_size'].tolist()
     json_data['normalize'] = h5_file.attrs['normalize'].tolist()
     json_data['region_number'] = int(h5_file.attrs['region_number'])
-    if 'label_map' in h5_file.attrs.keys():
-        label_value_map = {str(temp[0]): int(temp[1]) for temp in h5_file.attrs['label_map']}
-    else:
-        label_value_map = {str(i): i for i in range(1, json_data['region_number'] + 1)}
-    json_data['label_map'] = label_value_map
+    json_data['atlas'] = 'S01'
+    # if 'label_map' in h5_file.attrs.keys():
+    #     label_value_map = {str(temp[0]): int(temp[1]) for temp in h5_file.attrs['label_map']}
+    # else:
+    #     label_value_map = {str(i): i for i in range(1, json_data['region_number'] + 1)}
+    # json_data['label_map'] = label_value_map
     image_names = list(h5_file.keys())
     image_names.remove('S01')
     train, val_test = train_test_split(np.array(image_names), train_size=28)
@@ -250,33 +251,79 @@ def write_LPBA40_json(hdf5_path, output_path):
         json.dump(json_data, f, indent=4)
 
 
+def write_IXI_json(hdf5_path, output_path):
+    h5_file = h5py.File(hdf5_path, 'r')
+    json_data = dict()
+    json_data['dataset_path'] = hdf5_path[hdf5_path.find('datasets'):]
+    json_data['dataset_size'] = int(h5_file.attrs['dataset_size'])
+    json_data['image_size'] = h5_file.attrs['image_size'].tolist()
+    json_data['normalize'] = h5_file.attrs['normalize'].tolist()
+    json_data['region_number'] = int(h5_file.attrs['region_number'])
+    json_data['atlas'] = 'atlas'
+
+    train = h5_file.attrs['train'].tolist()
+    val = h5_file.attrs['val'].tolist()
+    test = h5_file.attrs['test'].tolist()
+
+    train.append('atlas')
+
+    train_pair = [[name, 'atlas'] for name in train]
+    val_pair = [[name, 'atlas'] for name in val]
+    test_pair = [[name, 'atlas'] for name in test]
+
+    json_data['train_size'] = len(train)
+    json_data['val_size'] = len(val)
+    json_data['test_size'] = len(test)
+
+    json_data['train_pairs_size'] = len(train_pair)
+    json_data['val_pairs_size'] = len(val_pair)
+    json_data['test_pairs_size'] = len(test_pair)
+
+    json_data['train'] = train
+    json_data['val'] = val
+    json_data['test'] = test
+
+    json_data['train_pair'] = train_pair
+    json_data['val_pair'] = val_pair
+    json_data['test_pair'] = test_pair
+
+    with open(output_path, 'w') as f:
+        json.dump(json_data, f, indent=4)
+
+
 if __name__ == '__main__':
     seed = 0
     random.seed(seed)
     np.random.seed(seed)
 
-    # LPBA40_path = '../../datasets/hdf5/LPBA40_test1.h5'
-    # LPBA40_output_path = '../../datasets/json/LPBA40_test1.json'
-    # write_json(LPBA40_path, LPBA40_output_path, train_size=0.7,
-    #            val_size=0.1, test_size=0.2, sampling_ratio=1.)
+    LPBA40_path = '../../datasets/hdf5/LPBA40.h5'
+    LPBA40_output_path = '../../datasets/json/LPBA40.json'
+    write_LPBA40_json(LPBA40_path, LPBA40_output_path)
 
     # Mindboggle101_path = '../../datasets/hdf5/Mindboggle101.h5'
     # Mindboggle101_output_path = '../../datasets/json/Mindboggle101.json'
     # write_json(Mindboggle101_path, Mindboggle101_output_path, train_size=0.7,
     #            val_size=0.1, test_size=0.2, sampling_ratio=0.1)
 
-    # OASIS_1_path = '../../datasets/hdf5/OASIS.h5'
-    # OASIS_1_output_path = '../../datasets/json/OASIS.json'
-    # write_json(OASIS_1_path, OASIS_1_output_path, train_size=0.7,
+    # OASIS_path = '../../datasets/hdf5/OASIS.h5'
+    # OASIS_output_path = '../../datasets/json/OASIS.json'
+    # write_json(OASIS_path, OASIS_output_path, train_size=0.7,
     #            val_size=0.1, test_size=0.2, sampling_ratio=0.01)
+
+    # LPBA40_path = '../../datasets/hdf5/LPBA40_test.h5'
+    # LPBA40_output_path = '../../datasets/json/LPBA40_test.json'
+    # write_json(LPBA40_path, LPBA40_output_path,train_size=0.7,
+    #            val_size=0.1, test_size=0.2, sampling_ratio=1.)
+
+    # IXI_path = '../../datasets/hdf5/IXI.h5'
+    # IXI_output_path = '../../datasets/json/IXI.json'
+    # write_IXI_json(IXI_path, IXI_output_path)
+
+
 
     # soma_nuclei_4_path = '../../datasets/hdf5/soma_nuclei.h5'
     # soma_nuclei_4_output_path = '../../datasets/json/soma_nuclei.json'
     # write_soma_nuclei_json(soma_nuclei_4_path, soma_nuclei_4_output_path)
-
-    LPBA40_path = '../../datasets/hdf5/LPBA40_test1.h5'
-    LPBA40_output_path = '../../datasets/json/LPBA40_test1.json'
-    write_LPBA40_json(LPBA40_path, LPBA40_output_path)
 
     # seretonin_path = '../../datasets/hdf5/soma_nuclei_seretonin.h5'
     # seretonin_output_path = '../../datasets/json/soma_nuclei_seretonin.json'

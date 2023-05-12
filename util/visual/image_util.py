@@ -6,7 +6,8 @@ from util.visual.visual_image import preview_image
 import matplotlib.pyplot as plt
 import os
 
-from util.visual.visual_registration import preview_3D_deformation, preview_3D_vector_field, RGB_dvf, PlotGrid_3d
+from util.visual.visual_registration import preview_3D_deformation, preview_3D_vector_field, RGB_dvf, PlotGrid_3d, \
+    comput_fig
 
 
 def write_image(outdir, name, img, type):
@@ -42,6 +43,15 @@ def save_deformation_figure(outdir, name, dvf, grid_spacing, **kwargs):
 def save_dvf_figure(outdir, name, dvf):
     os.makedirs(outdir, exist_ok=True)
     figure = preview_3D_vector_field(dvf)
+    plt.suptitle(name, fontsize=25)
+    figure.tight_layout()
+    plt.savefig(os.path.join(outdir, name + '.jpg'))
+
+
+def save_warp_grid_figure(outdir, name, warp_grid, **kwargs):
+    os.makedirs(outdir, exist_ok=True)
+    figure = comput_fig(warp_grid)
+    # figure = preview_image(warp_grid, cmap='gray', **kwargs)
     plt.suptitle(name, fontsize=25)
     figure.tight_layout()
     plt.savefig(os.path.join(outdir, name + '.jpg'))

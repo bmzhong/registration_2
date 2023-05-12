@@ -15,19 +15,18 @@ from util.ModelSaver import ModelSaver
 from util.data_util.dataset import PairDataset, SingleDataset
 
 from util.visual.tensorboard_visual import tensorboard_visual_registration, tensorboard_visual_dvf, \
-    tensorboard_visual_det, tensorboard_visual_segmentation, tensorboard_visual_RGB_dvf, \
-    tensorboard_visual_deformation_2
-from util.util import update_dict, std_dict
+    tensorboard_visual_det, tensorboard_visual_segmentation, tensorboard_visual_RGB_dvf, tensorboard_visual_warp_grid
+from util.util import update_dict
 from util.util import mean_dict
 from util.util import swap_training
 
-from util.loss.GradientLoss import GradientLoss
-from util.loss.BendingEnergyLoss import BendingEnergyLoss
-from util.metric.registration_metric import folds_count_metric, folds_ratio_metric, mse_metric, jacobian_determinant
-from util.metric.segmentation_metric import dice_metric
+from util.metric.registration_metric import folds_count_metric, folds_percent_metric, mse_metric, jacobian_determinant, \
+    ssim_metric
+from util.metric.segmentation_metric import dice_metric, ASD_metric, HD_metric
 from util.visual.tensorboard_visual import tensorboard_visual_deformation
 from util import loss
 from util.seg_reg_util import create_train_dataset
+from util.visual.visual_registration import mk_grid_img
 
 
 def train_seg_reg(config, basedir):
@@ -42,11 +41,11 @@ def train_seg_reg(config, basedir):
     """
     with open(config['TrainConfig']['data_path'], 'r') as f:
         dataset_config = json.load(f)
-
-    segmentation_available = dataset_config['segmentation_available']
+    num_classes = dataset_config['region_number'] + 1
+    seg = dataset_config[config['TrainConfig']['seg']] if len(config['TrainConfig']['seg']) > 0 else None
 
     reg_batch_generator_train, seg_batch_generator_train = create_train_dataset(dataset_config, config,
-                                                                                segmentation_available)
+                                                                                seg=seg)
 
     reg_val_dataset = PairDataset(dataset_config, 'val_pair')
 
@@ -63,7 +62,7 @@ def train_seg_reg(config, basedir):
     reg_checkpoint = None
     if len(config['TrainConfig']['Reg']['checkpoint']) > 0:
         reg_checkpoint = config['TrainConfig']['Reg']['checkpoint']
-    reg_net = get_reg_model(config['ModelConfig']['Reg'], reg_checkpoint)
+    reg_net = get_reg_model(config['ModelConfig']['Reg'], reg_checkpoint, dataset_config['image_size'])
     STN_bilinear = SpatialTransformer(dataset_config['image_size'], mode='bilinear')
     STN_nearest = SpatialTransformer(dataset_config['image_size'], mode='nearest')
 
@@ -104,6 +103,8 @@ def train_seg_reg(config, basedir):
 
     reg_best_val_metric = -1. * float('inf')
     seg_best_val_metric = -1. * float('inf')
+
+    raw_grid_img = mk_grid_img(4, 1, dataset_config['image_size']).to(reg_device)
 
     for epoch in range(1, config["TrainConfig"]["epoch"] + 1):
 
@@ -153,6 +154,7 @@ def train_seg_reg(config, basedir):
             reg_net.eval()
             reg_val_losses_dict = dict()
             reg_val_metrics_dict = dict()
+            val_count = 0
             with torch.no_grad():
                 for id1, volume1, label1, id2, volume2, label2 in reg_val_dataloader:
                     volume1 = volume1.to(reg_device)
@@ -171,39 +173,50 @@ def train_seg_reg(config, basedir):
                     warp_label1 = STN_nearest(label1.float(), dvf)
 
                     axis_order = (0, label1.dim() - 1) + tuple(range(1, label1.dim() - 1))
-                    warp_label1_one_hot = F.one_hot(warp_label1.squeeze(dim=1).long()).permute(axis_order).contiguous()
-                    label2_one_hot = F.one_hot(label2.squeeze(dim=1).long()).permute(axis_order).contiguous()
+                    warp_label1_one_hot = F.one_hot(warp_label1.squeeze(dim=1).long(), num_classes=num_classes).permute(
+                        axis_order).contiguous()
+                    label2_one_hot = F.one_hot(label2.squeeze(dim=1).long(), num_classes=num_classes).permute(
+                        axis_order).contiguous()
 
                     metric_dict = compute_reg_metric(dvf.clone().detach(), warp_volume1.clone().detach(),
                                                      warp_label1_one_hot.clone().detach(),
                                                      volume2.clone().detach(), label2_one_hot.clone().detach())
                     update_dict(reg_val_metrics_dict, metric_dict)
+                    grid_img = raw_grid_img.repeat(dvf.shape[0], 1, 1, 1, 1)
+                    warp_grid = STN_bilinear(grid_img.float(), dvf)
 
-                    tensorboard_visual_registration(mode='val/reg/', name=id1[0] + '_' + id2[0] + '/img', writer=writer,
-                                                    step=epoch, fix=volume2[0][0].detach().cpu(),
-                                                    mov=volume1[0][0].detach().cpu(),
-                                                    reg=warp_volume1[0][0].detach().cpu())
-                    tensorboard_visual_registration(mode='val/reg/', name=id1[0] + '_' + id2[0] + '/seg', writer=writer,
-                                                    step=epoch, fix=label2[0][0].detach().cpu(),
-                                                    mov=label1[0][0].detach().cpu(),
-                                                    reg=warp_label1[0][0].detach().cpu())
+                    if val_count < 8:
+                        tensorboard_visual_registration(mode='val/reg/', name=id1[0] + '_' + id2[0] + '/img',
+                                                        writer=writer,
+                                                        step=epoch, fix=volume2[0][0].detach().cpu(),
+                                                        mov=volume1[0][0].detach().cpu(),
+                                                        reg=warp_volume1[0][0].detach().cpu())
+                        tensorboard_visual_registration(mode='val/reg/', name=id1[0] + '_' + id2[0] + '/seg',
+                                                        writer=writer,
+                                                        step=epoch, fix=label2[0][0].detach().cpu(),
+                                                        mov=label1[0][0].detach().cpu(),
+                                                        reg=warp_label1[0][0].detach().cpu())
 
-                    tag = 'val/reg/' + id1[0] + '_' + id2[0]
+                        tag = 'val/reg/' + id1[0] + '_' + id2[0]
 
-                    tensorboard_visual_deformation(name=tag + '/deformation', dvf=dvf[0].detach().cpu(),
-                                                   grid_spacing=dvf.shape[-1] // 50, writer=writer, step=epoch,
-                                                   linewidth=1,
-                                                   color='darkblue')
+                        tensorboard_visual_deformation(name=tag + '/deformation', dvf=dvf[0].detach().cpu(),
+                                                       grid_spacing=dvf.shape[-1] // 50, writer=writer, step=epoch,
+                                                       linewidth=1,
+                                                       color='darkblue')
 
-                    tensorboard_visual_dvf(name=tag + '/dvf', dvf=dvf[0].detach().cpu(), writer=writer, step=epoch)
-                    tensorboard_visual_RGB_dvf(name=tag + '/rgb_dvf', dvf=dvf[0].detach().cpu(), writer=writer,
-                                               step=epoch)
+                        tensorboard_visual_dvf(name=tag + '/dvf', dvf=dvf[0].detach().cpu(), writer=writer, step=epoch)
+                        tensorboard_visual_RGB_dvf(name=tag + '/rgb_dvf', dvf=dvf[0].detach().cpu(), writer=writer,
+                                                   step=epoch)
 
-                    det = jacobian_determinant(dvf[0].detach().cpu())
+                        det = jacobian_determinant(dvf[0].detach().cpu())
 
-                    tensorboard_visual_det(name=tag + '/det', det=det, writer=writer, step=epoch, normalize_by='slice',
-                                           threshold=0, cmap='gray')
-
+                        tensorboard_visual_det(name=tag + '/det', det=det, writer=writer, step=epoch,
+                                               normalize_by='slice',
+                                               threshold=0, cmap='gray')
+                        tensorboard_visual_warp_grid(name=tag + '/warp_grid', warp_grid=warp_grid[0][0].cpu(),
+                                                     writer=writer,
+                                                     step=epoch)
+                    val_count += 1
             reg_mean_val_loss_dict = mean_dict(reg_val_losses_dict)
             reg_mean_val_metric_dict = mean_dict(reg_val_metrics_dict)
             print(f"\n\033[32mEpoch {epoch}/{config['TrainConfig']['epoch']}:\033[0m")
@@ -250,7 +263,7 @@ def train_seg_reg(config, basedir):
                 label2_predict = F.softmax(label2_predict, dim=1)
                 loss_dict = compute_seg_loss1(config=config, dvf=dvf, seg_loss_function_dict=seg_loss_function_dict,
                                               STN_nearest=STN_nearest, label1=label1, label1_predict=label1_predict,
-                                              label2=label2, label2_predict=label2_predict)
+                                              label2=label2, label2_predict=label2_predict, num_classes=num_classes)
                 loss_dict['total_loss'].backward()
 
                 seg_optimizer.step()
@@ -274,7 +287,7 @@ def train_seg_reg(config, basedir):
         if epoch % config['TrainConfig']['Seg']['val_interval'] == 0:
             seg_net.eval()
             seg_val_losses = []
-            seg_val_metrics = []
+            seg_val_metrics_dict = dict()
             with torch.no_grad():
                 for id, volume, label in seg_val_dataloader:
                     volume = volume.to(seg_device)
@@ -285,17 +298,18 @@ def train_seg_reg(config, basedir):
                     predict_softmax = F.softmax(predict, dim=1)
 
                     axis_order = (0, label.dim() - 1) + tuple(range(1, label.dim() - 1))
-                    label_one_hot = F.one_hot(label.squeeze(dim=1).long()).permute(axis_order).contiguous()
+                    label_one_hot = F.one_hot(label.squeeze(dim=1).long(), num_classes=num_classes).permute(
+                        axis_order).contiguous()
 
                     loss = seg_loss_function_dict['supervised_loss'](predict_softmax, label_one_hot.float())
                     seg_val_losses.append(loss.item())
 
-                    predict_one_hot = F.one_hot(torch.argmax(predict, dim=1).long()).permute(axis_order).contiguous()
+                    predict_one_hot = F.one_hot(torch.argmax(predict, dim=1).long(),
+                                                num_classes=num_classes).permute(axis_order).contiguous()
 
-                    dice = dice_metric(predict_one_hot.clone().detach(), label_one_hot.clone().detach(),
-                                       background=True)
+                    metric_dict = compute_seg_metric(predict_one_hot.clone().detach(), label_one_hot.clone().detach())
 
-                    seg_val_metrics.append(dice.item())
+                    update_dict(seg_val_metrics_dict, metric_dict)
 
                     predict_argmax = torch.argmax(predict_softmax, dim=1, keepdim=True)
 
@@ -305,14 +319,16 @@ def train_seg_reg(config, basedir):
                                                     target=label[0][0].detach().cpu())
 
             seg_mean_val_loss = np.mean(seg_val_losses)
-            seg_mean_val_metric = np.mean(seg_val_metrics)
+            seg_mean_val_metric_dict = mean_dict(seg_val_metrics_dict)
             print(f"\n\033[34mEpoch {epoch}/{config['TrainConfig']['epoch']}:\033[0m")
             print(f"\033[34mval seg loss: {seg_mean_val_loss}\033[0m")
-            print(f"\033[34mval seg dice:  {seg_mean_val_metric}\033[0m")
+            print(f"\033[34mval seg dice:  {seg_mean_val_metric_dict['dice']}\033[0m")
             writer.add_scalar("val/seg/loss", seg_mean_val_loss, epoch)
-            writer.add_scalar("val/seg/dice", seg_mean_val_metric, epoch)
-            if seg_mean_val_metric > seg_best_val_metric:
-                seg_best_val_metric = seg_mean_val_metric
+            for metric_type, metric_value in seg_mean_val_metric_dict.items():
+                writer.add_scalar("val/seg/" + metric_type, metric_value, epoch)
+
+            if seg_mean_val_metric_dict['dice'] > seg_best_val_metric:
+                seg_best_val_metric = seg_mean_val_metric_dict['dice']
                 if len(seg_gpu) > 1:
                     seg_model_saver.save(os.path.join(basedir, "checkpoint", "seg_best_epoch.pth"),
                                          {"model": seg_net.module.state_dict(), "optim": seg_optimizer.state_dict()})
@@ -338,22 +354,27 @@ def train_seg_reg(config, basedir):
             {"model": seg_net.state_dict(), "optim": seg_optimizer.state_dict()})
 
 
-def compute_seg_loss1(config, dvf, seg_loss_function_dict, STN_nearest, label1, label1_predict, label2, label2_predict):
+def compute_seg_loss1(config, dvf, seg_loss_function_dict, STN_nearest, label1, label1_predict, label2, label2_predict,
+                      num_classes):
     loss_dict = {}
     if label1 != [] and label2 != []:
         axis_order = (0, label1.dim() - 1) + tuple(range(1, label1.dim() - 1))
-        label1_one_hot = F.one_hot(label1.squeeze(dim=1).long()).permute(axis_order).contiguous()
-        label2_one_hot = F.one_hot(label2.squeeze(dim=1).long()).permute(axis_order).contiguous()
+        label1_one_hot = F.one_hot(label1.squeeze(dim=1).long(), num_classes=num_classes).permute(
+            axis_order).contiguous()
+        label2_one_hot = F.one_hot(label2.squeeze(dim=1).long(), num_classes=num_classes).permute(
+            axis_order).contiguous()
         supervised_loss = seg_loss_function_dict['supervised_loss'](label1_predict, label1_one_hot) + \
                           seg_loss_function_dict['supervised_loss'](label2_predict, label2_one_hot)
     elif label1 != []:
         axis_order = (0, label1.dim() - 1) + tuple(range(1, label1.dim() - 1))
-        label1_one_hot = F.one_hot(label1.squeeze(dim=1).long()).permute(axis_order).contiguous()
+        label1_one_hot = F.one_hot(label1.squeeze(dim=1).long(), num_classes=num_classes).permute(
+            axis_order).contiguous()
         supervised_loss = seg_loss_function_dict['supervised_loss'](label1_predict, label1_one_hot)
         label2_one_hot = label2_predict
     elif label2 != []:
         axis_order = (0, label2.dim() - 1) + tuple(range(1, label2.dim() - 1))
-        label2_one_hot = F.one_hot(label2.squeeze(dim=1).long()).permute(axis_order).contiguous()
+        label2_one_hot = F.one_hot(label2.squeeze(dim=1).long(), num_classes=num_classes).permute(
+            axis_order).contiguous()
         supervised_loss = seg_loss_function_dict['supervised_loss'](label2_predict, label2_one_hot)
         label1_one_hot = label1_predict
     else:
@@ -457,7 +478,16 @@ def get_seg_loss_function(config):
 def compute_reg_metric(dvf, warp_volume1, warp_label1, volume2, label2):
     metric_dict = dict()
     metric_dict['dice'] = dice_metric(warp_label1, label2).item()
-    metric_dict['folds_ratio'] = folds_ratio_metric(dvf).item()
-    metric_dict['folds_count'] = folds_count_metric(dvf).item()
-    metric_dict['mse'] = mse_metric(warp_volume1, volume2).item()
+    metric_dict['ASD'] = ASD_metric(warp_label1, label2).item()
+    metric_dict['HD'] = HD_metric(warp_label1, label2).item()
+    metric_dict['SSIM'] = ssim_metric(warp_volume1, volume2)
+    metric_dict['folds_percent'] = folds_percent_metric(dvf).item()
+    return metric_dict
+
+
+def compute_seg_metric(predict, target):
+    metric_dict = dict()
+    metric_dict['dice'] = dice_metric(predict, target).item()
+    metric_dict['ASD'] = ASD_metric(predict, target).item()
+    metric_dict['HD'] = HD_metric(predict, target).item()
     return metric_dict

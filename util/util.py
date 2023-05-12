@@ -4,7 +4,7 @@ import torch
 import os
 import numpy as np
 import random
-
+import sys
 
 def get_basedir(base_dir, start_new_model=False):
     # init the output folder structure
@@ -70,3 +70,17 @@ def swap_training(network_to_train, network_to_not_train):
 
     network_to_not_train.eval()
     network_to_train.train()
+
+
+
+class Logger(object):
+    def __init__(self, save_dir):
+        self.terminal = sys.stdout
+        self.log = open(os.path.join(save_dir,"logfile.log"), "a")
+
+    def write(self, message):
+        self.terminal.write(message)
+        self.log.write(message)
+
+    def flush(self):
+        pass

@@ -14,6 +14,7 @@ def get_args():
     parser.add_argument("--train_gpu", type=str, default=None)
     parser.add_argument("--epoch", type=int, default=None)
     parser.add_argument("--batchsize", type=int, default=None)
+    parser.add_argument("--seg", type=str, default=None)
 
     parser.add_argument("--seg_gpu", type=str, default=None)
     parser.add_argument("--seg_step_per_epoch", type=int, default=None)
@@ -36,6 +37,9 @@ def get_args():
 
     parser.add_argument("--reg_lr", type=float, default=None)
     parser.add_argument("--reg_step_size", type=int, default=None)
+
+    parser.add_argument("--seg_model", type=str, default=None)
+    parser.add_argument("--reg_model", type=str, default=None)
 
     parser.add_argument("--similarity_loss_use", type=bool, default=None)
     parser.add_argument("--similarity_loss_type", type=str, default=None)
@@ -64,6 +68,8 @@ if __name__ == '__main__':
 
     if args.train_data_path is not None:
         config['TrainConfig']['data_path'] = args.train_data_path
+        if args.test_data_path is None:
+            config['TestConfig']['data_path'] = args.train_data_path
 
     if args.train_gpu is not None:
         config['TrainConfig']['gpu'] = args.train_gpu
@@ -73,6 +79,9 @@ if __name__ == '__main__':
 
     if args.batchsize is not None:
         config['TrainConfig']['batchsize'] = args.batchsize
+
+    if args.seg is not None:
+        config['TrainConfig']['seg'] = args.seg
 
     if args.seg_gpu is not None:
         config['TrainConfig']['Seg']['gpu'] = args.seg_gpu
@@ -112,6 +121,12 @@ if __name__ == '__main__':
 
     if args.test_reg_checkpoint is not None:
         config['TestConfig']['Reg']['checkpoint'] = args.test_reg_checkpoint
+
+    if args.seg_model is not None:
+        config['ModelConfig']['Seg']['type'] = args.seg_model
+
+    if args.reg_model is not None:
+        config['ModelConfig']['Reg']['type'] = args.reg_model
 
     if args.seg_lr is not None:
         config['OptimConfig']['Seg']['optimizer']['params']['lr'] = args.seg_lr

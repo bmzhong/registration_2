@@ -1,0 +1,4948 @@
+{
+    "dataset_path": "datasets/hdf5/IXI.h5",
+    "dataset_size": 577,
+    "image_size": [
+        128,
+        128,
+        128
+    ],
+    "normalize": [
+        0.0,
+        1.0
+    ],
+    "region_number": 10,
+    "atlas": "atlas",
+    "train_size": 404,
+    "val_size": 58,
+    "test_size": 115,
+    "train_pairs_size": 404,
+    "val_pairs_size": 58,
+    "test_pairs_size": 115,
+    "train": [
+        "subject_0",
+        "subject_10",
+        "subject_100",
+        "subject_101",
+        "subject_102",
+        "subject_103",
+        "subject_104",
+        "subject_106",
+        "subject_107",
+        "subject_109",
+        "subject_111",
+        "subject_113",
+        "subject_116",
+        "subject_117",
+        "subject_118",
+        "subject_12",
+        "subject_120",
+        "subject_121",
+        "subject_122",
+        "subject_123",
+        "subject_124",
+        "subject_125",
+        "subject_127",
+        "subject_128",
+        "subject_129",
+        "subject_130",
+        "subject_132",
+        "subject_133",
+        "subject_134",
+        "subject_137",
+        "subject_138",
+        "subject_140",
+        "subject_141",
+        "subject_142",
+        "subject_143",
+        "subject_145",
+        "subject_146",
+        "subject_147",
+        "subject_148",
+        "subject_149",
+        "subject_15",
+        "subject_150",
+        "subject_152",
+        "subject_154",
+        "subject_157",
+        "subject_159",
+        "subject_16",
+        "subject_160",
+        "subject_161",
+        "subject_162",
+        "subject_163",
+        "subject_164",
+        "subject_168",
+        "subject_169",
+        "subject_17",
+        "subject_170",
+        "subject_171",
+        "subject_173",
+        "subject_174",
+        "subject_175",
+        "subject_176",
+        "subject_178",
+        "subject_179",
+        "subject_18",
+        "subject_180",
+        "subject_181",
+        "subject_187",
+        "subject_189",
+        "subject_190",
+        "subject_192",
+        "subject_193",
+        "subject_194",
+        "subject_196",
+        "subject_197",
+        "subject_20",
+        "subject_200",
+        "subject_201",
+        "subject_202",
+        "subject_203",
+        "subject_204",
+        "subject_205",
+        "subject_207",
+        "subject_208",
+        "subject_209",
+        "subject_210",
+        "subject_211",
+        "subject_213",
+        "subject_214",
+        "subject_215",
+        "subject_216",
+        "subject_217",
+        "subject_219",
+        "subject_22",
+        "subject_220",
+        "subject_221",
+        "subject_223",
+        "subject_228",
+        "subject_23",
+        "subject_230",
+        "subject_231",
+        "subject_232",
+        "subject_234",
+        "subject_235",
+        "subject_236",
+        "subject_237",
+        "subject_238",
+        "subject_239",
+        "subject_24",
+        "subject_240",
+        "subject_241",
+        "subject_242",
+        "subject_243",
+        "subject_244",
+        "subject_245",
+        "subject_246",
+        "subject_247",
+        "subject_249",
+        "subject_25",
+        "subject_250",
+        "subject_253",
+        "subject_254",
+        "subject_255",
+        "subject_256",
+        "subject_257",
+        "subject_258",
+        "subject_259",
+        "subject_26",
+        "subject_260",
+        "subject_261",
+        "subject_263",
+        "subject_264",
+        "subject_265",
+        "subject_266",
+        "subject_267",
+        "subject_268",
+        "subject_270",
+        "subject_271",
+        "subject_272",
+        "subject_273",
+        "subject_275",
+        "subject_276",
+        "subject_277",
+        "subject_278",
+        "subject_28",
+        "subject_280",
+        "subject_281",
+        "subject_282",
+        "subject_283",
+        "subject_284",
+        "subject_285",
+        "subject_288",
+        "subject_289",
+        "subject_29",
+        "subject_290",
+        "subject_292",
+        "subject_293",
+        "subject_294",
+        "subject_296",
+        "subject_297",
+        "subject_298",
+        "subject_299",
+        "subject_30",
+        "subject_300",
+        "subject_301",
+        "subject_303",
+        "subject_304",
+        "subject_306",
+        "subject_307",
+        "subject_308",
+        "subject_309",
+        "subject_31",
+        "subject_310",
+        "subject_311",
+        "subject_312",
+        "subject_313",
+        "subject_314",
+        "subject_315",
+        "subject_316",
+        "subject_32",
+        "subject_321",
+        "subject_323",
+        "subject_324",
+        "subject_326",
+        "subject_327",
+        "subject_328",
+        "subject_33",
+        "subject_330",
+        "subject_331",
+        "subject_332",
+        "subject_333",
+        "subject_334",
+        "subject_335",
+        "subject_336",
+        "subject_340",
+        "subject_341",
+        "subject_342",
+        "subject_343",
+        "subject_345",
+        "subject_346",
+        "subject_348",
+        "subject_349",
+        "subject_35",
+        "subject_350",
+        "subject_351",
+        "subject_352",
+        "subject_353",
+        "subject_354",
+        "subject_355",
+        "subject_356",
+        "subject_357",
+        "subject_359",
+        "subject_36",
+        "subject_360",
+        "subject_361",
+        "subject_364",
+        "subject_368",
+        "subject_370",
+        "subject_371",
+        "subject_372",
+        "subject_373",
+        "subject_374",
+        "subject_375",
+        "subject_377",
+        "subject_379",
+        "subject_38",
+        "subject_381",
+        "subject_382",
+        "subject_383",
+        "subject_385",
+        "subject_386",
+        "subject_387",
+        "subject_388",
+        "subject_392",
+        "subject_395",
+        "subject_396",
+        "subject_397",
+        "subject_398",
+        "subject_4",
+        "subject_40",
+        "subject_401",
+        "subject_403",
+        "subject_406",
+        "subject_407",
+        "subject_408",
+        "subject_409",
+        "subject_41",
+        "subject_413",
+        "subject_414",
+        "subject_415",
+        "subject_416",
+        "subject_417",
+        "subject_418",
+        "subject_419",
+        "subject_421",
+        "subject_422",
+        "subject_425",
+        "subject_426",
+        "subject_427",
+        "subject_43",
+        "subject_430",
+        "subject_431",
+        "subject_432",
+        "subject_433",
+        "subject_434",
+        "subject_436",
+        "subject_437",
+        "subject_438",
+        "subject_439",
+        "subject_44",
+        "subject_440",
+        "subject_441",
+        "subject_442",
+        "subject_443",
+        "subject_444",
+        "subject_445",
+        "subject_446",
+        "subject_448",
+        "subject_449",
+        "subject_45",
+        "subject_450",
+        "subject_451",
+        "subject_452",
+        "subject_454",
+        "subject_455",
+        "subject_456",
+        "subject_457",
+        "subject_458",
+        "subject_46",
+        "subject_460",
+        "subject_461",
+        "subject_462",
+        "subject_463",
+        "subject_465",
+        "subject_467",
+        "subject_468",
+        "subject_469",
+        "subject_47",
+        "subject_470",
+        "subject_473",
+        "subject_476",
+        "subject_48",
+        "subject_481",
+        "subject_482",
+        "subject_483",
+        "subject_489",
+        "subject_490",
+        "subject_491",
+        "subject_492",
+        "subject_493",
+        "subject_494",
+        "subject_495",
+        "subject_496",
+        "subject_497",
+        "subject_50",
+        "subject_500",
+        "subject_502",
+        "subject_503",
+        "subject_504",
+        "subject_505",
+        "subject_507",
+        "subject_51",
+        "subject_512",
+        "subject_514",
+        "subject_515",
+        "subject_516",
+        "subject_517",
+        "subject_518",
+        "subject_519",
+        "subject_52",
+        "subject_520",
+        "subject_521",
+        "subject_522",
+        "subject_524",
+        "subject_525",
+        "subject_526",
+        "subject_527",
+        "subject_528",
+        "subject_529",
+        "subject_53",
+        "subject_530",
+        "subject_532",
+        "subject_534",
+        "subject_535",
+        "subject_536",
+        "subject_537",
+        "subject_539",
+        "subject_54",
+        "subject_540",
+        "subject_541",
+        "subject_543",
+        "subject_544",
+        "subject_545",
+        "subject_548",
+        "subject_549",
+        "subject_551",
+        "subject_552",
+        "subject_554",
+        "subject_555",
+        "subject_556",
+        "subject_559",
+        "subject_56",
+        "subject_561",
+        "subject_562",
+        "subject_565",
+        "subject_566",
+        "subject_568",
+        "subject_570",
+        "subject_571",
+        "subject_572",
+        "subject_573",
+        "subject_576",
+        "subject_58",
+        "subject_59",
+        "subject_60",
+        "subject_61",
+        "subject_63",
+        "subject_65",
+        "subject_66",
+        "subject_68",
+        "subject_7",
+        "subject_71",
+        "subject_73",
+        "subject_74",
+        "subject_75",
+        "subject_76",
+        "subject_77",
+        "subject_8",
+        "subject_80",
+        "subject_81",
+        "subject_82",
+        "subject_83",
+        "subject_84",
+        "subject_86",
+        "subject_87",
+        "subject_88",
+        "subject_89",
+        "subject_9",
+        "subject_90",
+        "subject_93",
+        "subject_94",
+        "subject_95",
+        "subject_96",
+        "subject_98",
+        "atlas"
+    ],
+    "val": [
+        "subject_105",
+        "subject_108",
+        "subject_11",
+        "subject_114",
+        "subject_119",
+        "subject_126",
+        "subject_131",
+        "subject_136",
+        "subject_14",
+        "subject_144",
+        "subject_151",
+        "subject_153",
+        "subject_165",
+        "subject_177",
+        "subject_188",
+        "subject_195",
+        "subject_2",
+        "subject_21",
+        "subject_222",
+        "subject_248",
+        "subject_251",
+        "subject_252",
+        "subject_262",
+        "subject_269",
+        "subject_27",
+        "subject_295",
+        "subject_319",
+        "subject_344",
+        "subject_362",
+        "subject_369",
+        "subject_389",
+        "subject_391",
+        "subject_411",
+        "subject_42",
+        "subject_429",
+        "subject_435",
+        "subject_459",
+        "subject_474",
+        "subject_475",
+        "subject_478",
+        "subject_485",
+        "subject_488",
+        "subject_498",
+        "subject_5",
+        "subject_509",
+        "subject_513",
+        "subject_531",
+        "subject_557",
+        "subject_558",
+        "subject_560",
+        "subject_564",
+        "subject_569",
+        "subject_62",
+        "subject_64",
+        "subject_69",
+        "subject_78",
+        "subject_85",
+        "subject_92"
+    ],
+    "test": [
+        "subject_1",
+        "subject_110",
+        "subject_112",
+        "subject_115",
+        "subject_13",
+        "subject_135",
+        "subject_139",
+        "subject_155",
+        "subject_156",
+        "subject_158",
+        "subject_166",
+        "subject_167",
+        "subject_172",
+        "subject_182",
+        "subject_183",
+        "subject_184",
+        "subject_185",
+        "subject_186",
+        "subject_19",
+        "subject_191",
+        "subject_198",
+        "subject_199",
+        "subject_206",
+        "subject_212",
+        "subject_218",
+        "subject_224",
+        "subject_225",
+        "subject_226",
+        "subject_227",
+        "subject_229",
+        "subject_233",
+        "subject_274",
+        "subject_279",
+        "subject_286",
+        "subject_287",
+        "subject_291",
+        "subject_3",
+        "subject_302",
+        "subject_305",
+        "subject_317",
+        "subject_318",
+        "subject_320",
+        "subject_322",
+        "subject_325",
+        "subject_329",
+        "subject_337",
+        "subject_338",
+        "subject_339",
+        "subject_34",
+        "subject_347",
+        "subject_358",
+        "subject_363",
+        "subject_365",
+        "subject_366",
+        "subject_367",
+        "subject_37",
+        "subject_378",
+        "subject_380",
+        "subject_384",
+        "subject_39",
+        "subject_390",
+        "subject_393",
+        "subject_394",
+        "subject_399",
+        "subject_400",
+        "subject_402",
+        "subject_404",
+        "subject_405",
+        "subject_410",
+        "subject_412",
+        "subject_420",
+        "subject_423",
+        "subject_424",
+        "subject_428",
+        "subject_447",
+        "subject_453",
+        "subject_464",
+        "subject_466",
+        "subject_471",
+        "subject_472",
+        "subject_477",
+        "subject_479",
+        "subject_480",
+        "subject_484",
+        "subject_486",
+        "subject_487",
+        "subject_49",
+        "subject_499",
+        "subject_501",
+        "subject_506",
+        "subject_508",
+        "subject_510",
+        "subject_511",
+        "subject_523",
+        "subject_533",
+        "subject_538",
+        "subject_542",
+        "subject_546",
+        "subject_547",
+        "subject_55",
+        "subject_550",
+        "subject_553",
+        "subject_563",
+        "subject_567",
+        "subject_57",
+        "subject_574",
+        "subject_575",
+        "subject_6",
+        "subject_67",
+        "subject_70",
+        "subject_72",
+        "subject_79",
+        "subject_91",
+        "subject_97",
+        "subject_99"
+    ],
+    "train_pair": [
+        [
+            "subject_0",
+            "atlas"
+        ],
+        [
+            "subject_10",
+            "atlas"
+        ],
+        [
+            "subject_100",
+            "atlas"
+        ],
+        [
+            "subject_101",
+            "atlas"
+        ],
+        [
+            "subject_102",
+            "atlas"
+        ],
+        [
+            "subject_103",
+            "atlas"
+        ],
+        [
+            "subject_104",
+            "atlas"
+        ],
+        [
+            "subject_106",
+            "atlas"
+        ],
+        [
+            "subject_107",
+            "atlas"
+        ],
+        [
+            "subject_109",
+            "atlas"
+        ],
+        [
+            "subject_111",
+            "atlas"
+        ],
+        [
+            "subject_113",
+            "atlas"
+        ],
+        [
+            "subject_116",
+            "atlas"
+        ],
+        [
+            "subject_117",
+            "atlas"
+        ],
+        [
+            "subject_118",
+            "atlas"
+        ],
+        [
+            "subject_12",
+            "atlas"
+        ],
+        [
+            "subject_120",
+            "atlas"
+        ],
+        [
+            "subject_121",
+            "atlas"
+        ],
+        [
+            "subject_122",
+            "atlas"
+        ],
+        [
+            "subject_123",
+            "atlas"
+        ],
+        [
+            "subject_124",
+            "atlas"
+        ],
+        [
+            "subject_125",
+            "atlas"
+        ],
+        [
+            "subject_127",
+            "atlas"
+        ],
+        [
+            "subject_128",
+            "atlas"
+        ],
+        [
+            "subject_129",
+            "atlas"
+        ],
+        [
+            "subject_130",
+            "atlas"
+        ],
+        [
+            "subject_132",
+            "atlas"
+        ],
+        [
+            "subject_133",
+            "atlas"
+        ],
+        [
+            "subject_134",
+            "atlas"
+        ],
+        [
+            "subject_137",
+            "atlas"
+        ],
+        [
+            "subject_138",
+            "atlas"
+        ],
+        [
+            "subject_140",
+            "atlas"
+        ],
+        [
+            "subject_141",
+            "atlas"
+        ],
+        [
+            "subject_142",
+            "atlas"
+        ],
+        [
+            "subject_143",
+            "atlas"
+        ],
+        [
+            "subject_145",
+            "atlas"
+        ],
+        [
+            "subject_146",
+            "atlas"
+        ],
+        [
+            "subject_147",
+            "atlas"
+        ],
+        [
+            "subject_148",
+            "atlas"
+        ],
+        [
+            "subject_149",
+            "atlas"
+        ],
+        [
+            "subject_15",
+            "atlas"
+        ],
+        [
+            "subject_150",
+            "atlas"
+        ],
+        [
+            "subject_152",
+            "atlas"
+        ],
+        [
+            "subject_154",
+            "atlas"
+        ],
+        [
+            "subject_157",
+            "atlas"
+        ],
+        [
+            "subject_159",
+            "atlas"
+        ],
+        [
+            "subject_16",
+            "atlas"
+        ],
+        [
+            "subject_160",
+            "atlas"
+        ],
+        [
+            "subject_161",
+            "atlas"
+        ],
+        [
+            "subject_162",
+            "atlas"
+        ],
+        [
+            "subject_163",
+            "atlas"
+        ],
+        [
+            "subject_164",
+            "atlas"
+        ],
+        [
+            "subject_168",
+            "atlas"
+        ],
+        [
+            "subject_169",
+            "atlas"
+        ],
+        [
+            "subject_17",
+            "atlas"
+        ],
+        [
+            "subject_170",
+            "atlas"
+        ],
+        [
+            "subject_171",
+            "atlas"
+        ],
+        [
+            "subject_173",
+            "atlas"
+        ],
+        [
+            "subject_174",
+            "atlas"
+        ],
+        [
+            "subject_175",
+            "atlas"
+        ],
+        [
+            "subject_176",
+            "atlas"
+        ],
+        [
+            "subject_178",
+            "atlas"
+        ],
+        [
+            "subject_179",
+            "atlas"
+        ],
+        [
+            "subject_18",
+            "atlas"
+        ],
+        [
+            "subject_180",
+            "atlas"
+        ],
+        [
+            "subject_181",
+            "atlas"
+        ],
+        [
+            "subject_187",
+            "atlas"
+        ],
+        [
+            "subject_189",
+            "atlas"
+        ],
+        [
+            "subject_190",
+            "atlas"
+        ],
+        [
+            "subject_192",
+            "atlas"
+        ],
+        [
+            "subject_193",
+            "atlas"
+        ],
+        [
+            "subject_194",
+            "atlas"
+        ],
+        [
+            "subject_196",
+            "atlas"
+        ],
+        [
+            "subject_197",
+            "atlas"
+        ],
+        [
+            "subject_20",
+            "atlas"
+        ],
+        [
+            "subject_200",
+            "atlas"
+        ],
+        [
+            "subject_201",
+            "atlas"
+        ],
+        [
+            "subject_202",
+            "atlas"
+        ],
+        [
+            "subject_203",
+            "atlas"
+        ],
+        [
+            "subject_204",
+            "atlas"
+        ],
+        [
+            "subject_205",
+            "atlas"
+        ],
+        [
+            "subject_207",
+            "atlas"
+        ],
+        [
+            "subject_208",
+            "atlas"
+        ],
+        [
+            "subject_209",
+            "atlas"
+        ],
+        [
+            "subject_210",
+            "atlas"
+        ],
+        [
+            "subject_211",
+            "atlas"
+        ],
+        [
+            "subject_213",
+            "atlas"
+        ],
+        [
+            "subject_214",
+            "atlas"
+        ],
+        [
+            "subject_215",
+            "atlas"
+        ],
+        [
+            "subject_216",
+            "atlas"
+        ],
+        [
+            "subject_217",
+            "atlas"
+        ],
+        [
+            "subject_219",
+            "atlas"
+        ],
+        [
+            "subject_22",
+            "atlas"
+        ],
+        [
+            "subject_220",
+            "atlas"
+        ],
+        [
+            "subject_221",
+            "atlas"
+        ],
+        [
+            "subject_223",
+            "atlas"
+        ],
+        [
+            "subject_228",
+            "atlas"
+        ],
+        [
+            "subject_23",
+            "atlas"
+        ],
+        [
+            "subject_230",
+            "atlas"
+        ],
+        [
+            "subject_231",
+            "atlas"
+        ],
+        [
+            "subject_232",
+            "atlas"
+        ],
+        [
+            "subject_234",
+            "atlas"
+        ],
+        [
+            "subject_235",
+            "atlas"
+        ],
+        [
+            "subject_236",
+            "atlas"
+        ],
+        [
+            "subject_237",
+            "atlas"
+        ],
+        [
+            "subject_238",
+            "atlas"
+        ],
+        [
+            "subject_239",
+            "atlas"
+        ],
+        [
+            "subject_24",
+            "atlas"
+        ],
+        [
+            "subject_240",
+            "atlas"
+        ],
+        [
+            "subject_241",
+            "atlas"
+        ],
+        [
+            "subject_242",
+            "atlas"
+        ],
+        [
+            "subject_243",
+            "atlas"
+        ],
+        [
+            "subject_244",
+            "atlas"
+        ],
+        [
+            "subject_245",
+            "atlas"
+        ],
+        [
+            "subject_246",
+            "atlas"
+        ],
+        [
+            "subject_247",
+            "atlas"
+        ],
+        [
+            "subject_249",
+            "atlas"
+        ],
+        [
+            "subject_25",
+            "atlas"
+        ],
+        [
+            "subject_250",
+            "atlas"
+        ],
+        [
+            "subject_253",
+            "atlas"
+        ],
+        [
+            "subject_254",
+            "atlas"
+        ],
+        [
+            "subject_255",
+            "atlas"
+        ],
+        [
+            "subject_256",
+            "atlas"
+        ],
+        [
+            "subject_257",
+            "atlas"
+        ],
+        [
+            "subject_258",
+            "atlas"
+        ],
+        [
+            "subject_259",
+            "atlas"
+        ],
+        [
+            "subject_26",
+            "atlas"
+        ],
+        [
+            "subject_260",
+            "atlas"
+        ],
+        [
+            "subject_261",
+            "atlas"
+        ],
+        [
+            "subject_263",
+            "atlas"
+        ],
+        [
+            "subject_264",
+            "atlas"
+        ],
+        [
+            "subject_265",
+            "atlas"
+        ],
+        [
+            "subject_266",
+            "atlas"
+        ],
+        [
+            "subject_267",
+            "atlas"
+        ],
+        [
+            "subject_268",
+            "atlas"
+        ],
+        [
+            "subject_270",
+            "atlas"
+        ],
+        [
+            "subject_271",
+            "atlas"
+        ],
+        [
+            "subject_272",
+            "atlas"
+        ],
+        [
+            "subject_273",
+            "atlas"
+        ],
+        [
+            "subject_275",
+            "atlas"
+        ],
+        [
+            "subject_276",
+            "atlas"
+        ],
+        [
+            "subject_277",
+            "atlas"
+        ],
+        [
+            "subject_278",
+            "atlas"
+        ],
+        [
+            "subject_28",
+            "atlas"
+        ],
+        [
+            "subject_280",
+            "atlas"
+        ],
+        [
+            "subject_281",
+            "atlas"
+        ],
+        [
+            "subject_282",
+            "atlas"
+        ],
+        [
+            "subject_283",
+            "atlas"
+        ],
+        [
+            "subject_284",
+            "atlas"
+        ],
+        [
+            "subject_285",
+            "atlas"
+        ],
+        [
+            "subject_288",
+            "atlas"
+        ],
+        [
+            "subject_289",
+            "atlas"
+        ],
+        [
+            "subject_29",
+            "atlas"
+        ],
+        [
+            "subject_290",
+            "atlas"
+        ],
+        [
+            "subject_292",
+            "atlas"
+        ],
+        [
+            "subject_293",
+            "atlas"
+        ],
+        [
+            "subject_294",
+            "atlas"
+        ],
+        [
+            "subject_296",
+            "atlas"
+        ],
+        [
+            "subject_297",
+            "atlas"
+        ],
+        [
+            "subject_298",
+            "atlas"
+        ],
+        [
+            "subject_299",
+            "atlas"
+        ],
+        [
+            "subject_30",
+            "atlas"
+        ],
+        [
+            "subject_300",
+            "atlas"
+        ],
+        [
+            "subject_301",
+            "atlas"
+        ],
+        [
+            "subject_303",
+            "atlas"
+        ],
+        [
+            "subject_304",
+            "atlas"
+        ],
+        [
+            "subject_306",
+            "atlas"
+        ],
+        [
+            "subject_307",
+            "atlas"
+        ],
+        [
+            "subject_308",
+            "atlas"
+        ],
+        [
+            "subject_309",
+            "atlas"
+        ],
+        [
+            "subject_31",
+            "atlas"
+        ],
+        [
+            "subject_310",
+            "atlas"
+        ],
+        [
+            "subject_311",
+            "atlas"
+        ],
+        [
+            "subject_312",
+            "atlas"
+        ],
+        [
+            "subject_313",
+            "atlas"
+        ],
+        [
+            "subject_314",
+            "atlas"
+        ],
+        [
+            "subject_315",
+            "atlas"
+        ],
+        [
+            "subject_316",
+            "atlas"
+        ],
+        [
+            "subject_32",
+            "atlas"
+        ],
+        [
+            "subject_321",
+            "atlas"
+        ],
+        [
+            "subject_323",
+            "atlas"
+        ],
+        [
+            "subject_324",
+            "atlas"
+        ],
+        [
+            "subject_326",
+            "atlas"
+        ],
+        [
+            "subject_327",
+            "atlas"
+        ],
+        [
+            "subject_328",
+            "atlas"
+        ],
+        [
+            "subject_33",
+            "atlas"
+        ],
+        [
+            "subject_330",
+            "atlas"
+        ],
+        [
+            "subject_331",
+            "atlas"
+        ],
+        [
+            "subject_332",
+            "atlas"
+        ],
+        [
+            "subject_333",
+            "atlas"
+        ],
+        [
+            "subject_334",
+            "atlas"
+        ],
+        [
+            "subject_335",
+            "atlas"
+        ],
+        [
+            "subject_336",
+            "atlas"
+        ],
+        [
+            "subject_340",
+            "atlas"
+        ],
+        [
+            "subject_341",
+            "atlas"
+        ],
+        [
+            "subject_342",
+            "atlas"
+        ],
+        [
+            "subject_343",
+            "atlas"
+        ],
+        [
+            "subject_345",
+            "atlas"
+        ],
+        [
+            "subject_346",
+            "atlas"
+        ],
+        [
+            "subject_348",
+            "atlas"
+        ],
+        [
+            "subject_349",
+            "atlas"
+        ],
+        [
+            "subject_35",
+            "atlas"
+        ],
+        [
+            "subject_350",
+            "atlas"
+        ],
+        [
+            "subject_351",
+            "atlas"
+        ],
+        [
+            "subject_352",
+            "atlas"
+        ],
+        [
+            "subject_353",
+            "atlas"
+        ],
+        [
+            "subject_354",
+            "atlas"
+        ],
+        [
+            "subject_355",
+            "atlas"
+        ],
+        [
+            "subject_356",
+            "atlas"
+        ],
+        [
+            "subject_357",
+            "atlas"
+        ],
+        [
+            "subject_359",
+            "atlas"
+        ],
+        [
+            "subject_36",
+            "atlas"
+        ],
+        [
+            "subject_360",
+            "atlas"
+        ],
+        [
+            "subject_361",
+            "atlas"
+        ],
+        [
+            "subject_364",
+            "atlas"
+        ],
+        [
+            "subject_368",
+            "atlas"
+        ],
+        [
+            "subject_370",
+            "atlas"
+        ],
+        [
+            "subject_371",
+            "atlas"
+        ],
+        [
+            "subject_372",
+            "atlas"
+        ],
+        [
+            "subject_373",
+            "atlas"
+        ],
+        [
+            "subject_374",
+            "atlas"
+        ],
+        [
+            "subject_375",
+            "atlas"
+        ],
+        [
+            "subject_377",
+            "atlas"
+        ],
+        [
+            "subject_379",
+            "atlas"
+        ],
+        [
+            "subject_38",
+            "atlas"
+        ],
+        [
+            "subject_381",
+            "atlas"
+        ],
+        [
+            "subject_382",
+            "atlas"
+        ],
+        [
+            "subject_383",
+            "atlas"
+        ],
+        [
+            "subject_385",
+            "atlas"
+        ],
+        [
+            "subject_386",
+            "atlas"
+        ],
+        [
+            "subject_387",
+            "atlas"
+        ],
+        [
+            "subject_388",
+            "atlas"
+        ],
+        [
+            "subject_392",
+            "atlas"
+        ],
+        [
+            "subject_395",
+            "atlas"
+        ],
+        [
+            "subject_396",
+            "atlas"
+        ],
+        [
+            "subject_397",
+            "atlas"
+        ],
+        [
+            "subject_398",
+            "atlas"
+        ],
+        [
+            "subject_4",
+            "atlas"
+        ],
+        [
+            "subject_40",
+            "atlas"
+        ],
+        [
+            "subject_401",
+            "atlas"
+        ],
+        [
+            "subject_403",
+            "atlas"
+        ],
+        [
+            "subject_406",
+            "atlas"
+        ],
+        [
+            "subject_407",
+            "atlas"
+        ],
+        [
+            "subject_408",
+            "atlas"
+        ],
+        [
+            "subject_409",
+            "atlas"
+        ],
+        [
+            "subject_41",
+            "atlas"
+        ],
+        [
+            "subject_413",
+            "atlas"
+        ],
+        [
+            "subject_414",
+            "atlas"
+        ],
+        [
+            "subject_415",
+            "atlas"
+        ],
+        [
+            "subject_416",
+            "atlas"
+        ],
+        [
+            "subject_417",
+            "atlas"
+        ],
+        [
+            "subject_418",
+            "atlas"
+        ],
+        [
+            "subject_419",
+            "atlas"
+        ],
+        [
+            "subject_421",
+            "atlas"
+        ],
+        [
+            "subject_422",
+            "atlas"
+        ],
+        [
+            "subject_425",
+            "atlas"
+        ],
+        [
+            "subject_426",
+            "atlas"
+        ],
+        [
+            "subject_427",
+            "atlas"
+        ],
+        [
+            "subject_43",
+            "atlas"
+        ],
+        [
+            "subject_430",
+            "atlas"
+        ],
+        [
+            "subject_431",
+            "atlas"
+        ],
+        [
+            "subject_432",
+            "atlas"
+        ],
+        [
+            "subject_433",
+            "atlas"
+        ],
+        [
+            "subject_434",
+            "atlas"
+        ],
+        [
+            "subject_436",
+            "atlas"
+        ],
+        [
+            "subject_437",
+            "atlas"
+        ],
+        [
+            "subject_438",
+            "atlas"
+        ],
+        [
+            "subject_439",
+            "atlas"
+        ],
+        [
+            "subject_44",
+            "atlas"
+        ],
+        [
+            "subject_440",
+            "atlas"
+        ],
+        [
+            "subject_441",
+            "atlas"
+        ],
+        [
+            "subject_442",
+            "atlas"
+        ],
+        [
+            "subject_443",
+            "atlas"
+        ],
+        [
+            "subject_444",
+            "atlas"
+        ],
+        [
+            "subject_445",
+            "atlas"
+        ],
+        [
+            "subject_446",
+            "atlas"
+        ],
+        [
+            "subject_448",
+            "atlas"
+        ],
+        [
+            "subject_449",
+            "atlas"
+        ],
+        [
+            "subject_45",
+            "atlas"
+        ],
+        [
+            "subject_450",
+            "atlas"
+        ],
+        [
+            "subject_451",
+            "atlas"
+        ],
+        [
+            "subject_452",
+            "atlas"
+        ],
+        [
+            "subject_454",
+            "atlas"
+        ],
+        [
+            "subject_455",
+            "atlas"
+        ],
+        [
+            "subject_456",
+            "atlas"
+        ],
+        [
+            "subject_457",
+            "atlas"
+        ],
+        [
+            "subject_458",
+            "atlas"
+        ],
+        [
+            "subject_46",
+            "atlas"
+        ],
+        [
+            "subject_460",
+            "atlas"
+        ],
+        [
+            "subject_461",
+            "atlas"
+        ],
+        [
+            "subject_462",
+            "atlas"
+        ],
+        [
+            "subject_463",
+            "atlas"
+        ],
+        [
+            "subject_465",
+            "atlas"
+        ],
+        [
+            "subject_467",
+            "atlas"
+        ],
+        [
+            "subject_468",
+            "atlas"
+        ],
+        [
+            "subject_469",
+            "atlas"
+        ],
+        [
+            "subject_47",
+            "atlas"
+        ],
+        [
+            "subject_470",
+            "atlas"
+        ],
+        [
+            "subject_473",
+            "atlas"
+        ],
+        [
+            "subject_476",
+            "atlas"
+        ],
+        [
+            "subject_48",
+            "atlas"
+        ],
+        [
+            "subject_481",
+            "atlas"
+        ],
+        [
+            "subject_482",
+            "atlas"
+        ],
+        [
+            "subject_483",
+            "atlas"
+        ],
+        [
+            "subject_489",
+            "atlas"
+        ],
+        [
+            "subject_490",
+            "atlas"
+        ],
+        [
+            "subject_491",
+            "atlas"
+        ],
+        [
+            "subject_492",
+            "atlas"
+        ],
+        [
+            "subject_493",
+            "atlas"
+        ],
+        [
+            "subject_494",
+            "atlas"
+        ],
+        [
+            "subject_495",
+            "atlas"
+        ],
+        [
+            "subject_496",
+            "atlas"
+        ],
+        [
+            "subject_497",
+            "atlas"
+        ],
+        [
+            "subject_50",
+            "atlas"
+        ],
+        [
+            "subject_500",
+            "atlas"
+        ],
+        [
+            "subject_502",
+            "atlas"
+        ],
+        [
+            "subject_503",
+            "atlas"
+        ],
+        [
+            "subject_504",
+            "atlas"
+        ],
+        [
+            "subject_505",
+            "atlas"
+        ],
+        [
+            "subject_507",
+            "atlas"
+        ],
+        [
+            "subject_51",
+            "atlas"
+        ],
+        [
+            "subject_512",
+            "atlas"
+        ],
+        [
+            "subject_514",
+            "atlas"
+        ],
+        [
+            "subject_515",
+            "atlas"
+        ],
+        [
+            "subject_516",
+            "atlas"
+        ],
+        [
+            "subject_517",
+            "atlas"
+        ],
+        [
+            "subject_518",
+            "atlas"
+        ],
+        [
+            "subject_519",
+            "atlas"
+        ],
+        [
+            "subject_52",
+            "atlas"
+        ],
+        [
+            "subject_520",
+            "atlas"
+        ],
+        [
+            "subject_521",
+            "atlas"
+        ],
+        [
+            "subject_522",
+            "atlas"
+        ],
+        [
+            "subject_524",
+            "atlas"
+        ],
+        [
+            "subject_525",
+            "atlas"
+        ],
+        [
+            "subject_526",
+            "atlas"
+        ],
+        [
+            "subject_527",
+            "atlas"
+        ],
+        [
+            "subject_528",
+            "atlas"
+        ],
+        [
+            "subject_529",
+            "atlas"
+        ],
+        [
+            "subject_53",
+            "atlas"
+        ],
+        [
+            "subject_530",
+            "atlas"
+        ],
+        [
+            "subject_532",
+            "atlas"
+        ],
+        [
+            "subject_534",
+            "atlas"
+        ],
+        [
+            "subject_535",
+            "atlas"
+        ],
+        [
+            "subject_536",
+            "atlas"
+        ],
+        [
+            "subject_537",
+            "atlas"
+        ],
+        [
+            "subject_539",
+            "atlas"
+        ],
+        [
+            "subject_54",
+            "atlas"
+        ],
+        [
+            "subject_540",
+            "atlas"
+        ],
+        [
+            "subject_541",
+            "atlas"
+        ],
+        [
+            "subject_543",
+            "atlas"
+        ],
+        [
+            "subject_544",
+            "atlas"
+        ],
+        [
+            "subject_545",
+            "atlas"
+        ],
+        [
+            "subject_548",
+            "atlas"
+        ],
+        [
+            "subject_549",
+            "atlas"
+        ],
+        [
+            "subject_551",
+            "atlas"
+        ],
+        [
+            "subject_552",
+            "atlas"
+        ],
+        [
+            "subject_554",
+            "atlas"
+        ],
+        [
+            "subject_555",
+            "atlas"
+        ],
+        [
+            "subject_556",
+            "atlas"
+        ],
+        [
+            "subject_559",
+            "atlas"
+        ],
+        [
+            "subject_56",
+            "atlas"
+        ],
+        [
+            "subject_561",
+            "atlas"
+        ],
+        [
+            "subject_562",
+            "atlas"
+        ],
+        [
+            "subject_565",
+            "atlas"
+        ],
+        [
+            "subject_566",
+            "atlas"
+        ],
+        [
+            "subject_568",
+            "atlas"
+        ],
+        [
+            "subject_570",
+            "atlas"
+        ],
+        [
+            "subject_571",
+            "atlas"
+        ],
+        [
+            "subject_572",
+            "atlas"
+        ],
+        [
+            "subject_573",
+            "atlas"
+        ],
+        [
+            "subject_576",
+            "atlas"
+        ],
+        [
+            "subject_58",
+            "atlas"
+        ],
+        [
+            "subject_59",
+            "atlas"
+        ],
+        [
+            "subject_60",
+            "atlas"
+        ],
+        [
+            "subject_61",
+            "atlas"
+        ],
+        [
+            "subject_63",
+            "atlas"
+        ],
+        [
+            "subject_65",
+            "atlas"
+        ],
+        [
+            "subject_66",
+            "atlas"
+        ],
+        [
+            "subject_68",
+            "atlas"
+        ],
+        [
+            "subject_7",
+            "atlas"
+        ],
+        [
+            "subject_71",
+            "atlas"
+        ],
+        [
+            "subject_73",
+            "atlas"
+        ],
+        [
+            "subject_74",
+            "atlas"
+        ],
+        [
+            "subject_75",
+            "atlas"
+        ],
+        [
+            "subject_76",
+            "atlas"
+        ],
+        [
+            "subject_77",
+            "atlas"
+        ],
+        [
+            "subject_8",
+            "atlas"
+        ],
+        [
+            "subject_80",
+            "atlas"
+        ],
+        [
+            "subject_81",
+            "atlas"
+        ],
+        [
+            "subject_82",
+            "atlas"
+        ],
+        [
+            "subject_83",
+            "atlas"
+        ],
+        [
+            "subject_84",
+            "atlas"
+        ],
+        [
+            "subject_86",
+            "atlas"
+        ],
+        [
+            "subject_87",
+            "atlas"
+        ],
+        [
+            "subject_88",
+            "atlas"
+        ],
+        [
+            "subject_89",
+            "atlas"
+        ],
+        [
+            "subject_9",
+            "atlas"
+        ],
+        [
+            "subject_90",
+            "atlas"
+        ],
+        [
+            "subject_93",
+            "atlas"
+        ],
+        [
+            "subject_94",
+            "atlas"
+        ],
+        [
+            "subject_95",
+            "atlas"
+        ],
+        [
+            "subject_96",
+            "atlas"
+        ],
+        [
+            "subject_98",
+            "atlas"
+        ],
+        [
+            "atlas",
+            "atlas"
+        ]
+    ],
+    "val_pair": [
+        [
+            "subject_105",
+            "atlas"
+        ],
+        [
+            "subject_108",
+            "atlas"
+        ],
+        [
+            "subject_11",
+            "atlas"
+        ],
+        [
+            "subject_114",
+            "atlas"
+        ],
+        [
+            "subject_119",
+            "atlas"
+        ],
+        [
+            "subject_126",
+            "atlas"
+        ],
+        [
+            "subject_131",
+            "atlas"
+        ],
+        [
+            "subject_136",
+            "atlas"
+        ],
+        [
+            "subject_14",
+            "atlas"
+        ],
+        [
+            "subject_144",
+            "atlas"
+        ],
+        [
+            "subject_151",
+            "atlas"
+        ],
+        [
+            "subject_153",
+            "atlas"
+        ],
+        [
+            "subject_165",
+            "atlas"
+        ],
+        [
+            "subject_177",
+            "atlas"
+        ],
+        [
+            "subject_188",
+            "atlas"
+        ],
+        [
+            "subject_195",
+            "atlas"
+        ],
+        [
+            "subject_2",
+            "atlas"
+        ],
+        [
+            "subject_21",
+            "atlas"
+        ],
+        [
+            "subject_222",
+            "atlas"
+        ],
+        [
+            "subject_248",
+            "atlas"
+        ],
+        [
+            "subject_251",
+            "atlas"
+        ],
+        [
+            "subject_252",
+            "atlas"
+        ],
+        [
+            "subject_262",
+            "atlas"
+        ],
+        [
+            "subject_269",
+            "atlas"
+        ],
+        [
+            "subject_27",
+            "atlas"
+        ],
+        [
+            "subject_295",
+            "atlas"
+        ],
+        [
+            "subject_319",
+            "atlas"
+        ],
+        [
+            "subject_344",
+            "atlas"
+        ],
+        [
+            "subject_362",
+            "atlas"
+        ],
+        [
+            "subject_369",
+            "atlas"
+        ],
+        [
+            "subject_389",
+            "atlas"
+        ],
+        [
+            "subject_391",
+            "atlas"
+        ],
+        [
+            "subject_411",
+            "atlas"
+        ],
+        [
+            "subject_42",
+            "atlas"
+        ],
+        [
+            "subject_429",
+            "atlas"
+        ],
+        [
+            "subject_435",
+            "atlas"
+        ],
+        [
+            "subject_459",
+            "atlas"
+        ],
+        [
+            "subject_474",
+            "atlas"
+        ],
+        [
+            "subject_475",
+            "atlas"
+        ],
+        [
+            "subject_478",
+            "atlas"
+        ],
+        [
+            "subject_485",
+            "atlas"
+        ],
+        [
+            "subject_488",
+            "atlas"
+        ],
+        [
+            "subject_498",
+            "atlas"
+        ],
+        [
+            "subject_5",
+            "atlas"
+        ],
+        [
+            "subject_509",
+            "atlas"
+        ],
+        [
+            "subject_513",
+            "atlas"
+        ],
+        [
+            "subject_531",
+            "atlas"
+        ],
+        [
+            "subject_557",
+            "atlas"
+        ],
+        [
+            "subject_558",
+            "atlas"
+        ],
+        [
+            "subject_560",
+            "atlas"
+        ],
+        [
+            "subject_564",
+            "atlas"
+        ],
+        [
+            "subject_569",
+            "atlas"
+        ],
+        [
+            "subject_62",
+            "atlas"
+        ],
+        [
+            "subject_64",
+            "atlas"
+        ],
+        [
+            "subject_69",
+            "atlas"
+        ],
+        [
+            "subject_78",
+            "atlas"
+        ],
+        [
+            "subject_85",
+            "atlas"
+        ],
+        [
+            "subject_92",
+            "atlas"
+        ]
+    ],
+    "test_pair": [
+        [
+            "subject_1",
+            "atlas"
+        ],
+        [
+            "subject_110",
+            "atlas"
+        ],
+        [
+            "subject_112",
+            "atlas"
+        ],
+        [
+            "subject_115",
+            "atlas"
+        ],
+        [
+            "subject_13",
+            "atlas"
+        ],
+        [
+            "subject_135",
+            "atlas"
+        ],
+        [
+            "subject_139",
+            "atlas"
+        ],
+        [
+            "subject_155",
+            "atlas"
+        ],
+        [
+            "subject_156",
+            "atlas"
+        ],
+        [
+            "subject_158",
+            "atlas"
+        ],
+        [
+            "subject_166",
+            "atlas"
+        ],
+        [
+            "subject_167",
+            "atlas"
+        ],
+        [
+            "subject_172",
+            "atlas"
+        ],
+        [
+            "subject_182",
+            "atlas"
+        ],
+        [
+            "subject_183",
+            "atlas"
+        ],
+        [
+            "subject_184",
+            "atlas"
+        ],
+        [
+            "subject_185",
+            "atlas"
+        ],
+        [
+            "subject_186",
+            "atlas"
+        ],
+        [
+            "subject_19",
+            "atlas"
+        ],
+        [
+            "subject_191",
+            "atlas"
+        ],
+        [
+            "subject_198",
+            "atlas"
+        ],
+        [
+            "subject_199",
+            "atlas"
+        ],
+        [
+            "subject_206",
+            "atlas"
+        ],
+        [
+            "subject_212",
+            "atlas"
+        ],
+        [
+            "subject_218",
+            "atlas"
+        ],
+        [
+            "subject_224",
+            "atlas"
+        ],
+        [
+            "subject_225",
+            "atlas"
+        ],
+        [
+            "subject_226",
+            "atlas"
+        ],
+        [
+            "subject_227",
+            "atlas"
+        ],
+        [
+            "subject_229",
+            "atlas"
+        ],
+        [
+            "subject_233",
+            "atlas"
+        ],
+        [
+            "subject_274",
+            "atlas"
+        ],
+        [
+            "subject_279",
+            "atlas"
+        ],
+        [
+            "subject_286",
+            "atlas"
+        ],
+        [
+            "subject_287",
+            "atlas"
+        ],
+        [
+            "subject_291",
+            "atlas"
+        ],
+        [
+            "subject_3",
+            "atlas"
+        ],
+        [
+            "subject_302",
+            "atlas"
+        ],
+        [
+            "subject_305",
+            "atlas"
+        ],
+        [
+            "subject_317",
+            "atlas"
+        ],
+        [
+            "subject_318",
+            "atlas"
+        ],
+        [
+            "subject_320",
+            "atlas"
+        ],
+        [
+            "subject_322",
+            "atlas"
+        ],
+        [
+            "subject_325",
+            "atlas"
+        ],
+        [
+            "subject_329",
+            "atlas"
+        ],
+        [
+            "subject_337",
+            "atlas"
+        ],
+        [
+            "subject_338",
+            "atlas"
+        ],
+        [
+            "subject_339",
+            "atlas"
+        ],
+        [
+            "subject_34",
+            "atlas"
+        ],
+        [
+            "subject_347",
+            "atlas"
+        ],
+        [
+            "subject_358",
+            "atlas"
+        ],
+        [
+            "subject_363",
+            "atlas"
+        ],
+        [
+            "subject_365",
+            "atlas"
+        ],
+        [
+            "subject_366",
+            "atlas"
+        ],
+        [
+            "subject_367",
+            "atlas"
+        ],
+        [
+            "subject_37",
+            "atlas"
+        ],
+        [
+            "subject_378",
+            "atlas"
+        ],
+        [
+            "subject_380",
+            "atlas"
+        ],
+        [
+            "subject_384",
+            "atlas"
+        ],
+        [
+            "subject_39",
+            "atlas"
+        ],
+        [
+            "subject_390",
+            "atlas"
+        ],
+        [
+            "subject_393",
+            "atlas"
+        ],
+        [
+            "subject_394",
+            "atlas"
+        ],
+        [
+            "subject_399",
+            "atlas"
+        ],
+        [
+            "subject_400",
+            "atlas"
+        ],
+        [
+            "subject_402",
+            "atlas"
+        ],
+        [
+            "subject_404",
+            "atlas"
+        ],
+        [
+            "subject_405",
+            "atlas"
+        ],
+        [
+            "subject_410",
+            "atlas"
+        ],
+        [
+            "subject_412",
+            "atlas"
+        ],
+        [
+            "subject_420",
+            "atlas"
+        ],
+        [
+            "subject_423",
+            "atlas"
+        ],
+        [
+            "subject_424",
+            "atlas"
+        ],
+        [
+            "subject_428",
+            "atlas"
+        ],
+        [
+            "subject_447",
+            "atlas"
+        ],
+        [
+            "subject_453",
+            "atlas"
+        ],
+        [
+            "subject_464",
+            "atlas"
+        ],
+        [
+            "subject_466",
+            "atlas"
+        ],
+        [
+            "subject_471",
+            "atlas"
+        ],
+        [
+            "subject_472",
+            "atlas"
+        ],
+        [
+            "subject_477",
+            "atlas"
+        ],
+        [
+            "subject_479",
+            "atlas"
+        ],
+        [
+            "subject_480",
+            "atlas"
+        ],
+        [
+            "subject_484",
+            "atlas"
+        ],
+        [
+            "subject_486",
+            "atlas"
+        ],
+        [
+            "subject_487",
+            "atlas"
+        ],
+        [
+            "subject_49",
+            "atlas"
+        ],
+        [
+            "subject_499",
+            "atlas"
+        ],
+        [
+            "subject_501",
+            "atlas"
+        ],
+        [
+            "subject_506",
+            "atlas"
+        ],
+        [
+            "subject_508",
+            "atlas"
+        ],
+        [
+            "subject_510",
+            "atlas"
+        ],
+        [
+            "subject_511",
+            "atlas"
+        ],
+        [
+            "subject_523",
+            "atlas"
+        ],
+        [
+            "subject_533",
+            "atlas"
+        ],
+        [
+            "subject_538",
+            "atlas"
+        ],
+        [
+            "subject_542",
+            "atlas"
+        ],
+        [
+            "subject_546",
+            "atlas"
+        ],
+        [
+            "subject_547",
+            "atlas"
+        ],
+        [
+            "subject_55",
+            "atlas"
+        ],
+        [
+            "subject_550",
+            "atlas"
+        ],
+        [
+            "subject_553",
+            "atlas"
+        ],
+        [
+            "subject_563",
+            "atlas"
+        ],
+        [
+            "subject_567",
+            "atlas"
+        ],
+        [
+            "subject_57",
+            "atlas"
+        ],
+        [
+            "subject_574",
+            "atlas"
+        ],
+        [
+            "subject_575",
+            "atlas"
+        ],
+        [
+            "subject_6",
+            "atlas"
+        ],
+        [
+            "subject_67",
+            "atlas"
+        ],
+        [
+            "subject_70",
+            "atlas"
+        ],
+        [
+            "subject_72",
+            "atlas"
+        ],
+        [
+            "subject_79",
+            "atlas"
+        ],
+        [
+            "subject_91",
+            "atlas"
+        ],
+        [
+            "subject_97",
+            "atlas"
+        ],
+        [
+            "subject_99",
+            "atlas"
+        ]
+    ],
+    "seg_0": {
+        "subject_0": false,
+        "subject_10": false,
+        "subject_100": false,
+        "subject_101": false,
+        "subject_102": false,
+        "subject_103": false,
+        "subject_104": false,
+        "subject_106": false,
+        "subject_107": false,
+        "subject_109": false,
+        "subject_111": false,
+        "subject_113": false,
+        "subject_116": false,
+        "subject_117": false,
+        "subject_118": false,
+        "subject_12": false,
+        "subject_120": false,
+        "subject_121": false,
+        "subject_122": false,
+        "subject_123": false,
+        "subject_124": false,
+        "subject_125": false,
+        "subject_127": false,
+        "subject_128": false,
+        "subject_129": false,
+        "subject_130": false,
+        "subject_132": false,
+        "subject_133": false,
+        "subject_134": false,
+        "subject_137": false,
+        "subject_138": false,
+        "subject_140": false,
+        "subject_141": false,
+        "subject_142": false,
+        "subject_143": false,
+        "subject_145": false,
+        "subject_146": false,
+        "subject_147": false,
+        "subject_148": false,
+        "subject_149": false,
+        "subject_15": false,
+        "subject_150": false,
+        "subject_152": false,
+        "subject_154": false,
+        "subject_157": false,
+        "subject_159": false,
+        "subject_16": false,
+        "subject_160": false,
+        "subject_161": false,
+        "subject_162": false,
+        "subject_163": false,
+        "subject_164": false,
+        "subject_168": false,
+        "subject_169": false,
+        "subject_17": false,
+        "subject_170": false,
+        "subject_171": false,
+        "subject_173": false,
+        "subject_174": false,
+        "subject_175": false,
+        "subject_176": false,
+        "subject_178": false,
+        "subject_179": false,
+        "subject_18": false,
+        "subject_180": false,
+        "subject_181": false,
+        "subject_187": false,
+        "subject_189": false,
+        "subject_190": false,
+        "subject_192": false,
+        "subject_193": false,
+        "subject_194": false,
+        "subject_196": false,
+        "subject_197": false,
+        "subject_20": false,
+        "subject_200": false,
+        "subject_201": false,
+        "subject_202": false,
+        "subject_203": false,
+        "subject_204": false,
+        "subject_205": false,
+        "subject_207": false,
+        "subject_208": false,
+        "subject_209": false,
+        "subject_210": false,
+        "subject_211": false,
+        "subject_213": false,
+        "subject_214": false,
+        "subject_215": false,
+        "subject_216": false,
+        "subject_217": false,
+        "subject_219": false,
+        "subject_22": false,
+        "subject_220": false,
+        "subject_221": false,
+        "subject_223": false,
+        "subject_228": false,
+        "subject_23": false,
+        "subject_230": false,
+        "subject_231": false,
+        "subject_232": false,
+        "subject_234": false,
+        "subject_235": false,
+        "subject_236": false,
+        "subject_237": false,
+        "subject_238": false,
+        "subject_239": false,
+        "subject_24": false,
+        "subject_240": false,
+        "subject_241": false,
+        "subject_242": false,
+        "subject_243": false,
+        "subject_244": false,
+        "subject_245": false,
+        "subject_246": false,
+        "subject_247": false,
+        "subject_249": false,
+        "subject_25": false,
+        "subject_250": false,
+        "subject_253": false,
+        "subject_254": false,
+        "subject_255": false,
+        "subject_256": false,
+        "subject_257": false,
+        "subject_258": false,
+        "subject_259": false,
+        "subject_26": false,
+        "subject_260": false,
+        "subject_261": false,
+        "subject_263": false,
+        "subject_264": false,
+        "subject_265": false,
+        "subject_266": false,
+        "subject_267": false,
+        "subject_268": false,
+        "subject_270": false,
+        "subject_271": false,
+        "subject_272": false,
+        "subject_273": false,
+        "subject_275": false,
+        "subject_276": false,
+        "subject_277": false,
+        "subject_278": false,
+        "subject_28": false,
+        "subject_280": false,
+        "subject_281": false,
+        "subject_282": false,
+        "subject_283": false,
+        "subject_284": false,
+        "subject_285": false,
+        "subject_288": false,
+        "subject_289": false,
+        "subject_29": false,
+        "subject_290": false,
+        "subject_292": false,
+        "subject_293": false,
+        "subject_294": false,
+        "subject_296": false,
+        "subject_297": false,
+        "subject_298": false,
+        "subject_299": false,
+        "subject_30": false,
+        "subject_300": false,
+        "subject_301": false,
+        "subject_303": false,
+        "subject_304": false,
+        "subject_306": false,
+        "subject_307": false,
+        "subject_308": false,
+        "subject_309": false,
+        "subject_31": false,
+        "subject_310": false,
+        "subject_311": false,
+        "subject_312": false,
+        "subject_313": false,
+        "subject_314": false,
+        "subject_315": false,
+        "subject_316": false,
+        "subject_32": false,
+        "subject_321": false,
+        "subject_323": false,
+        "subject_324": false,
+        "subject_326": false,
+        "subject_327": false,
+        "subject_328": false,
+        "subject_33": false,
+        "subject_330": false,
+        "subject_331": false,
+        "subject_332": false,
+        "subject_333": false,
+        "subject_334": false,
+        "subject_335": false,
+        "subject_336": false,
+        "subject_340": false,
+        "subject_341": false,
+        "subject_342": false,
+        "subject_343": false,
+        "subject_345": false,
+        "subject_346": false,
+        "subject_348": false,
+        "subject_349": false,
+        "subject_35": false,
+        "subject_350": false,
+        "subject_351": false,
+        "subject_352": false,
+        "subject_353": false,
+        "subject_354": false,
+        "subject_355": false,
+        "subject_356": false,
+        "subject_357": false,
+        "subject_359": false,
+        "subject_36": false,
+        "subject_360": false,
+        "subject_361": false,
+        "subject_364": false,
+        "subject_368": false,
+        "subject_370": false,
+        "subject_371": false,
+        "subject_372": false,
+        "subject_373": false,
+        "subject_374": false,
+        "subject_375": false,
+        "subject_377": false,
+        "subject_379": false,
+        "subject_38": false,
+        "subject_381": false,
+        "subject_382": false,
+        "subject_383": false,
+        "subject_385": false,
+        "subject_386": false,
+        "subject_387": false,
+        "subject_388": false,
+        "subject_392": false,
+        "subject_395": false,
+        "subject_396": false,
+        "subject_397": false,
+        "subject_398": false,
+        "subject_4": false,
+        "subject_40": false,
+        "subject_401": false,
+        "subject_403": false,
+        "subject_406": false,
+        "subject_407": false,
+        "subject_408": false,
+        "subject_409": false,
+        "subject_41": false,
+        "subject_413": false,
+        "subject_414": false,
+        "subject_415": false,
+        "subject_416": false,
+        "subject_417": false,
+        "subject_418": false,
+        "subject_419": false,
+        "subject_421": false,
+        "subject_422": false,
+        "subject_425": false,
+        "subject_426": false,
+        "subject_427": false,
+        "subject_43": false,
+        "subject_430": false,
+        "subject_431": false,
+        "subject_432": false,
+        "subject_433": false,
+        "subject_434": false,
+        "subject_436": false,
+        "subject_437": false,
+        "subject_438": false,
+        "subject_439": false,
+        "subject_44": false,
+        "subject_440": false,
+        "subject_441": false,
+        "subject_442": false,
+        "subject_443": false,
+        "subject_444": false,
+        "subject_445": false,
+        "subject_446": false,
+        "subject_448": false,
+        "subject_449": false,
+        "subject_45": false,
+        "subject_450": false,
+        "subject_451": false,
+        "subject_452": false,
+        "subject_454": false,
+        "subject_455": false,
+        "subject_456": false,
+        "subject_457": false,
+        "subject_458": false,
+        "subject_46": false,
+        "subject_460": false,
+        "subject_461": false,
+        "subject_462": false,
+        "subject_463": false,
+        "subject_465": false,
+        "subject_467": false,
+        "subject_468": false,
+        "subject_469": false,
+        "subject_47": false,
+        "subject_470": false,
+        "subject_473": false,
+        "subject_476": false,
+        "subject_48": false,
+        "subject_481": false,
+        "subject_482": false,
+        "subject_483": false,
+        "subject_489": false,
+        "subject_490": false,
+        "subject_491": false,
+        "subject_492": false,
+        "subject_493": false,
+        "subject_494": false,
+        "subject_495": false,
+        "subject_496": false,
+        "subject_497": false,
+        "subject_50": false,
+        "subject_500": false,
+        "subject_502": false,
+        "subject_503": false,
+        "subject_504": false,
+        "subject_505": false,
+        "subject_507": false,
+        "subject_51": false,
+        "subject_512": false,
+        "subject_514": false,
+        "subject_515": false,
+        "subject_516": false,
+        "subject_517": false,
+        "subject_518": false,
+        "subject_519": false,
+        "subject_52": false,
+        "subject_520": false,
+        "subject_521": false,
+        "subject_522": false,
+        "subject_524": false,
+        "subject_525": false,
+        "subject_526": false,
+        "subject_527": false,
+        "subject_528": false,
+        "subject_529": false,
+        "subject_53": false,
+        "subject_530": false,
+        "subject_532": false,
+        "subject_534": false,
+        "subject_535": false,
+        "subject_536": false,
+        "subject_537": false,
+        "subject_539": false,
+        "subject_54": false,
+        "subject_540": false,
+        "subject_541": false,
+        "subject_543": false,
+        "subject_544": false,
+        "subject_545": false,
+        "subject_548": false,
+        "subject_549": false,
+        "subject_551": false,
+        "subject_552": false,
+        "subject_554": false,
+        "subject_555": false,
+        "subject_556": false,
+        "subject_559": false,
+        "subject_56": false,
+        "subject_561": false,
+        "subject_562": false,
+        "subject_565": false,
+        "subject_566": false,
+        "subject_568": false,
+        "subject_570": false,
+        "subject_571": false,
+        "subject_572": false,
+        "subject_573": false,
+        "subject_576": false,
+        "subject_58": false,
+        "subject_59": false,
+        "subject_60": false,
+        "subject_61": false,
+        "subject_63": false,
+        "subject_65": false,
+        "subject_66": false,
+        "subject_68": false,
+        "subject_7": false,
+        "subject_71": false,
+        "subject_73": false,
+        "subject_74": false,
+        "subject_75": false,
+        "subject_76": false,
+        "subject_77": false,
+        "subject_8": false,
+        "subject_80": false,
+        "subject_81": false,
+        "subject_82": false,
+        "subject_83": false,
+        "subject_84": false,
+        "subject_86": false,
+        "subject_87": false,
+        "subject_88": false,
+        "subject_89": false,
+        "subject_9": false,
+        "subject_90": false,
+        "subject_93": false,
+        "subject_94": false,
+        "subject_95": false,
+        "subject_96": false,
+        "subject_98": false,
+        "atlas": false
+    },
+    "seg_1": {
+        "subject_0": false,
+        "subject_10": false,
+        "subject_100": false,
+        "subject_101": false,
+        "subject_102": false,
+        "subject_103": false,
+        "subject_104": false,
+        "subject_106": false,
+        "subject_107": false,
+        "subject_109": false,
+        "subject_111": false,
+        "subject_113": false,
+        "subject_116": false,
+        "subject_117": false,
+        "subject_118": false,
+        "subject_12": false,
+        "subject_120": false,
+        "subject_121": false,
+        "subject_122": false,
+        "subject_123": false,
+        "subject_124": false,
+        "subject_125": false,
+        "subject_127": false,
+        "subject_128": false,
+        "subject_129": false,
+        "subject_130": false,
+        "subject_132": false,
+        "subject_133": false,
+        "subject_134": false,
+        "subject_137": false,
+        "subject_138": false,
+        "subject_140": false,
+        "subject_141": false,
+        "subject_142": false,
+        "subject_143": false,
+        "subject_145": false,
+        "subject_146": false,
+        "subject_147": false,
+        "subject_148": false,
+        "subject_149": false,
+        "subject_15": false,
+        "subject_150": false,
+        "subject_152": false,
+        "subject_154": false,
+        "subject_157": false,
+        "subject_159": false,
+        "subject_16": false,
+        "subject_160": false,
+        "subject_161": false,
+        "subject_162": false,
+        "subject_163": false,
+        "subject_164": false,
+        "subject_168": false,
+        "subject_169": false,
+        "subject_17": false,
+        "subject_170": false,
+        "subject_171": false,
+        "subject_173": false,
+        "subject_174": false,
+        "subject_175": false,
+        "subject_176": false,
+        "subject_178": false,
+        "subject_179": false,
+        "subject_18": false,
+        "subject_180": false,
+        "subject_181": false,
+        "subject_187": false,
+        "subject_189": false,
+        "subject_190": false,
+        "subject_192": false,
+        "subject_193": false,
+        "subject_194": false,
+        "subject_196": false,
+        "subject_197": false,
+        "subject_20": false,
+        "subject_200": false,
+        "subject_201": false,
+        "subject_202": false,
+        "subject_203": false,
+        "subject_204": false,
+        "subject_205": false,
+        "subject_207": false,
+        "subject_208": false,
+        "subject_209": false,
+        "subject_210": false,
+        "subject_211": false,
+        "subject_213": false,
+        "subject_214": false,
+        "subject_215": false,
+        "subject_216": false,
+        "subject_217": false,
+        "subject_219": false,
+        "subject_22": false,
+        "subject_220": false,
+        "subject_221": false,
+        "subject_223": false,
+        "subject_228": false,
+        "subject_23": false,
+        "subject_230": false,
+        "subject_231": false,
+        "subject_232": false,
+        "subject_234": false,
+        "subject_235": false,
+        "subject_236": false,
+        "subject_237": false,
+        "subject_238": false,
+        "subject_239": false,
+        "subject_24": false,
+        "subject_240": false,
+        "subject_241": false,
+        "subject_242": false,
+        "subject_243": false,
+        "subject_244": false,
+        "subject_245": false,
+        "subject_246": false,
+        "subject_247": false,
+        "subject_249": false,
+        "subject_25": false,
+        "subject_250": false,
+        "subject_253": false,
+        "subject_254": false,
+        "subject_255": false,
+        "subject_256": false,
+        "subject_257": false,
+        "subject_258": false,
+        "subject_259": false,
+        "subject_26": false,
+        "subject_260": false,
+        "subject_261": false,
+        "subject_263": false,
+        "subject_264": false,
+        "subject_265": false,
+        "subject_266": false,
+        "subject_267": false,
+        "subject_268": false,
+        "subject_270": false,
+        "subject_271": false,
+        "subject_272": false,
+        "subject_273": false,
+        "subject_275": false,
+        "subject_276": false,
+        "subject_277": false,
+        "subject_278": false,
+        "subject_28": false,
+        "subject_280": false,
+        "subject_281": false,
+        "subject_282": false,
+        "subject_283": false,
+        "subject_284": false,
+        "subject_285": false,
+        "subject_288": false,
+        "subject_289": false,
+        "subject_29": false,
+        "subject_290": false,
+        "subject_292": false,
+        "subject_293": false,
+        "subject_294": false,
+        "subject_296": false,
+        "subject_297": false,
+        "subject_298": false,
+        "subject_299": false,
+        "subject_30": false,
+        "subject_300": false,
+        "subject_301": false,
+        "subject_303": false,
+        "subject_304": false,
+        "subject_306": false,
+        "subject_307": false,
+        "subject_308": false,
+        "subject_309": false,
+        "subject_31": false,
+        "subject_310": false,
+        "subject_311": false,
+        "subject_312": false,
+        "subject_313": false,
+        "subject_314": false,
+        "subject_315": false,
+        "subject_316": false,
+        "subject_32": false,
+        "subject_321": false,
+        "subject_323": false,
+        "subject_324": false,
+        "subject_326": false,
+        "subject_327": false,
+        "subject_328": false,
+        "subject_33": false,
+        "subject_330": false,
+        "subject_331": false,
+        "subject_332": false,
+        "subject_333": false,
+        "subject_334": false,
+        "subject_335": false,
+        "subject_336": false,
+        "subject_340": false,
+        "subject_341": false,
+        "subject_342": false,
+        "subject_343": false,
+        "subject_345": false,
+        "subject_346": false,
+        "subject_348": false,
+        "subject_349": false,
+        "subject_35": false,
+        "subject_350": false,
+        "subject_351": false,
+        "subject_352": false,
+        "subject_353": false,
+        "subject_354": false,
+        "subject_355": false,
+        "subject_356": false,
+        "subject_357": false,
+        "subject_359": false,
+        "subject_36": false,
+        "subject_360": false,
+        "subject_361": false,
+        "subject_364": false,
+        "subject_368": false,
+        "subject_370": false,
+        "subject_371": false,
+        "subject_372": false,
+        "subject_373": false,
+        "subject_374": false,
+        "subject_375": false,
+        "subject_377": false,
+        "subject_379": false,
+        "subject_38": false,
+        "subject_381": false,
+        "subject_382": false,
+        "subject_383": false,
+        "subject_385": false,
+        "subject_386": false,
+        "subject_387": false,
+        "subject_388": false,
+        "subject_392": false,
+        "subject_395": false,
+        "subject_396": false,
+        "subject_397": false,
+        "subject_398": false,
+        "subject_4": false,
+        "subject_40": false,
+        "subject_401": false,
+        "subject_403": false,
+        "subject_406": false,
+        "subject_407": false,
+        "subject_408": false,
+        "subject_409": false,
+        "subject_41": false,
+        "subject_413": false,
+        "subject_414": false,
+        "subject_415": false,
+        "subject_416": false,
+        "subject_417": false,
+        "subject_418": false,
+        "subject_419": false,
+        "subject_421": false,
+        "subject_422": false,
+        "subject_425": false,
+        "subject_426": false,
+        "subject_427": false,
+        "subject_43": false,
+        "subject_430": false,
+        "subject_431": false,
+        "subject_432": false,
+        "subject_433": false,
+        "subject_434": false,
+        "subject_436": false,
+        "subject_437": false,
+        "subject_438": false,
+        "subject_439": false,
+        "subject_44": false,
+        "subject_440": false,
+        "subject_441": false,
+        "subject_442": false,
+        "subject_443": false,
+        "subject_444": false,
+        "subject_445": false,
+        "subject_446": false,
+        "subject_448": false,
+        "subject_449": false,
+        "subject_45": false,
+        "subject_450": false,
+        "subject_451": false,
+        "subject_452": false,
+        "subject_454": false,
+        "subject_455": false,
+        "subject_456": false,
+        "subject_457": false,
+        "subject_458": false,
+        "subject_46": false,
+        "subject_460": false,
+        "subject_461": false,
+        "subject_462": false,
+        "subject_463": false,
+        "subject_465": false,
+        "subject_467": false,
+        "subject_468": false,
+        "subject_469": false,
+        "subject_47": false,
+        "subject_470": false,
+        "subject_473": false,
+        "subject_476": false,
+        "subject_48": false,
+        "subject_481": false,
+        "subject_482": false,
+        "subject_483": false,
+        "subject_489": false,
+        "subject_490": false,
+        "subject_491": false,
+        "subject_492": false,
+        "subject_493": false,
+        "subject_494": false,
+        "subject_495": false,
+        "subject_496": false,
+        "subject_497": false,
+        "subject_50": false,
+        "subject_500": false,
+        "subject_502": false,
+        "subject_503": false,
+        "subject_504": false,
+        "subject_505": false,
+        "subject_507": false,
+        "subject_51": false,
+        "subject_512": false,
+        "subject_514": false,
+        "subject_515": false,
+        "subject_516": false,
+        "subject_517": false,
+        "subject_518": false,
+        "subject_519": false,
+        "subject_52": false,
+        "subject_520": false,
+        "subject_521": false,
+        "subject_522": false,
+        "subject_524": false,
+        "subject_525": false,
+        "subject_526": false,
+        "subject_527": false,
+        "subject_528": false,
+        "subject_529": false,
+        "subject_53": false,
+        "subject_530": false,
+        "subject_532": false,
+        "subject_534": false,
+        "subject_535": false,
+        "subject_536": false,
+        "subject_537": false,
+        "subject_539": false,
+        "subject_54": false,
+        "subject_540": false,
+        "subject_541": false,
+        "subject_543": false,
+        "subject_544": false,
+        "subject_545": false,
+        "subject_548": false,
+        "subject_549": false,
+        "subject_551": false,
+        "subject_552": false,
+        "subject_554": false,
+        "subject_555": false,
+        "subject_556": false,
+        "subject_559": false,
+        "subject_56": false,
+        "subject_561": false,
+        "subject_562": false,
+        "subject_565": false,
+        "subject_566": false,
+        "subject_568": false,
+        "subject_570": false,
+        "subject_571": false,
+        "subject_572": false,
+        "subject_573": false,
+        "subject_576": false,
+        "subject_58": false,
+        "subject_59": false,
+        "subject_60": false,
+        "subject_61": false,
+        "subject_63": false,
+        "subject_65": false,
+        "subject_66": false,
+        "subject_68": false,
+        "subject_7": true,
+        "subject_71": false,
+        "subject_73": false,
+        "subject_74": false,
+        "subject_75": false,
+        "subject_76": false,
+        "subject_77": false,
+        "subject_8": false,
+        "subject_80": false,
+        "subject_81": false,
+        "subject_82": false,
+        "subject_83": false,
+        "subject_84": false,
+        "subject_86": false,
+        "subject_87": false,
+        "subject_88": false,
+        "subject_89": false,
+        "subject_9": false,
+        "subject_90": false,
+        "subject_93": false,
+        "subject_94": false,
+        "subject_95": false,
+        "subject_96": false,
+        "subject_98": false,
+        "atlas": false
+    },
+    "seg_202": {
+        "subject_0": true,
+        "subject_10": false,
+        "subject_100": false,
+        "subject_101": true,
+        "subject_102": true,
+        "subject_103": false,
+        "subject_104": true,
+        "subject_106": true,
+        "subject_107": false,
+        "subject_109": true,
+        "subject_111": true,
+        "subject_113": true,
+        "subject_116": false,
+        "subject_117": false,
+        "subject_118": true,
+        "subject_12": false,
+        "subject_120": false,
+        "subject_121": false,
+        "subject_122": true,
+        "subject_123": true,
+        "subject_124": true,
+        "subject_125": false,
+        "subject_127": false,
+        "subject_128": false,
+        "subject_129": false,
+        "subject_130": true,
+        "subject_132": true,
+        "subject_133": false,
+        "subject_134": false,
+        "subject_137": false,
+        "subject_138": false,
+        "subject_140": true,
+        "subject_141": true,
+        "subject_142": false,
+        "subject_143": true,
+        "subject_145": false,
+        "subject_146": false,
+        "subject_147": false,
+        "subject_148": false,
+        "subject_149": false,
+        "subject_15": false,
+        "subject_150": true,
+        "subject_152": false,
+        "subject_154": false,
+        "subject_157": true,
+        "subject_159": false,
+        "subject_16": true,
+        "subject_160": false,
+        "subject_161": false,
+        "subject_162": true,
+        "subject_163": false,
+        "subject_164": false,
+        "subject_168": true,
+        "subject_169": true,
+        "subject_17": true,
+        "subject_170": false,
+        "subject_171": false,
+        "subject_173": true,
+        "subject_174": false,
+        "subject_175": false,
+        "subject_176": false,
+        "subject_178": false,
+        "subject_179": false,
+        "subject_18": false,
+        "subject_180": false,
+        "subject_181": false,
+        "subject_187": true,
+        "subject_189": true,
+        "subject_190": false,
+        "subject_192": false,
+        "subject_193": true,
+        "subject_194": false,
+        "subject_196": true,
+        "subject_197": true,
+        "subject_20": true,
+        "subject_200": true,
+        "subject_201": false,
+        "subject_202": false,
+        "subject_203": true,
+        "subject_204": true,
+        "subject_205": false,
+        "subject_207": false,
+        "subject_208": true,
+        "subject_209": false,
+        "subject_210": true,
+        "subject_211": true,
+        "subject_213": true,
+        "subject_214": true,
+        "subject_215": false,
+        "subject_216": true,
+        "subject_217": true,
+        "subject_219": true,
+        "subject_22": true,
+        "subject_220": true,
+        "subject_221": false,
+        "subject_223": false,
+        "subject_228": false,
+        "subject_23": true,
+        "subject_230": true,
+        "subject_231": false,
+        "subject_232": false,
+        "subject_234": true,
+        "subject_235": false,
+        "subject_236": true,
+        "subject_237": false,
+        "subject_238": true,
+        "subject_239": false,
+        "subject_24": true,
+        "subject_240": false,
+        "subject_241": true,
+        "subject_242": true,
+        "subject_243": false,
+        "subject_244": false,
+        "subject_245": true,
+        "subject_246": false,
+        "subject_247": true,
+        "subject_249": false,
+        "subject_25": true,
+        "subject_250": false,
+        "subject_253": false,
+        "subject_254": true,
+        "subject_255": true,
+        "subject_256": true,
+        "subject_257": false,
+        "subject_258": false,
+        "subject_259": true,
+        "subject_26": true,
+        "subject_260": true,
+        "subject_261": true,
+        "subject_263": false,
+        "subject_264": false,
+        "subject_265": false,
+        "subject_266": false,
+        "subject_267": false,
+        "subject_268": true,
+        "subject_270": true,
+        "subject_271": true,
+        "subject_272": false,
+        "subject_273": true,
+        "subject_275": true,
+        "subject_276": false,
+        "subject_277": true,
+        "subject_278": false,
+        "subject_28": false,
+        "subject_280": false,
+        "subject_281": true,
+        "subject_282": true,
+        "subject_283": false,
+        "subject_284": true,
+        "subject_285": true,
+        "subject_288": true,
+        "subject_289": true,
+        "subject_29": true,
+        "subject_290": false,
+        "subject_292": true,
+        "subject_293": false,
+        "subject_294": true,
+        "subject_296": false,
+        "subject_297": false,
+        "subject_298": true,
+        "subject_299": false,
+        "subject_30": true,
+        "subject_300": true,
+        "subject_301": false,
+        "subject_303": true,
+        "subject_304": false,
+        "subject_306": true,
+        "subject_307": false,
+        "subject_308": true,
+        "subject_309": true,
+        "subject_31": false,
+        "subject_310": true,
+        "subject_311": false,
+        "subject_312": true,
+        "subject_313": true,
+        "subject_314": true,
+        "subject_315": false,
+        "subject_316": false,
+        "subject_32": false,
+        "subject_321": true,
+        "subject_323": true,
+        "subject_324": false,
+        "subject_326": true,
+        "subject_327": true,
+        "subject_328": false,
+        "subject_33": false,
+        "subject_330": false,
+        "subject_331": true,
+        "subject_332": true,
+        "subject_333": true,
+        "subject_334": true,
+        "subject_335": true,
+        "subject_336": true,
+        "subject_340": true,
+        "subject_341": false,
+        "subject_342": true,
+        "subject_343": true,
+        "subject_345": false,
+        "subject_346": false,
+        "subject_348": false,
+        "subject_349": true,
+        "subject_35": true,
+        "subject_350": true,
+        "subject_351": false,
+        "subject_352": true,
+        "subject_353": false,
+        "subject_354": true,
+        "subject_355": true,
+        "subject_356": false,
+        "subject_357": true,
+        "subject_359": false,
+        "subject_36": false,
+        "subject_360": true,
+        "subject_361": false,
+        "subject_364": true,
+        "subject_368": false,
+        "subject_370": false,
+        "subject_371": true,
+        "subject_372": false,
+        "subject_373": true,
+        "subject_374": false,
+        "subject_375": true,
+        "subject_377": true,
+        "subject_379": true,
+        "subject_38": false,
+        "subject_381": false,
+        "subject_382": true,
+        "subject_383": true,
+        "subject_385": false,
+        "subject_386": true,
+        "subject_387": true,
+        "subject_388": false,
+        "subject_392": false,
+        "subject_395": true,
+        "subject_396": false,
+        "subject_397": true,
+        "subject_398": false,
+        "subject_4": true,
+        "subject_40": true,
+        "subject_401": false,
+        "subject_403": false,
+        "subject_406": false,
+        "subject_407": true,
+        "subject_408": false,
+        "subject_409": false,
+        "subject_41": false,
+        "subject_413": true,
+        "subject_414": true,
+        "subject_415": true,
+        "subject_416": true,
+        "subject_417": false,
+        "subject_418": false,
+        "subject_419": false,
+        "subject_421": false,
+        "subject_422": true,
+        "subject_425": false,
+        "subject_426": true,
+        "subject_427": false,
+        "subject_43": false,
+        "subject_430": false,
+        "subject_431": true,
+        "subject_432": true,
+        "subject_433": true,
+        "subject_434": false,
+        "subject_436": true,
+        "subject_437": false,
+        "subject_438": false,
+        "subject_439": false,
+        "subject_44": true,
+        "subject_440": false,
+        "subject_441": false,
+        "subject_442": false,
+        "subject_443": false,
+        "subject_444": true,
+        "subject_445": false,
+        "subject_446": false,
+        "subject_448": false,
+        "subject_449": false,
+        "subject_45": false,
+        "subject_450": false,
+        "subject_451": false,
+        "subject_452": true,
+        "subject_454": false,
+        "subject_455": false,
+        "subject_456": false,
+        "subject_457": false,
+        "subject_458": false,
+        "subject_46": false,
+        "subject_460": false,
+        "subject_461": true,
+        "subject_462": false,
+        "subject_463": false,
+        "subject_465": true,
+        "subject_467": false,
+        "subject_468": true,
+        "subject_469": false,
+        "subject_47": true,
+        "subject_470": false,
+        "subject_473": true,
+        "subject_476": true,
+        "subject_48": true,
+        "subject_481": true,
+        "subject_482": true,
+        "subject_483": true,
+        "subject_489": true,
+        "subject_490": true,
+        "subject_491": false,
+        "subject_492": true,
+        "subject_493": true,
+        "subject_494": false,
+        "subject_495": true,
+        "subject_496": true,
+        "subject_497": true,
+        "subject_50": true,
+        "subject_500": true,
+        "subject_502": true,
+        "subject_503": true,
+        "subject_504": true,
+        "subject_505": true,
+        "subject_507": true,
+        "subject_51": true,
+        "subject_512": true,
+        "subject_514": false,
+        "subject_515": false,
+        "subject_516": true,
+        "subject_517": true,
+        "subject_518": true,
+        "subject_519": true,
+        "subject_52": false,
+        "subject_520": false,
+        "subject_521": false,
+        "subject_522": true,
+        "subject_524": true,
+        "subject_525": false,
+        "subject_526": true,
+        "subject_527": false,
+        "subject_528": true,
+        "subject_529": false,
+        "subject_53": false,
+        "subject_530": false,
+        "subject_532": true,
+        "subject_534": false,
+        "subject_535": true,
+        "subject_536": false,
+        "subject_537": false,
+        "subject_539": false,
+        "subject_54": false,
+        "subject_540": false,
+        "subject_541": true,
+        "subject_543": true,
+        "subject_544": true,
+        "subject_545": true,
+        "subject_548": false,
+        "subject_549": false,
+        "subject_551": false,
+        "subject_552": true,
+        "subject_554": false,
+        "subject_555": true,
+        "subject_556": false,
+        "subject_559": true,
+        "subject_56": true,
+        "subject_561": true,
+        "subject_562": false,
+        "subject_565": true,
+        "subject_566": true,
+        "subject_568": true,
+        "subject_570": true,
+        "subject_571": false,
+        "subject_572": true,
+        "subject_573": true,
+        "subject_576": false,
+        "subject_58": false,
+        "subject_59": false,
+        "subject_60": false,
+        "subject_61": false,
+        "subject_63": false,
+        "subject_65": true,
+        "subject_66": true,
+        "subject_68": true,
+        "subject_7": true,
+        "subject_71": false,
+        "subject_73": false,
+        "subject_74": true,
+        "subject_75": false,
+        "subject_76": false,
+        "subject_77": true,
+        "subject_8": false,
+        "subject_80": false,
+        "subject_81": true,
+        "subject_82": false,
+        "subject_83": false,
+        "subject_84": false,
+        "subject_86": true,
+        "subject_87": true,
+        "subject_88": false,
+        "subject_89": false,
+        "subject_9": true,
+        "subject_90": false,
+        "subject_93": true,
+        "subject_94": true,
+        "subject_95": false,
+        "subject_96": true,
+        "subject_98": false,
+        "atlas": true
+    },
+    "seg_404": {
+        "subject_0": true,
+        "subject_10": true,
+        "subject_100": true,
+        "subject_101": true,
+        "subject_102": true,
+        "subject_103": true,
+        "subject_104": true,
+        "subject_106": true,
+        "subject_107": true,
+        "subject_109": true,
+        "subject_111": true,
+        "subject_113": true,
+        "subject_116": true,
+        "subject_117": true,
+        "subject_118": true,
+        "subject_12": true,
+        "subject_120": true,
+        "subject_121": true,
+        "subject_122": true,
+        "subject_123": true,
+        "subject_124": true,
+        "subject_125": true,
+        "subject_127": true,
+        "subject_128": true,
+        "subject_129": true,
+        "subject_130": true,
+        "subject_132": true,
+        "subject_133": true,
+        "subject_134": true,
+        "subject_137": true,
+        "subject_138": true,
+        "subject_140": true,
+        "subject_141": true,
+        "subject_142": true,
+        "subject_143": true,
+        "subject_145": true,
+        "subject_146": true,
+        "subject_147": true,
+        "subject_148": true,
+        "subject_149": true,
+        "subject_15": true,
+        "subject_150": true,
+        "subject_152": true,
+        "subject_154": true,
+        "subject_157": true,
+        "subject_159": true,
+        "subject_16": true,
+        "subject_160": true,
+        "subject_161": true,
+        "subject_162": true,
+        "subject_163": true,
+        "subject_164": true,
+        "subject_168": true,
+        "subject_169": true,
+        "subject_17": true,
+        "subject_170": true,
+        "subject_171": true,
+        "subject_173": true,
+        "subject_174": true,
+        "subject_175": true,
+        "subject_176": true,
+        "subject_178": true,
+        "subject_179": true,
+        "subject_18": true,
+        "subject_180": true,
+        "subject_181": true,
+        "subject_187": true,
+        "subject_189": true,
+        "subject_190": true,
+        "subject_192": true,
+        "subject_193": true,
+        "subject_194": true,
+        "subject_196": true,
+        "subject_197": true,
+        "subject_20": true,
+        "subject_200": true,
+        "subject_201": true,
+        "subject_202": true,
+        "subject_203": true,
+        "subject_204": true,
+        "subject_205": true,
+        "subject_207": true,
+        "subject_208": true,
+        "subject_209": true,
+        "subject_210": true,
+        "subject_211": true,
+        "subject_213": true,
+        "subject_214": true,
+        "subject_215": true,
+        "subject_216": true,
+        "subject_217": true,
+        "subject_219": true,
+        "subject_22": true,
+        "subject_220": true,
+        "subject_221": true,
+        "subject_223": true,
+        "subject_228": true,
+        "subject_23": true,
+        "subject_230": true,
+        "subject_231": true,
+        "subject_232": true,
+        "subject_234": true,
+        "subject_235": true,
+        "subject_236": true,
+        "subject_237": true,
+        "subject_238": true,
+        "subject_239": true,
+        "subject_24": true,
+        "subject_240": true,
+        "subject_241": true,
+        "subject_242": true,
+        "subject_243": true,
+        "subject_244": true,
+        "subject_245": true,
+        "subject_246": true,
+        "subject_247": true,
+        "subject_249": true,
+        "subject_25": true,
+        "subject_250": true,
+        "subject_253": true,
+        "subject_254": true,
+        "subject_255": true,
+        "subject_256": true,
+        "subject_257": true,
+        "subject_258": true,
+        "subject_259": true,
+        "subject_26": true,
+        "subject_260": true,
+        "subject_261": true,
+        "subject_263": true,
+        "subject_264": true,
+        "subject_265": true,
+        "subject_266": true,
+        "subject_267": true,
+        "subject_268": true,
+        "subject_270": true,
+        "subject_271": true,
+        "subject_272": true,
+        "subject_273": true,
+        "subject_275": true,
+        "subject_276": true,
+        "subject_277": true,
+        "subject_278": true,
+        "subject_28": true,
+        "subject_280": true,
+        "subject_281": true,
+        "subject_282": true,
+        "subject_283": true,
+        "subject_284": true,
+        "subject_285": true,
+        "subject_288": true,
+        "subject_289": true,
+        "subject_29": true,
+        "subject_290": true,
+        "subject_292": true,
+        "subject_293": true,
+        "subject_294": true,
+        "subject_296": true,
+        "subject_297": true,
+        "subject_298": true,
+        "subject_299": true,
+        "subject_30": true,
+        "subject_300": true,
+        "subject_301": true,
+        "subject_303": true,
+        "subject_304": true,
+        "subject_306": true,
+        "subject_307": true,
+        "subject_308": true,
+        "subject_309": true,
+        "subject_31": true,
+        "subject_310": true,
+        "subject_311": true,
+        "subject_312": true,
+        "subject_313": true,
+        "subject_314": true,
+        "subject_315": true,
+        "subject_316": true,
+        "subject_32": true,
+        "subject_321": true,
+        "subject_323": true,
+        "subject_324": true,
+        "subject_326": true,
+        "subject_327": true,
+        "subject_328": true,
+        "subject_33": true,
+        "subject_330": true,
+        "subject_331": true,
+        "subject_332": true,
+        "subject_333": true,
+        "subject_334": true,
+        "subject_335": true,
+        "subject_336": true,
+        "subject_340": true,
+        "subject_341": true,
+        "subject_342": true,
+        "subject_343": true,
+        "subject_345": true,
+        "subject_346": true,
+        "subject_348": true,
+        "subject_349": true,
+        "subject_35": true,
+        "subject_350": true,
+        "subject_351": true,
+        "subject_352": true,
+        "subject_353": true,
+        "subject_354": true,
+        "subject_355": true,
+        "subject_356": true,
+        "subject_357": true,
+        "subject_359": true,
+        "subject_36": true,
+        "subject_360": true,
+        "subject_361": true,
+        "subject_364": true,
+        "subject_368": true,
+        "subject_370": true,
+        "subject_371": true,
+        "subject_372": true,
+        "subject_373": true,
+        "subject_374": true,
+        "subject_375": true,
+        "subject_377": true,
+        "subject_379": true,
+        "subject_38": true,
+        "subject_381": true,
+        "subject_382": true,
+        "subject_383": true,
+        "subject_385": true,
+        "subject_386": true,
+        "subject_387": true,
+        "subject_388": true,
+        "subject_392": true,
+        "subject_395": true,
+        "subject_396": true,
+        "subject_397": true,
+        "subject_398": true,
+        "subject_4": true,
+        "subject_40": true,
+        "subject_401": true,
+        "subject_403": true,
+        "subject_406": true,
+        "subject_407": true,
+        "subject_408": true,
+        "subject_409": true,
+        "subject_41": true,
+        "subject_413": true,
+        "subject_414": true,
+        "subject_415": true,
+        "subject_416": true,
+        "subject_417": true,
+        "subject_418": true,
+        "subject_419": true,
+        "subject_421": true,
+        "subject_422": true,
+        "subject_425": true,
+        "subject_426": true,
+        "subject_427": true,
+        "subject_43": true,
+        "subject_430": true,
+        "subject_431": true,
+        "subject_432": true,
+        "subject_433": true,
+        "subject_434": true,
+        "subject_436": true,
+        "subject_437": true,
+        "subject_438": true,
+        "subject_439": true,
+        "subject_44": true,
+        "subject_440": true,
+        "subject_441": true,
+        "subject_442": true,
+        "subject_443": true,
+        "subject_444": true,
+        "subject_445": true,
+        "subject_446": true,
+        "subject_448": true,
+        "subject_449": true,
+        "subject_45": true,
+        "subject_450": true,
+        "subject_451": true,
+        "subject_452": true,
+        "subject_454": true,
+        "subject_455": true,
+        "subject_456": true,
+        "subject_457": true,
+        "subject_458": true,
+        "subject_46": true,
+        "subject_460": true,
+        "subject_461": true,
+        "subject_462": true,
+        "subject_463": true,
+        "subject_465": true,
+        "subject_467": true,
+        "subject_468": true,
+        "subject_469": true,
+        "subject_47": true,
+        "subject_470": true,
+        "subject_473": true,
+        "subject_476": true,
+        "subject_48": true,
+        "subject_481": true,
+        "subject_482": true,
+        "subject_483": true,
+        "subject_489": true,
+        "subject_490": true,
+        "subject_491": true,
+        "subject_492": true,
+        "subject_493": true,
+        "subject_494": true,
+        "subject_495": true,
+        "subject_496": true,
+        "subject_497": true,
+        "subject_50": true,
+        "subject_500": true,
+        "subject_502": true,
+        "subject_503": true,
+        "subject_504": true,
+        "subject_505": true,
+        "subject_507": true,
+        "subject_51": true,
+        "subject_512": true,
+        "subject_514": true,
+        "subject_515": true,
+        "subject_516": true,
+        "subject_517": true,
+        "subject_518": true,
+        "subject_519": true,
+        "subject_52": true,
+        "subject_520": true,
+        "subject_521": true,
+        "subject_522": true,
+        "subject_524": true,
+        "subject_525": true,
+        "subject_526": true,
+        "subject_527": true,
+        "subject_528": true,
+        "subject_529": true,
+        "subject_53": true,
+        "subject_530": true,
+        "subject_532": true,
+        "subject_534": true,
+        "subject_535": true,
+        "subject_536": true,
+        "subject_537": true,
+        "subject_539": true,
+        "subject_54": true,
+        "subject_540": true,
+        "subject_541": true,
+        "subject_543": true,
+        "subject_544": true,
+        "subject_545": true,
+        "subject_548": true,
+        "subject_549": true,
+        "subject_551": true,
+        "subject_552": true,
+        "subject_554": true,
+        "subject_555": true,
+        "subject_556": true,
+        "subject_559": true,
+        "subject_56": true,
+        "subject_561": true,
+        "subject_562": true,
+        "subject_565": true,
+        "subject_566": true,
+        "subject_568": true,
+        "subject_570": true,
+        "subject_571": true,
+        "subject_572": true,
+        "subject_573": true,
+        "subject_576": true,
+        "subject_58": true,
+        "subject_59": true,
+        "subject_60": true,
+        "subject_61": true,
+        "subject_63": true,
+        "subject_65": true,
+        "subject_66": true,
+        "subject_68": true,
+        "subject_7": true,
+        "subject_71": true,
+        "subject_73": true,
+        "subject_74": true,
+        "subject_75": true,
+        "subject_76": true,
+        "subject_77": true,
+        "subject_8": true,
+        "subject_80": true,
+        "subject_81": true,
+        "subject_82": true,
+        "subject_83": true,
+        "subject_84": true,
+        "subject_86": true,
+        "subject_87": true,
+        "subject_88": true,
+        "subject_89": true,
+        "subject_9": true,
+        "subject_90": true,
+        "subject_93": true,
+        "subject_94": true,
+        "subject_95": true,
+        "subject_96": true,
+        "subject_98": true,
+        "atlas": true
+    },
+    "seg_5": {
+        "subject_0": false,
+        "subject_10": false,
+        "subject_100": false,
+        "subject_101": false,
+        "subject_102": false,
+        "subject_103": false,
+        "subject_104": false,
+        "subject_106": false,
+        "subject_107": false,
+        "subject_109": false,
+        "subject_111": false,
+        "subject_113": false,
+        "subject_116": false,
+        "subject_117": false,
+        "subject_118": false,
+        "subject_12": false,
+        "subject_120": false,
+        "subject_121": false,
+        "subject_122": false,
+        "subject_123": false,
+        "subject_124": false,
+        "subject_125": false,
+        "subject_127": false,
+        "subject_128": false,
+        "subject_129": false,
+        "subject_130": false,
+        "subject_132": false,
+        "subject_133": false,
+        "subject_134": false,
+        "subject_137": false,
+        "subject_138": false,
+        "subject_140": false,
+        "subject_141": false,
+        "subject_142": false,
+        "subject_143": false,
+        "subject_145": false,
+        "subject_146": false,
+        "subject_147": false,
+        "subject_148": false,
+        "subject_149": false,
+        "subject_15": false,
+        "subject_150": false,
+        "subject_152": false,
+        "subject_154": false,
+        "subject_157": false,
+        "subject_159": false,
+        "subject_16": true,
+        "subject_160": false,
+        "subject_161": false,
+        "subject_162": false,
+        "subject_163": false,
+        "subject_164": false,
+        "subject_168": false,
+        "subject_169": false,
+        "subject_17": false,
+        "subject_170": false,
+        "subject_171": false,
+        "subject_173": false,
+        "subject_174": false,
+        "subject_175": false,
+        "subject_176": false,
+        "subject_178": false,
+        "subject_179": false,
+        "subject_18": true,
+        "subject_180": false,
+        "subject_181": false,
+        "subject_187": false,
+        "subject_189": false,
+        "subject_190": false,
+        "subject_192": false,
+        "subject_193": false,
+        "subject_194": false,
+        "subject_196": false,
+        "subject_197": false,
+        "subject_20": false,
+        "subject_200": false,
+        "subject_201": false,
+        "subject_202": false,
+        "subject_203": false,
+        "subject_204": false,
+        "subject_205": false,
+        "subject_207": false,
+        "subject_208": false,
+        "subject_209": false,
+        "subject_210": false,
+        "subject_211": false,
+        "subject_213": false,
+        "subject_214": false,
+        "subject_215": false,
+        "subject_216": false,
+        "subject_217": false,
+        "subject_219": false,
+        "subject_22": false,
+        "subject_220": false,
+        "subject_221": false,
+        "subject_223": false,
+        "subject_228": false,
+        "subject_23": false,
+        "subject_230": false,
+        "subject_231": false,
+        "subject_232": false,
+        "subject_234": false,
+        "subject_235": false,
+        "subject_236": false,
+        "subject_237": false,
+        "subject_238": false,
+        "subject_239": false,
+        "subject_24": false,
+        "subject_240": false,
+        "subject_241": false,
+        "subject_242": false,
+        "subject_243": false,
+        "subject_244": false,
+        "subject_245": false,
+        "subject_246": false,
+        "subject_247": false,
+        "subject_249": false,
+        "subject_25": false,
+        "subject_250": false,
+        "subject_253": false,
+        "subject_254": false,
+        "subject_255": false,
+        "subject_256": false,
+        "subject_257": false,
+        "subject_258": false,
+        "subject_259": false,
+        "subject_26": false,
+        "subject_260": false,
+        "subject_261": false,
+        "subject_263": false,
+        "subject_264": false,
+        "subject_265": false,
+        "subject_266": false,
+        "subject_267": false,
+        "subject_268": false,
+        "subject_270": false,
+        "subject_271": false,
+        "subject_272": false,
+        "subject_273": false,
+        "subject_275": false,
+        "subject_276": false,
+        "subject_277": false,
+        "subject_278": false,
+        "subject_28": false,
+        "subject_280": false,
+        "subject_281": false,
+        "subject_282": false,
+        "subject_283": false,
+        "subject_284": false,
+        "subject_285": false,
+        "subject_288": false,
+        "subject_289": false,
+        "subject_29": false,
+        "subject_290": false,
+        "subject_292": false,
+        "subject_293": false,
+        "subject_294": false,
+        "subject_296": false,
+        "subject_297": false,
+        "subject_298": false,
+        "subject_299": true,
+        "subject_30": false,
+        "subject_300": false,
+        "subject_301": false,
+        "subject_303": false,
+        "subject_304": false,
+        "subject_306": true,
+        "subject_307": false,
+        "subject_308": false,
+        "subject_309": false,
+        "subject_31": false,
+        "subject_310": false,
+        "subject_311": false,
+        "subject_312": false,
+        "subject_313": false,
+        "subject_314": false,
+        "subject_315": false,
+        "subject_316": false,
+        "subject_32": false,
+        "subject_321": false,
+        "subject_323": false,
+        "subject_324": false,
+        "subject_326": false,
+        "subject_327": false,
+        "subject_328": false,
+        "subject_33": false,
+        "subject_330": false,
+        "subject_331": false,
+        "subject_332": false,
+        "subject_333": false,
+        "subject_334": false,
+        "subject_335": false,
+        "subject_336": false,
+        "subject_340": false,
+        "subject_341": false,
+        "subject_342": false,
+        "subject_343": false,
+        "subject_345": false,
+        "subject_346": false,
+        "subject_348": false,
+        "subject_349": false,
+        "subject_35": false,
+        "subject_350": false,
+        "subject_351": false,
+        "subject_352": false,
+        "subject_353": false,
+        "subject_354": false,
+        "subject_355": false,
+        "subject_356": false,
+        "subject_357": false,
+        "subject_359": false,
+        "subject_36": false,
+        "subject_360": false,
+        "subject_361": false,
+        "subject_364": false,
+        "subject_368": false,
+        "subject_370": false,
+        "subject_371": false,
+        "subject_372": false,
+        "subject_373": false,
+        "subject_374": false,
+        "subject_375": false,
+        "subject_377": false,
+        "subject_379": false,
+        "subject_38": false,
+        "subject_381": false,
+        "subject_382": false,
+        "subject_383": false,
+        "subject_385": false,
+        "subject_386": false,
+        "subject_387": false,
+        "subject_388": false,
+        "subject_392": false,
+        "subject_395": false,
+        "subject_396": false,
+        "subject_397": false,
+        "subject_398": false,
+        "subject_4": false,
+        "subject_40": false,
+        "subject_401": false,
+        "subject_403": false,
+        "subject_406": false,
+        "subject_407": false,
+        "subject_408": false,
+        "subject_409": false,
+        "subject_41": false,
+        "subject_413": false,
+        "subject_414": false,
+        "subject_415": false,
+        "subject_416": false,
+        "subject_417": false,
+        "subject_418": false,
+        "subject_419": false,
+        "subject_421": false,
+        "subject_422": false,
+        "subject_425": false,
+        "subject_426": false,
+        "subject_427": false,
+        "subject_43": false,
+        "subject_430": false,
+        "subject_431": false,
+        "subject_432": false,
+        "subject_433": false,
+        "subject_434": false,
+        "subject_436": false,
+        "subject_437": false,
+        "subject_438": false,
+        "subject_439": false,
+        "subject_44": true,
+        "subject_440": false,
+        "subject_441": false,
+        "subject_442": false,
+        "subject_443": false,
+        "subject_444": false,
+        "subject_445": false,
+        "subject_446": false,
+        "subject_448": false,
+        "subject_449": false,
+        "subject_45": false,
+        "subject_450": false,
+        "subject_451": false,
+        "subject_452": false,
+        "subject_454": false,
+        "subject_455": false,
+        "subject_456": false,
+        "subject_457": false,
+        "subject_458": false,
+        "subject_46": false,
+        "subject_460": false,
+        "subject_461": false,
+        "subject_462": false,
+        "subject_463": false,
+        "subject_465": false,
+        "subject_467": false,
+        "subject_468": false,
+        "subject_469": false,
+        "subject_47": false,
+        "subject_470": false,
+        "subject_473": false,
+        "subject_476": false,
+        "subject_48": false,
+        "subject_481": false,
+        "subject_482": false,
+        "subject_483": false,
+        "subject_489": false,
+        "subject_490": false,
+        "subject_491": false,
+        "subject_492": false,
+        "subject_493": false,
+        "subject_494": false,
+        "subject_495": false,
+        "subject_496": false,
+        "subject_497": false,
+        "subject_50": false,
+        "subject_500": false,
+        "subject_502": false,
+        "subject_503": false,
+        "subject_504": false,
+        "subject_505": false,
+        "subject_507": false,
+        "subject_51": false,
+        "subject_512": false,
+        "subject_514": false,
+        "subject_515": false,
+        "subject_516": false,
+        "subject_517": false,
+        "subject_518": false,
+        "subject_519": false,
+        "subject_52": false,
+        "subject_520": false,
+        "subject_521": false,
+        "subject_522": false,
+        "subject_524": false,
+        "subject_525": false,
+        "subject_526": false,
+        "subject_527": false,
+        "subject_528": false,
+        "subject_529": false,
+        "subject_53": false,
+        "subject_530": false,
+        "subject_532": false,
+        "subject_534": false,
+        "subject_535": false,
+        "subject_536": false,
+        "subject_537": false,
+        "subject_539": false,
+        "subject_54": false,
+        "subject_540": false,
+        "subject_541": false,
+        "subject_543": false,
+        "subject_544": false,
+        "subject_545": false,
+        "subject_548": false,
+        "subject_549": false,
+        "subject_551": false,
+        "subject_552": false,
+        "subject_554": false,
+        "subject_555": false,
+        "subject_556": false,
+        "subject_559": false,
+        "subject_56": false,
+        "subject_561": false,
+        "subject_562": false,
+        "subject_565": false,
+        "subject_566": false,
+        "subject_568": false,
+        "subject_570": false,
+        "subject_571": false,
+        "subject_572": false,
+        "subject_573": false,
+        "subject_576": false,
+        "subject_58": false,
+        "subject_59": false,
+        "subject_60": false,
+        "subject_61": false,
+        "subject_63": false,
+        "subject_65": false,
+        "subject_66": false,
+        "subject_68": false,
+        "subject_7": false,
+        "subject_71": false,
+        "subject_73": false,
+        "subject_74": false,
+        "subject_75": false,
+        "subject_76": false,
+        "subject_77": false,
+        "subject_8": false,
+        "subject_80": false,
+        "subject_81": false,
+        "subject_82": false,
+        "subject_83": false,
+        "subject_84": false,
+        "subject_86": false,
+        "subject_87": false,
+        "subject_88": false,
+        "subject_89": false,
+        "subject_9": false,
+        "subject_90": false,
+        "subject_93": false,
+        "subject_94": false,
+        "subject_95": false,
+        "subject_96": false,
+        "subject_98": false,
+        "atlas": false
+    }
+}

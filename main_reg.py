@@ -1,7 +1,8 @@
 import argparse
 import os
+import sys
 import warnings
-from util.util import set_random_seed, get_basedir
+from util.util import set_random_seed, get_basedir, Logger
 from shutil import copyfile
 import yaml
 from train_reg import train_reg
@@ -42,14 +43,17 @@ if __name__ == '__main__':
         args.output, config["TrainConfig"]["start_new_model"])
 
     copyfile(args.config, os.path.join(basedir, "config.yaml"))
+    sys.stdout = Logger(basedir)
+
     print(f"base dir is {basedir}")
     start_time = time.time()
     if args.train:
         os.environ["CUDA_VISIBLE_DEVICES"] = config["TrainConfig"]["gpu"]
         train_reg(config, basedir)
-
         checkpoint = os.path.join(basedir, "checkpoint", 'best_epoch.pth')
         test_basedir = get_basedir(os.path.join(basedir, 'test'), config["TrainConfig"]["start_new_model"])
+        config["TestConfig"]["gpu"] = config["TrainConfig"]["gpu"]
+        config["TestConfig"]["data_path"] = config["TrainConfig"]["data_path"]
         test_reg(config, test_basedir, checkpoint=checkpoint)
 
     elif args.test:

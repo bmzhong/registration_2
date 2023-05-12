@@ -9,18 +9,19 @@ TrainConfig:
   batchsize: 8
   checkpoint: ""
   val_interval: 1
+  seg: "seg_28"
 
 
 #  writer_board_interval: 10
 
 TestConfig:
-  checkpoint: "output/reg/debug/debug1/checkpoint/best_epoch.pth"
+  checkpoint: ""
   data_path: "datasets/json/LPBA40_test.json"
   save_image: True
   gpu: "0"
 
 ModelConfig:
-  type: "VoxelMorpher"
+  type: "vxm_diff"
 
 
 
@@ -35,7 +36,7 @@ OptimConfig:
     params:
       step_size: 1500
       gamma: 0.5
-      warmup: True
+      warmup: False
       warmup_steps: 100
 
 LossConfig:
@@ -47,12 +48,7 @@ LossConfig:
 
   segmentation_loss:
     use: True
-    type: 'MonAIDiceLoss'
-    params:
-      include_background: True
-      to_onehot_y: False
-      softmax: False
-      reduction: 'mean'
+    type: 'DiceLoss2'
     weight: 1
 
   gradient_loss:

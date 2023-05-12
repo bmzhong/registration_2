@@ -9,7 +9,8 @@ import numpy as np
 import torch.nn.functional as F
 import SimpleITK as sitk
 import matplotlib.pyplot as plt
-from util.visual.visual_registration import preview_3D_deformation, preview_3D_vector_field, RGB_dvf, PlotGrid_3d
+from util.visual.visual_registration import preview_3D_deformation, preview_3D_vector_field, RGB_dvf, PlotGrid_3d, \
+    comput_fig
 from util.visual.visual_image import preview_image
 
 
@@ -112,6 +113,14 @@ def tensorboard_visual_det(name, det, writer, step, **kwargs):
 
 def tensorboard_visual_RGB_dvf(name, dvf, writer, step):
     figure = RGB_dvf(dvf)
+    plt.suptitle(name, fontsize=25)
+    figure.tight_layout()
+    writer.add_figure(name, figure, step)
+
+
+def tensorboard_visual_warp_grid(name, warp_grid, writer, step, **kwargs):
+    figure = comput_fig(warp_grid)
+    # figure = preview_image(warp_grid, cmap='gray', **kwargs)
     plt.suptitle(name, fontsize=25)
     figure.tight_layout()
     writer.add_figure(name, figure, step)

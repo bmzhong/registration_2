@@ -9,17 +9,19 @@ from model.registration.SpatialNetwork import SpatialTransformer
 import torch.nn.functional as F
 from util.Optimizer import Optimizer
 from util.ModelSaver import ModelSaver
-from util.data_util.dataset import PairDataset
+from util.data_util.dataset import PairDataset, RandomPairDataset
 from util.visual.tensorboard_visual import visual_gradient, tensorboard_visual_registration, tensorboard_visual_dvf, \
-    tensorboard_visual_det, tensorboard_visual_RGB_dvf, tensorboard_visual_deformation_2
+    tensorboard_visual_det, tensorboard_visual_RGB_dvf, tensorboard_visual_deformation_2, tensorboard_visual_warp_grid
 from util.util import update_dict
 from util.util import mean_dict
 from util.loss.GradientLoss import GradientLoss
 from util.loss.BendingEnergyLoss import BendingEnergyLoss
-from util.metric.registration_metric import folds_count_metric, folds_ratio_metric, mse_metric, jacobian_determinant
-from util.metric.segmentation_metric import dice_metric
+from util.metric.registration_metric import folds_count_metric, folds_percent_metric, mse_metric, jacobian_determinant, \
+    ssim_metric
+from util.metric.segmentation_metric import dice_metric, ASD_metric, HD_metric
 from util.visual.tensorboard_visual import tensorboard_visual_deformation
 from util import loss
+from util.visual.visual_registration import mk_grid_img
 
 
 def train_reg(config, basedir):
@@ -33,12 +35,18 @@ def train_reg(config, basedir):
     """
     with open(config['TrainConfig']['data_path'], 'r') as f:
         dataset_config = json.load(f)
-    train_dataset = PairDataset(dataset_config, 'train_pair')
-    val_dataset = PairDataset(dataset_config, 'val_pair')
-    test_dataset = PairDataset(dataset_config, 'test_pair')
+    num_classes = dataset_config['region_number'] + 1
+    # train_dataset = PairDataset(dataset_config, 'train_pair')
+    # val_dataset = PairDataset(dataset_config, 'val_pair')
+
+    seg = dataset_config[config['TrainConfig']['seg']] if len(config['TrainConfig']['seg']) > 0 else None
+
+    train_dataset = RandomPairDataset(dataset_config, 'train', seg=seg)
+    val_dataset = RandomPairDataset(dataset_config, 'val')
+
     print(f'train dataset size: {len(train_dataset)}')
     print(f'val dataset size: {len(val_dataset)}')
-    print(f'test dataset size: {len(test_dataset)}')
+
     train_dataloader = DataLoader(train_dataset, config["TrainConfig"]['batchsize'], shuffle=True)
     val_dataloader = DataLoader(val_dataset, config["TrainConfig"]['batchsize'], shuffle=False)
 
@@ -50,7 +58,7 @@ def train_reg(config, basedir):
     checkpoint = None
     if len(config['TrainConfig']['checkpoint']) > 0:
         checkpoint = config['TrainConfig']['checkpoint']
-    reg_net = get_reg_model(config['ModelConfig'], checkpoint)
+    reg_net = get_reg_model(config['ModelConfig'], checkpoint, dataset_config['image_size'])
     STN_bilinear = SpatialTransformer(dataset_config['image_size'], mode='bilinear')
     STN_nearest = SpatialTransformer(dataset_config['image_size'], mode='nearest')
 
@@ -71,6 +79,7 @@ def train_reg(config, basedir):
     optimizer = Optimizer(config=config["OptimConfig"],
                           model=reg_net,
                           checkpoint=config["TrainConfig"]["checkpoint"])
+    raw_grid_img = mk_grid_img(4, 1, dataset_config['image_size']).to(device)
     loss_function_dict = get_loss_function(config)
     step = 0
     best_val_dice_metric = -1. * float('inf')
@@ -86,9 +95,10 @@ def train_reg(config, basedir):
         train_metrics_dict = dict()
         for id1, volume1, label1, id2, volume2, label2 in tqdm(train_dataloader):
             volume1 = volume1.to(device)
-            label1 = label1.to(device)
+            label1 = label1.to(device) if label1 != [] else label1
+
             volume2 = volume2.to(device)
-            label2 = label2.to(device)
+            label2 = label2.to(device) if label2 != [] else label2
 
             optimizer.zero_grad()
 
@@ -105,8 +115,10 @@ def train_reg(config, basedir):
             warp_label1 = STN_nearest(label1.float(), dvf)
 
             axis_order = (0, label1.dim() - 1) + tuple(range(1, label1.dim() - 1))
-            warp_label1_one_hot = F.one_hot(warp_label1.squeeze(dim=1).long()).permute(axis_order).contiguous()
-            label2_one_hot = F.one_hot(label2.squeeze(dim=1).long()).permute(axis_order).contiguous()
+            warp_label1_one_hot = F.one_hot(warp_label1.squeeze(dim=1).long(), num_classes=num_classes).permute(
+                axis_order).contiguous()
+            label2_one_hot = F.one_hot(label2.squeeze(dim=1).long(), num_classes=num_classes).permute(
+                axis_order).contiguous()
             metric_dict = compute_reg_metric(dvf.clone().detach(), warp_volume1.clone().detach(),
                                              warp_label1_one_hot.clone().detach(),
                                              volume2.clone().detach(), label2_one_hot.clone().detach())
@@ -153,13 +165,17 @@ def train_reg(config, basedir):
                     warp_label1 = STN_nearest(label1.float(), dvf).type(torch.uint8)
 
                     axis_order = (0, label1.dim() - 1) + tuple(range(1, label1.dim() - 1))
-                    warp_label1_one_hot = F.one_hot(warp_label1.squeeze(dim=1).long()).permute(axis_order).contiguous()
-                    label2_one_hot = F.one_hot(label2.squeeze(dim=1).long()).permute(axis_order).contiguous()
+                    warp_label1_one_hot = F.one_hot(warp_label1.squeeze(dim=1).long(), num_classes=num_classes).permute(
+                        axis_order).contiguous()
+                    label2_one_hot = F.one_hot(label2.squeeze(dim=1).long(), num_classes=num_classes).permute(
+                        axis_order).contiguous()
 
                     metric_dict = compute_reg_metric(dvf.clone().detach(), warp_volume1.clone().detach(),
                                                      warp_label1_one_hot.clone().detach(),
                                                      volume2.clone().detach(), label2_one_hot.clone().detach())
                     update_dict(val_metrics_dict, metric_dict)
+                    grid_img = raw_grid_img.repeat(dvf.shape[0], 1, 1, 1, 1)
+                    warp_grid = STN_bilinear(grid_img.float(), dvf)
 
                     tensorboard_visual_registration(mode='val', name=id1[0] + '_' + id2[0] + '/img', writer=writer,
                                                     step=epoch, fix=volume2[0][0].detach().cpu(),
@@ -184,7 +200,9 @@ def train_reg(config, basedir):
 
                     tensorboard_visual_det(name=tag + '/det', det=det, writer=writer, step=epoch, normalize_by='slice',
                                            threshold=0, cmap='gray')
-
+                    tensorboard_visual_warp_grid(name=tag + '/warp_grid', warp_grid=warp_grid[0][0].detach().cpu(),
+                                                 writer=writer,
+                                                 step=epoch)
             mean_val_loss_dict = mean_dict(val_losses_dict)
             mean_val_metric_dict = mean_dict(val_metrics_dict)
 
@@ -265,7 +283,10 @@ def get_loss_function(config):
 def compute_reg_metric(dvf, warp_volume1, warp_label1, volume2, label2):
     metric_dict = dict()
     metric_dict['dice'] = dice_metric(warp_label1, label2).item()
-    metric_dict['folds_ratio'] = folds_ratio_metric(dvf).item()
-    metric_dict['folds_count'] = folds_count_metric(dvf).item()
-    metric_dict['mse'] = mse_metric(warp_volume1, volume2).item()
+    metric_dict['ASD'] = ASD_metric(warp_label1, label2).item()
+    metric_dict['HD'] = HD_metric(warp_label1, label2).item()
+    metric_dict['SSIM'] = ssim_metric(warp_volume1, volume2)
+    metric_dict['folds_percent'] = folds_percent_metric(dvf).item()
+    # metric_dict['folds_count'] = folds_count_metric(dvf).item()
+    # metric_dict['mse'] = mse_metric(warp_volume1, volume2).item()
     return metric_dict

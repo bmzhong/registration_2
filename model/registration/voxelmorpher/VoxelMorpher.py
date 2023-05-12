@@ -2,12 +2,22 @@ import numpy as np
 import torch
 import torch.nn as nn
 from torch.distributions.normal import Normal
-from torch.nn.functional import interpolate
+import torch.nn.functional as F
+from . import layers
+from .layers import ProbabilityLayer
 
 
-class VoxelMorpher(nn.Module):
+def default_unet_features():
+    nb_features = [
+        [16, 32, 32, 32],  # encoder
+        [32, 32, 32, 32, 32, 16, 16]  # decoder
+    ]
+    return nb_features
+
+
+class Unet(nn.Module):
     def __init__(self, dim, enc_nf, dec_nf, bn=None, full_size=True):
-        super(VoxelMorpher, self).__init__()
+        super(Unet, self).__init__()
         self.bn = bn
         self.dim = dim
         self.enc_nf = enc_nf
@@ -32,13 +42,6 @@ class VoxelMorpher(nn.Module):
             self.vm2_conv = self.conv_block(dim, dec_nf[5], dec_nf[6], batchnorm=bn)
         self.upsample = nn.Upsample(scale_factor=2, mode='nearest')
 
-        # One conv to get the flow field
-        conv_fn = getattr(nn, 'Conv%dd' % dim)
-        self.flow = conv_fn(dec_nf[-1], dim, kernel_size=3, padding=1)
-        # Make flow weights + bias small. Not sure this is necessary.
-        # nd = Normal(0, 1e-5)
-        # self.flow.weight = nn.Parameter(nd.sample(self.flow.weight.shape))
-        # self.flow.bias = nn.Parameter(torch.zeros(self.flow.bias.shape))
         self.batch_norm = getattr(nn, "BatchNorm{0}d".format(dim))(3)
 
     def conv_block(self, dim, in_channels, out_channels, kernel_size=3, stride=1, padding=1, batchnorm=False):
@@ -55,8 +58,7 @@ class VoxelMorpher(nn.Module):
                 nn.LeakyReLU(0.2))
         return layer
 
-    def forward(self, src, tgt):
-        x = torch.cat([src, tgt], dim=1)
+    def forward(self, x):
         # Get encoder activations
         x_enc = [x]
         for i, l in enumerate(self.enc):
@@ -67,10 +69,8 @@ class VoxelMorpher(nn.Module):
         for i in range(3):
             y = self.dec[i](y)
             y = self.upsample(y)
-            y_shape = np.array(y.shape[2:])
-            x_shape = np.array(x_enc[-(i + 2)].shape[2:])
-            if not (y_shape == x_shape).all():
-                y = interpolate(y, scale_factor=(x_shape / y_shape).tolist(), mode='trilinear')
+            if y.shape[2:] != x_enc[-(i + 2)].shape[2:]:
+                y = F.interpolate(y, size=x_enc[-(i + 2)].shape[2:], mode='trilinear')
             y = torch.cat([y, x_enc[-(i + 2)]], dim=1)
         # Two convs at full_size/2 res
         y = self.dec[3](y)
@@ -78,28 +78,161 @@ class VoxelMorpher(nn.Module):
         # Upsample to full res, concatenate and conv
         if self.full_size:
             y = self.upsample(y)
-            y_shape = np.array(y.shape[2:])
-            x_shape = np.array(x_enc[0].shape[2:])
-            if not (y_shape == x_shape).all():
-                y = interpolate(y, scale_factor=(x_shape / y_shape).tolist(), mode='trilinear')
+            if y.shape[2:] != x_enc[0].shape[2:]:
+                y = F.interpolate(y, size=x_enc[0].shape[2:], mode='trilinear')
             y = torch.cat([y, x_enc[0]], dim=1)
             y = self.dec[5](y)
         # Extra conv for vm2
         if self.vm2:
             y = self.vm2_conv(y)
-        flow = self.flow(y)
         if self.bn:
-            flow = self.batch_norm(flow)
-        return flow
+            y = self.batch_norm(y)
+        return y
 
 
-if __name__ == '__main__':
-    nf_enc = [16, 32, 32, 32]
-    nf_dec = [32, 32, 32, 32, 8, 8]
-    device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
-    print(device)
-    reg_net = VoxelMorpher(3, nf_enc, nf_dec).to(device)
-    B, C, D, H, W = 1, 1, 199, 199, 199
-    mov, fix = torch.randn((B, C, D, H, W)).to(device), torch.randn((B, C, D, H, W)).to(device)
-    output = reg_net(mov, fix)
-    print(output.shape)
+class VxmDense(nn.Module):
+    """
+    VoxelMorph network for (unsupervised) nonlinear registration between two images.
+    """
+
+    def __init__(self,
+                 inshape,
+                 enc_nf=None,
+                 dec_nf=None,
+                 bn=None,
+                 int_steps=7,
+                 int_downsize=2,
+                 bidir=False,
+                 use_probs=False
+                 ):
+        """
+        Parameters:
+            inshape: Input shape. e.g. (192, 192, 192)
+            int_steps: Number of flow integration steps. The warp is non-diffeomorphic when this
+                value is 0.
+            int_downsize: Integer specifying the flow downsample factor for vector integration.
+                The flow field is not downsampled when this value is 1.
+            bidir: Enable bidirectional cost function. Default is False.
+            use_probs: Use probabilities in flow field. Default is False.
+            unet_half_res: Skip the last unet decoder upsampling. Requires that int_downsize=2.
+                Default is False.
+        """
+        super().__init__()
+
+        # internal flag indicating whether to return flow or integrated warp during inference
+        self.training = True
+
+        # ensure correct dimensionality
+        ndims = len(inshape)
+        assert ndims in [1, 2, 3], 'ndims should be one of 1, 2, or 3. found: %d' % ndims
+
+        # configure core unet model
+        self.unet_model = Unet(
+            dim=ndims,
+            enc_nf=enc_nf,
+            dec_nf=dec_nf,
+            bn=bn
+        )
+
+        # configure unet to flow field layer
+        Conv = getattr(nn, 'Conv%dd' % ndims)
+        self.flow = Conv(dec_nf[-1], ndims, kernel_size=3, padding=1)
+
+        # init flow layer with small weights and bias
+        self.flow.weight = nn.Parameter(Normal(0, 1e-5).sample(self.flow.weight.shape))
+        self.flow.bias = nn.Parameter(torch.zeros(self.flow.bias.shape))
+
+        # probabilities are not supported in pytorch
+        if use_probs:
+            self.probability_layer = ProbabilityLayer(self.unet_model.final_nf, ndims)
+        else:
+            self.probability_layer = None
+        # configure optional resize layers (downsize)
+        if int_steps > 0 and int_downsize > 1:
+            self.resize = layers.ResizeTransform(int_downsize, ndims)
+        else:
+            self.resize = None
+
+        # resize to full res
+        if int_steps > 0 and int_downsize > 1:
+            self.fullsize = layers.ResizeTransform(1 / int_downsize, ndims)
+        else:
+            self.fullsize = None
+
+        # configure bidirectional training
+        self.bidir = bidir
+
+        # configure optional integration layer for diffeomorphic warp
+        down_shape = [int(dim / int_downsize) for dim in inshape]
+        self.integrate = layers.VecInt(down_shape, int_steps) if int_steps > 0 else None
+
+        # configure transformer
+        self.transformer = layers.SpatialTransformer(inshape)
+
+    def forward(self, source, target, registration=False):
+        '''
+        Parameters:
+            source: Source image tensor.
+            target: Target image tensor.
+            registration: Return transformed image and flow. Default is False.
+        '''
+
+        # concatenate inputs and propagate unet
+        x = torch.cat([source, target], dim=1)
+        x = self.unet_model(x)
+
+        # transform into flow field
+        if self.probability_layer:
+            flow_field = self.probability_layer(x)
+        else:
+            flow_field = self.flow(x)
+
+        # resize flow for integration
+        pos_flow = flow_field
+        if self.resize:
+            pos_flow = self.resize(pos_flow)
+
+        preint_flow = pos_flow
+
+        # negate flow for bidirectional model
+        neg_flow = -pos_flow if self.bidir else None
+
+        # integrate to produce diffeomorphic warp
+        if self.integrate:
+            pos_flow = self.integrate(pos_flow)
+            neg_flow = self.integrate(neg_flow) if self.bidir else None
+
+            # resize to final resolution
+            if self.fullsize:
+                pos_flow = self.fullsize(pos_flow)
+                neg_flow = self.fullsize(neg_flow) if self.bidir else None
+
+        return pos_flow
+
+        # # warp image with flow field
+        # y_source = self.transformer(source, pos_flow)
+        # y_target = self.transformer(target, neg_flow) if self.bidir else None
+        #
+        # # return non-integrated flow field if training
+        # if not registration:
+        #     return (y_source, y_target, preint_flow) if self.bidir else (y_source, preint_flow)
+        # else:
+        #     return y_source, pos_flow
+
+
+class ConvBlock(nn.Module):
+    """
+    Specific convolutional block followed by leakyrelu for unet.
+    """
+
+    def __init__(self, ndims, in_channels, out_channels, stride=1):
+        super().__init__()
+
+        Conv = getattr(nn, 'Conv%dd' % ndims)
+        self.main = Conv(in_channels, out_channels, 3, stride, 1)
+        self.activation = nn.LeakyReLU(0.2)
+
+    def forward(self, x):
+        out = self.main(x)
+        out = self.activation(out)
+        return out

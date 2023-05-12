@@ -50,7 +50,7 @@ def write_OASIS_1(image_size, scale_factor, source_path, output_path):
     temp = np.array(temp)
     print(np.sum(temp == 5))
     print(len(temp))
-    file.attrs['label_map'] = [[i, i] for i in range(0, region_number + 1)]
+    # file.attrs['label_map'] = [[i, i] for i in range(0, region_number + 1)]
     file.attrs['image_size'] = image_size
     file.attrs['dataset_size'] = len(file.keys())
     file.attrs['region_number'] = region_number
@@ -59,7 +59,7 @@ def write_OASIS_1(image_size, scale_factor, source_path, output_path):
 
 
 if __name__ == '__main__':
-    image_size = [160, 160, 160]
+    image_size = [128, 128, 128]
     scale_factor = 1.
     output_path = '../../datasets/hdf5/OASIS.h5'
     source_path = r'G:\biomdeical\registration\public_data\OASIS\neurite-oasis.v1.0'

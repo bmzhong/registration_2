@@ -3,27 +3,27 @@ from util.data_util.dataset import PairDataset
 from torch.utils.data import DataLoader
 
 
-def create_train_dataset(dataset_config, config, segmentation_available):
+def create_train_dataset(dataset_config, config, seg):
     subdivide_names_dict = {'00': [], '01': [], '10': [], '11': []}
     train_data_pair_names = np.array(dataset_config['train_pair'])
     for name1, name2 in train_data_pair_names:
-        if segmentation_available[name1] and segmentation_available[name2]:
+        if seg[name1] and seg[name2]:
             subdivide_names_dict['11'].append([name1, name2])
-        elif not segmentation_available[name1] and segmentation_available[name2]:
+        elif not seg[name1] and seg[name2]:
             subdivide_names_dict['01'].append([name1, name2])
-        elif segmentation_available[name1] and not segmentation_available[name2]:
+        elif seg[name1] and not seg[name2]:
             subdivide_names_dict['10'].append([name1, name2])
         else:
             subdivide_names_dict['00'].append([name1, name2])
     subdivide_dataset_dict = {
         '00': PairDataset(dataset_config, 'train_pair', data_names=subdivide_names_dict['00'],
-                          segmentation_available=segmentation_available),
+                          seg=seg),
         '01': PairDataset(dataset_config, 'train_pair', data_names=subdivide_names_dict['01'],
-                          segmentation_available=segmentation_available),
+                          seg=seg),
         '10': PairDataset(dataset_config, 'train_pair', data_names=subdivide_names_dict['10'],
-                          segmentation_available=segmentation_available),
+                          seg=seg),
         '11': PairDataset(dataset_config, 'train_pair', data_names=subdivide_names_dict['11'],
-                          segmentation_available=segmentation_available)
+                          seg=seg)
     }
     subdivide_dataloader_dict = {
         '00': DataLoader(subdivide_dataset_dict['00'], batch_size=config['TrainConfig']['batchsize'],
@@ -61,6 +61,7 @@ def create_batch_generator(dataloader_subdivided, weights=None):
     if weights is None:
         weights = np.array([len(dataloader_subdivided[s]) for s in seg_availabilities])
     weights = np.array(weights)
+    print(f"['00', '01', '10', '11'] weight: {weights}")
     weights = weights / weights.sum()
     dataloader_subdivided_as_iterators = {s: iter(d) for s, d in dataloader_subdivided.items()}
 

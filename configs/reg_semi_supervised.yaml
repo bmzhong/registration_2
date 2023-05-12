@@ -1,26 +1,25 @@
-# reg_seme_supervised.yaml
+# reg_semi_supervised.yaml
 
 TrainConfig:
   start_new_model: True
   max_save_num: 2                 # numbers that checkpoint files saved; default 2
   gpu: "0"
-  data_path: "datasets/json/LPBA40_test.json"
-  epoch: 50
-  batchsize: 8
+  data_path: "datasets/json/LPBA40.json"
+  epoch: 500
+  batchsize: 1
   checkpoint: ""
   val_interval: 1
-  semi_supervised: True
+  seg: "seg_28"
 
-#  writer_board_interval: 10
 
 TestConfig:
-  checkpoint: "output/reg/debug/debug1/checkpoint/best_epoch.pth"
-  data_path: "datasets/json/LPBA40_test.json"
-  save_image: True
+  checkpoint: ""
+  data_path: "datasets/json/LPBA40.json"
+  save_image: False
   gpu: "0"
 
 ModelConfig:
-  type: "VoxelMorpher"
+  type: "vxm_diff"
 
 
 
@@ -29,13 +28,13 @@ OptimConfig:
   optimizer:
     type: "Adam"
     params:
-      lr: 0.0004
+      lr: 0.0005
   lr_scheduler:
     type: "StepLR"
     params:
-      step_size: 1500
-      gamma: 0.5
-      warmup: True
+      step_size: 10000
+      gamma: 0.8
+      warmup: False
       warmup_steps: 100
 
 LossConfig:
@@ -43,20 +42,15 @@ LossConfig:
   similarity_loss:
     use: True
     type: 'NCCLoss'
-    weight: 1.0
+    weight: 1
 
   segmentation_loss:
     use: True
-    type: 'MonAIDiceLoss'
-    params:
-      include_background: True
-      to_onehot_y: False
-      softmax: False
-      reduction: 'mean'
+    type: 'DiceLoss2'
     weight: 1
 
   gradient_loss:
-    use: False
+    use: True
     type: 'GradientLoss'
     weight: 1
 

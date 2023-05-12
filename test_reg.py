@@ -7,23 +7,33 @@ from tqdm import tqdm
 
 from model.registration.SpatialNetwork import SpatialTransformer
 from model.registration.model_util import get_reg_model
-from train_reg import compute_reg_metric
 from util.data_util.dataset import PairDataset
 from torch.utils.data import DataLoader
 import json
 
-from util.metric.registration_metric import jacobian_determinant
+from util.metric.registration_metric import jacobian_determinant, ssim_metric, folds_percent_metric
+from util.metric.segmentation_metric import dice_metric, ASD_metric, HD_metric
 from util.util import update_dict, mean_dict, std_dict
 from util.visual.image_util import write_image, save_image_figure, save_deformation_figure, save_det_figure, \
-    save_dvf_figure, save_RGB_dvf_figure, save_RGB_deformation_2_figure
+    save_dvf_figure, save_RGB_dvf_figure, save_RGB_deformation_2_figure, save_warp_grid_figure
 import time
+import csv
+
+from util.visual.visual_registration import mk_grid_img
 
 
 def test_reg(config, basedir, checkpoint=None, model_config=None):
-    outfile = open(os.path.join(basedir, "log.txt"), 'a', encoding='utf-8')
-    outfile.write(f"\n--------------{time.asctime()}------------------\n")
+    csv_file = open(os.path.join(basedir, "result.csv"), 'a', encoding='utf-8', newline='')
+    csv_writer = csv.writer(csv_file)
+
+    csv_writer.writerow([str(time.asctime())])
+
+    header_names = ['dice', 'ASD', 'HD', 'SSIM', 'folds_percent']
+    csv_writer.writerow(["moving_fixed"] + header_names)
+
     with open(config['TestConfig']['data_path'], 'r') as f:
         dataset_config = json.load(f)
+    num_classes = dataset_config['region_number'] + 1
     test_dataset = PairDataset(dataset_config, 'test_pair')
     print(f'test dataset size: {len(test_dataset)}')
     test_loader = DataLoader(test_dataset, batch_size=1, shuffle=False)
@@ -36,7 +46,7 @@ def test_reg(config, basedir, checkpoint=None, model_config=None):
 
     if model_config is None:
         model_config = config['ModelConfig']
-    reg_net = get_reg_model(model_config, checkpoint)
+    reg_net = get_reg_model(model_config, checkpoint, dataset_config['image_size'])
 
     STN_bilinear = SpatialTransformer(dataset_config['image_size'], mode='bilinear')
     STN_nearest = SpatialTransformer(dataset_config['image_size'], mode='nearest')
@@ -52,7 +62,7 @@ def test_reg(config, basedir, checkpoint=None, model_config=None):
         reg_net = torch.nn.DataParallel(reg_net, device_ids=[i for i in range(gpu_num)])
         STN_bilinear = torch.nn.DataParallel(STN_bilinear, device_ids=[i for i in range(gpu_num)])
         STN_nearest = torch.nn.DataParallel(STN_nearest, device_ids=[i for i in range(gpu_num)])
-
+    raw_grid_img = mk_grid_img(4, 1, dataset_config['image_size']).to(device)
     reg_net.eval()
     test_metrics_dict = dict()
     with torch.no_grad():
@@ -68,15 +78,21 @@ def test_reg(config, basedir, checkpoint=None, model_config=None):
             warp_label1 = STN_nearest(label1.float(), dvf).type(torch.uint8)
 
             axis_order = (0, label1.dim() - 1) + tuple(range(1, label1.dim() - 1))
-            warp_label1_one_hot = F.one_hot(warp_label1.squeeze(dim=1).long()).permute(axis_order).contiguous()
-            label2_one_hot = F.one_hot(label2.squeeze(dim=1).long()).permute(axis_order).contiguous()
+            warp_label1_one_hot = F.one_hot(warp_label1.squeeze(dim=1).long(), num_classes=num_classes).permute(
+                axis_order).contiguous()
+            label2_one_hot = F.one_hot(label2.squeeze(dim=1).long(), num_classes=num_classes).permute(
+                axis_order).contiguous()
             metric_dict = compute_reg_metric(dvf.clone().detach(), warp_volume1.clone().detach(),
                                              warp_label1_one_hot.clone().detach(),
                                              volume2.clone().detach(), label2_one_hot.clone().detach())
             update_dict(test_metrics_dict, metric_dict)
+            grid_img = raw_grid_img.repeat(dvf.shape[0], 1, 1, 1, 1)
+            warp_grid = STN_bilinear(grid_img.float(), dvf)
 
-            for key, value in metric_dict.items():
-                outfile.write(f"{id1[0]}_{id2[0]} {key}: {value}\n")
+            row_list = [id1[0] + "_" + id2[0]]
+            for metric_name in header_names:
+                row_list.append(f"{metric_dict[metric_name]:.6f}")
+            csv_writer.writerow(row_list)
 
             if config["TestConfig"]["save_image"]:
                 output_dir = os.path.join(basedir, "images", id1[0])
@@ -98,10 +114,32 @@ def test_reg(config, basedir, checkpoint=None, model_config=None):
                                 cmap='gray')
                 save_RGB_dvf_figure(output_dir, 'rgb_dvf' + tag, dvf[0].detach().cpu())
                 save_RGB_deformation_2_figure(output_dir, 'deformation_2' + tag, dvf[0].detach().cpu())
+                save_warp_grid_figure(output_dir, 'warp_grid' + tag, warp_grid[0][0].detach().cpu())
 
     mean_test_metric_dict = mean_dict(test_metrics_dict)
     std_metric_dict = std_dict(test_metrics_dict)
+
+    row_list = ["mean"]
+    for metric_name in header_names:
+        row_list.append(f"{mean_test_metric_dict[metric_name]:.6f}")
+    csv_writer.writerow(row_list)
+
+    row_list = ["std"]
+    for metric_name in header_names:
+        row_list.append(f"{std_metric_dict[metric_name]:.6f}")
+    csv_writer.writerow(row_list)
+
     for key in mean_test_metric_dict.keys():
-        outfile.write(f"mean {key}: {mean_test_metric_dict[key]}, std {key}: {std_metric_dict[key]}\n")
         print(f"mean {key}: {mean_test_metric_dict[key]}, std {key}: {std_metric_dict[key]}")
-    outfile.close()
+
+    csv_file.close()
+
+
+def compute_reg_metric(dvf, warp_volume1, warp_label1, volume2, label2):
+    metric_dict = dict()
+    metric_dict['dice'] = dice_metric(warp_label1, label2).item()
+    metric_dict['ASD'] = ASD_metric(warp_label1, label2).item()
+    metric_dict['HD'] = HD_metric(warp_label1, label2).item()
+    metric_dict['SSIM'] = ssim_metric(warp_volume1, volume2)
+    metric_dict['folds_percent'] = folds_percent_metric(dvf).item()
+    return metric_dict

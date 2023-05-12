@@ -6,7 +6,7 @@ TrainConfig:
   data_path: "datasets/json/LPBA40_test.json"
   epoch: 50
   gpu: "0"
-  M: -1
+  seg: "seg_28"
   batchsize: 2
   Seg:
     gpu: "0"
@@ -21,7 +21,7 @@ TrainConfig:
 
 TestConfig:
   gpu: "0"
-  data_path: "datasets/json/LPBA40_test.json"
+  data_path: ""
   save_image: True
   Seg:
     checkpoint: ""
@@ -34,7 +34,7 @@ ModelConfig:
   Seg:
     type: "UNet"
   Reg:
-    type: "VoxelMorpher"
+    type: "vxm_diff"
 
 
 OptimConfig:
@@ -49,7 +49,7 @@ OptimConfig:
       params:
         step_size: 1500
         gamma: 0.5
-        warmup: True
+        warmup: False
         warmup_steps: 100
   Reg:
     load_checkpoint: False     # whether load a checkpoint in training, using the path defined in Trainconfig
@@ -62,7 +62,7 @@ OptimConfig:
       params:
         step_size: 1500
         gamma: 0.5
-        warmup: True
+        warmup: False
         warmup_steps: 100
 
 
@@ -75,12 +75,7 @@ LossConfig:
 
     segmentation_loss:
       use: True
-      type: 'MonAIDiceLoss'
-      params:
-        include_background: True
-        to_onehot_y: False
-        softmax: False
-        reduction: 'mean'
+      type: 'DiceLoss2'
       weight: 1
 
     gradient_loss:

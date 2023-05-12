@@ -1,6 +1,7 @@
 import numpy as np
 import torch
 import torch.nn.functional as F
+import pytorch_msssim
 
 
 def jacobian_determinant(vf):
@@ -51,10 +52,24 @@ def folds_count_metric(dvf):
     return count / B
 
 
-def folds_ratio_metric(dvf):
+def folds_percent_metric(dvf):
     folds_num = folds_count_metric(dvf)
-    return folds_num / np.prod(dvf.shape[2:]).item()
+    return (folds_num / np.prod(dvf.shape[2:]).item()) * 100.
 
 
 def mse_metric(predict, target):
     return torch.mean((predict - target) ** 2)
+
+
+def nmse_metric(predict, target):
+    return torch.sum((predict - target) ** 2) / torch.sum(target ** 2)
+
+
+def ssim_metric(predict, target):
+    return pytorch_msssim.ssim(predict, target, data_range=1., size_average=True)
+
+
+if __name__ == '__main__':
+    a = torch.randn(size=(1, 1, 128, 128, 128))
+    b = torch.randn(size=(1, 1, 128, 128, 128))
+    print(ssim_metric(a, b))

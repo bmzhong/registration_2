@@ -1,5 +1,6 @@
 import torch
 import torch.nn.functional as F
+import monai
 
 
 def dice_coefficient(predict, target):
@@ -40,3 +41,19 @@ def dice_metric(predict, target, background=False):
     mean_dice = total_dice / num_classes if background else total_dice / (num_classes - 1)
 
     return mean_dice
+
+
+def ASD_metric(predict, target):
+    ASD = monai.metrics.compute_average_surface_distance(predict, target, include_background=False, symmetric=False)
+    return torch.mean(ASD)
+
+
+def HD_metric(predict, target):
+    HD = monai.metrics.compute_hausdorff_distance(predict, target, include_background=False)
+    return torch.mean(HD)
+
+
+if __name__ == '__main__':
+    a = torch.randint(0, 2, size=(2, 1, 128, 128, 128))
+    b = torch.randint(0, 2, size=(2, 1, 128, 128, 128))
+    print(ASD_metric(a, a))
