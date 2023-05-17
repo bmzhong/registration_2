@@ -45,6 +45,10 @@ def train_reg_semi_supervised(config, basedir):
     print(f'val dataset size: {len(val_dataset)}')
     val_dataloader = DataLoader(val_dataset, config["TrainConfig"]['batchsize'], shuffle=False)
 
+    step_size = config['OptimConfig']['lr_scheduler']['params']['step_size']
+    train_size, batch_size = dataset_config['train_size'], config["TrainConfig"]['batchsize']
+    config['OptimConfig']['lr_scheduler']['params']['step_size'] = int(step_size * train_size / batch_size)
+
     """
      ------------------------------------------------
                loading model
@@ -112,6 +116,7 @@ def train_reg_semi_supervised(config, basedir):
                         axis_order).contiguous()
                     train_dice = dice_metric(warp_label1_one_hot, label2_one_hot).item()
                     train_dice_list.append(train_dice)
+                    del warp_label1, warp_label1_one_hot, label2_one_hot
 
                 loss_dict['total_loss'].backward()
 
@@ -193,7 +198,7 @@ def train_reg_semi_supervised(config, basedir):
 
                         tensorboard_visual_det(name=tag + '/det', det=det, writer=writer, step=epoch,
                                                normalize_by='slice',
-                                               threshold=0, cmap='gray')
+                                               threshold=0, cmap='b')
                         # tensorboard_visual_warp_grid(name=tag + '/warp_grid', warp_grid=warp_grid[0][0].cpu(),
                         #                              writer=writer,
                         #                              step=epoch)

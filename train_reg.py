@@ -50,6 +50,9 @@ def train_reg(config, basedir):
     train_dataloader = DataLoader(train_dataset, config["TrainConfig"]['batchsize'], shuffle=True)
     val_dataloader = DataLoader(val_dataset, config["TrainConfig"]['batchsize'], shuffle=False)
 
+    step_size = config['OptimConfig']['lr_scheduler']['params']['step_size']
+    train_size, batch_size = dataset_config['train_size'], config["TrainConfig"]['batchsize']
+    config['OptimConfig']['lr_scheduler']['params']['step_size'] = int(step_size * train_size / batch_size)
     """
      ------------------------------------------------
                loading model
@@ -111,31 +114,34 @@ def train_reg(config, basedir):
             optimizer.step()
             update_dict(train_losses_dict, loss_dict)
 
-            warp_volume1 = STN_bilinear(volume1, dvf)
-            warp_label1 = STN_nearest(label1.float(), dvf)
-
-            axis_order = (0, label1.dim() - 1) + tuple(range(1, label1.dim() - 1))
-            warp_label1_one_hot = F.one_hot(warp_label1.squeeze(dim=1).long(), num_classes=num_classes).permute(
-                axis_order).contiguous()
-            label2_one_hot = F.one_hot(label2.squeeze(dim=1).long(), num_classes=num_classes).permute(
-                axis_order).contiguous()
-            metric_dict = compute_reg_metric(dvf.clone().detach(), warp_volume1.clone().detach(),
-                                             warp_label1_one_hot.clone().detach(),
-                                             volume2.clone().detach(), label2_one_hot.clone().detach())
-
-            update_dict(train_metrics_dict, metric_dict)
+            # warp_volume1 = STN_bilinear(volume1, dvf)
+            # warp_label1 = STN_nearest(label1.float(), dvf)
+            #
+            # axis_order = (0, label1.dim() - 1) + tuple(range(1, label1.dim() - 1))
+            # warp_label1_one_hot = F.one_hot(warp_label1.squeeze(dim=1).long(), num_classes=num_classes).permute(
+            #     axis_order).contiguous()
+            # label2_one_hot = F.one_hot(label2.squeeze(dim=1).long(), num_classes=num_classes).permute(
+            #     axis_order).contiguous()
+            # metric_dict = compute_reg_metric(dvf.clone().detach(), warp_volume1.clone().detach(),
+            #                                  warp_label1_one_hot.clone().detach(),
+            #                                  volume2.clone().detach(), label2_one_hot.clone().detach())
+            #
+            # update_dict(train_metrics_dict, metric_dict)
             step += 1
+
         mean_train_loss_dict = mean_dict(train_losses_dict)
-        mean_train_metric_dict = mean_dict(train_metrics_dict)
+
         print(f"Epoch {epoch}/{config['TrainConfig']['epoch']}:")
         for loss_type, loss_value in mean_train_loss_dict.items():
             writer.add_scalar("train/loss/" + loss_type, loss_value, epoch)
         print(f"training total loss: {mean_train_loss_dict['total_loss']}")
 
-        for metric_type, metric_value in mean_train_metric_dict.items():
-            writer.add_scalar("train/metric/" + metric_type, metric_value, epoch)
-        print(f"training dice: {mean_train_metric_dict['dice']}")
+        # mean_train_metric_dict = mean_dict(train_metrics_dict)
+        # for metric_type, metric_value in mean_train_metric_dict.items():
+        #     writer.add_scalar("train/metric/" + metric_type, metric_value, epoch)
+        # print(f"training dice: {mean_train_metric_dict['dice']}")
         writer.add_scalar("lr", optimizer.get_cur_lr(), epoch)
+
         visual_gradient(reg_net, writer, epoch)
 
         """
@@ -148,6 +154,7 @@ def train_reg(config, basedir):
             reg_net.eval()
             val_losses_dict = dict()
             val_metrics_dict = dict()
+            val_count = 0
             with torch.no_grad():
                 for id1, volume1, label1, id2, volume2, label2 in tqdm(val_dataloader):
                     volume1 = volume1.to(device)
@@ -174,35 +181,37 @@ def train_reg(config, basedir):
                                                      warp_label1_one_hot.clone().detach(),
                                                      volume2.clone().detach(), label2_one_hot.clone().detach())
                     update_dict(val_metrics_dict, metric_dict)
-                    grid_img = raw_grid_img.repeat(dvf.shape[0], 1, 1, 1, 1)
-                    warp_grid = STN_bilinear(grid_img.float(), dvf)
+                    if val_count < 8:
+                        grid_img = raw_grid_img.repeat(dvf.shape[0], 1, 1, 1, 1)
+                        warp_grid = STN_bilinear(grid_img.float(), dvf)
+                        tensorboard_visual_registration(mode='val', name=id1[0] + '_' + id2[0] + '/img', writer=writer,
+                                                        step=epoch, fix=volume2[0][0].detach().cpu(),
+                                                        mov=volume1[0][0].detach().cpu(),
+                                                        reg=warp_volume1[0][0].detach().cpu())
+                        tensorboard_visual_registration(mode='val', name=id1[0] + '_' + id2[0] + '/seg', writer=writer,
+                                                        step=epoch, fix=label2[0][0].detach().cpu(),
+                                                        mov=label1[0][0].detach().cpu(),
+                                                        reg=warp_label1[0][0].detach().cpu())
 
-                    tensorboard_visual_registration(mode='val', name=id1[0] + '_' + id2[0] + '/img', writer=writer,
-                                                    step=epoch, fix=volume2[0][0].detach().cpu(),
-                                                    mov=volume1[0][0].detach().cpu(),
-                                                    reg=warp_volume1[0][0].detach().cpu())
-                    tensorboard_visual_registration(mode='val', name=id1[0] + '_' + id2[0] + '/seg', writer=writer,
-                                                    step=epoch, fix=label2[0][0].detach().cpu(),
-                                                    mov=label1[0][0].detach().cpu(),
-                                                    reg=warp_label1[0][0].detach().cpu())
+                        tag = 'val/' + id1[0] + '_' + id2[0]
 
-                    tag = 'val/' + id1[0] + '_' + id2[0]
+                        tensorboard_visual_deformation(name=tag + '/deformation', dvf=dvf[0].detach().cpu(),
+                                                       grid_spacing=dvf.shape[-1] // 50, writer=writer, step=epoch,
+                                                       linewidth=1, color='darkblue')
 
-                    tensorboard_visual_deformation(name=tag + '/deformation', dvf=dvf[0].detach().cpu(),
-                                                   grid_spacing=dvf.shape[-1] // 50, writer=writer, step=epoch,
-                                                   linewidth=1, color='darkblue')
+                        tensorboard_visual_dvf(name=tag + '/dvf', dvf=dvf[0].detach().cpu(), writer=writer, step=epoch)
+                        tensorboard_visual_RGB_dvf(name=tag + '/rgb_dvf', dvf=dvf[0].detach().cpu(), writer=writer,
+                                                   step=epoch)
 
-                    tensorboard_visual_dvf(name=tag + '/dvf', dvf=dvf[0].detach().cpu(), writer=writer, step=epoch)
-                    tensorboard_visual_RGB_dvf(name=tag + '/rgb_dvf', dvf=dvf[0].detach().cpu(), writer=writer,
-                                               step=epoch)
+                        det = jacobian_determinant(dvf[0].detach().cpu())
 
-                    det = jacobian_determinant(dvf[0].detach().cpu())
-
-                    tensorboard_visual_det(name=tag + '/det', det=det, writer=writer, step=epoch, normalize_by='slice',
-                                           threshold=0, cmap='gray')
-                    tensorboard_visual_warp_grid(name=tag + '/warp_grid', warp_grid=warp_grid[0][0].detach().cpu(),
-                                                 writer=writer,
-                                                 step=epoch)
+                        tensorboard_visual_det(name=tag + '/det', det=det, writer=writer, step=epoch,
+                                               normalize_by='slice',
+                                               threshold=0, cmap='b')
+                        tensorboard_visual_warp_grid(name=tag + '/warp_grid', warp_grid=warp_grid[0][0].detach().cpu(),
+                                                     writer=writer,
+                                                     step=epoch)
+                        val_count += 1
             mean_val_loss_dict = mean_dict(val_losses_dict)
             mean_val_metric_dict = mean_dict(val_metrics_dict)
 
@@ -240,10 +249,12 @@ def compute_reg_loss(config, dvf, loss_function_dict, STN_bilinear, volume1, lab
 
     if config['LossConfig']['segmentation_loss']['use']:
         loss_dict['segmentation_loss'] = 0.
-        num_classes = torch.max(label1)
-        for i in range(1, num_classes):
-            loss_dict['segmentation_loss'] = loss_dict['segmentation_loss'] + loss_function_dict['segmentation_loss'](
-                STN_bilinear((label1 == i).float(), dvf), (label2 == i).float())
+        if label1 != [] and label2 != []:
+            num_classes = torch.max(label1)
+            for i in range(1, num_classes):
+                loss_dict['segmentation_loss'] = loss_dict['segmentation_loss'] + loss_function_dict[
+                    'segmentation_loss'](
+                    STN_bilinear((label1 == i).float(), dvf), (label2 == i).float())
 
     if config['LossConfig']['gradient_loss']['use']:
         loss_dict['gradient_loss'] = loss_function_dict['gradient_loss'](dvf)

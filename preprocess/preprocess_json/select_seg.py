@@ -22,7 +22,12 @@ def select_seg(M_list, dataset_config, output_path):
     train_data_names = np.array(dataset_config['train'])
     for M in M_list:
         seg = {name: False for name in train_data_names}
+        if dataset_config['atlas'] != '':
+            seg[dataset_config['atlas']] = False
         seg_true_list = np.random.choice(train_data_names, size=M, replace=False).tolist()
+        if M > 0 and dataset_config['atlas'] != '':
+            seg_true_list.append(dataset_config['atlas'])
+        print(seg_true_list)
         seg_true_dict = {name: True for name in seg_true_list}
         seg.update(seg_true_dict)
         dataset_config['seg_' + str(M)] = seg

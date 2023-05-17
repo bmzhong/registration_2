@@ -43,6 +43,7 @@ class Unet(nn.Module):
         self.upsample = nn.Upsample(scale_factor=2, mode='nearest')
 
         self.batch_norm = getattr(nn, "BatchNorm{0}d".format(dim))(3)
+        self.final_nf=dec_nf[-1]
 
     def conv_block(self, dim, in_channels, out_channels, kernel_size=3, stride=1, padding=1, batchnorm=False):
         conv_fn = getattr(nn, "Conv{0}d".format(dim))
@@ -133,6 +134,7 @@ class VxmDense(nn.Module):
             dec_nf=dec_nf,
             bn=bn
         )
+        
 
         # configure unet to flow field layer
         Conv = getattr(nn, 'Conv%dd' % ndims)

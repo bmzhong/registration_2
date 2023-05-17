@@ -54,6 +54,16 @@ def train_seg_reg(config, basedir):
     reg_val_dataloader = DataLoader(reg_val_dataset, config['TrainConfig']['batchsize'], shuffle=False)
     seg_val_dataloader = DataLoader(seg_val_dataset, config['TrainConfig']['batchsize'], shuffle=False)
 
+    seg_step_size = config['Seg']['OptimConfig']['lr_scheduler']['params']['step_size']
+    train_size, batch_size = dataset_config['train_size'], config["TrainConfig"]['batchsize']
+    config['Seg']['OptimConfig']['lr_scheduler']['params']['step_size'] = int(seg_step_size * train_size / batch_size)
+
+    reg_step_size = config['Reg']['OptimConfig']['lr_scheduler']['params']['step_size']
+    config['Reg']['OptimConfig']['lr_scheduler']['params']['step_size'] = int(reg_step_size * train_size / batch_size)
+
+    print(f"seg step_size: {config['Seg']['OptimConfig']['lr_scheduler']['params']['step_size']}")
+    print(f"reg step_size: {config['Reg']['OptimConfig']['lr_scheduler']['params']['step_size']}")
+
     """
      ------------------------------------------------
                loading model
@@ -212,7 +222,7 @@ def train_seg_reg(config, basedir):
 
                         tensorboard_visual_det(name=tag + '/det', det=det, writer=writer, step=epoch,
                                                normalize_by='slice',
-                                               threshold=0, cmap='gray')
+                                               threshold=0, cmap='b')
                         tensorboard_visual_warp_grid(name=tag + '/warp_grid', warp_grid=warp_grid[0][0].cpu(),
                                                      writer=writer,
                                                      step=epoch)

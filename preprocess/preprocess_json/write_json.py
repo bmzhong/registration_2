@@ -224,12 +224,13 @@ def write_LPBA40_json(hdf5_path, output_path):
     image_names.remove('S01')
     train, val_test = train_test_split(np.array(image_names), train_size=28)
     val, test = train_test_split(val_test, test_size=2 / 3)
-    train = train.tolist() + ['S01']
+    train = train.tolist()
     val = val.tolist()
     test = test.tolist()
     train_pairs = [[img, 'S01'] for img in train]
     val_pairs = [[img, 'S01'] for img in val]
     test_pairs = [[img, 'S01'] for img in test]
+
 
     json_data['train_size'] = len(train)
     json_data['val_size'] = len(val)
@@ -267,9 +268,9 @@ def write_IXI_json(hdf5_path, output_path):
 
     train.append('atlas')
 
-    train_pair = [[name, 'atlas'] for name in train]
-    val_pair = [[name, 'atlas'] for name in val]
-    test_pair = [[name, 'atlas'] for name in test]
+    train_pair = [['atlas', name] for name in train]
+    val_pair = [['atlas', name] for name in val]
+    test_pair = [['atlas', name] for name in test]
 
     json_data['train_size'] = len(train)
     json_data['val_size'] = len(val)
@@ -318,8 +319,6 @@ if __name__ == '__main__':
     # IXI_path = '../../datasets/hdf5/IXI.h5'
     # IXI_output_path = '../../datasets/json/IXI.json'
     # write_IXI_json(IXI_path, IXI_output_path)
-
-
 
     # soma_nuclei_4_path = '../../datasets/hdf5/soma_nuclei.h5'
     # soma_nuclei_4_output_path = '../../datasets/json/soma_nuclei.json'

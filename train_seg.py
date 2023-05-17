@@ -45,6 +45,9 @@ def train_seg(config, basedir):
 
     train_dataloader = DataLoader(train_dataset, config["TrainConfig"]['batchsize'], shuffle=True)
     val_dataloader = DataLoader(val_dataset, config["TrainConfig"]['batchsize'], shuffle=False)
+    step_size = config['OptimConfig']['lr_scheduler']['params']['step_size']
+    train_size, batch_size = dataset_config['train_size'], config["TrainConfig"]['batchsize']
+    config['OptimConfig']['lr_scheduler']['params']['step_size'] = int(step_size * train_size / batch_size)
     """
      ------------------------------------------------
                loading model

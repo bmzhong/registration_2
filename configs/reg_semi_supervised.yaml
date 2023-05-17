@@ -8,7 +8,7 @@ TrainConfig:
   epoch: 500
   batchsize: 1
   checkpoint: ""
-  val_interval: 1
+  val_interval: 2
   seg: "seg_28"
 
 
@@ -32,7 +32,7 @@ OptimConfig:
   lr_scheduler:
     type: "StepLR"
     params:
-      step_size: 10000
+      step_size: 700
       gamma: 0.8
       warmup: False
       warmup_steps: 100
@@ -52,7 +52,7 @@ LossConfig:
   gradient_loss:
     use: True
     type: 'GradientLoss'
-    weight: 1
+    weight: 0.1
 
   bending_energy_loss:
     use: False

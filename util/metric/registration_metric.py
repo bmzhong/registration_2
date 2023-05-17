@@ -57,6 +57,12 @@ def folds_percent_metric(dvf):
     return (folds_num / np.prod(dvf.shape[2:]).item()) * 100.
 
 
+def SDLogJ_metric(dvf):
+    dvf = torch.clamp(dvf, min=1e-9, max=1e9)
+    dvf = torch.log(dvf)
+    return torch.std(dvf)
+
+
 def mse_metric(predict, target):
     return torch.mean((predict - target) ** 2)
 

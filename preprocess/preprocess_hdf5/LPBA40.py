@@ -56,7 +56,7 @@ GROUP_CONFIG = [
 def group_label(label):
     label_merged = np.zeros(label.shape, dtype=np.int32)
     for i, (name, start, end) in enumerate(GROUP_CONFIG):
-        region = np.logical_and(label >= start, label <= end)
+        region = np.logical_and(label >= start, label >= end)
         label_merged[region] = i + 1
     return label_merged
 
@@ -121,9 +121,9 @@ if __name__ == '__main__':
     source_path = r'G:\biomdeical\registration\public_data\LPBA40\LPBA40_Subjects_Delineation_Space_MRI_and' \
                   r'_label_files\LPBA40subjects.delineation_space\LPBA40\delineation_space'
     output_path = '../../datasets/hdf5/LPBA40.h5'
-    image_size = [128, 128, 128]
+    image_size = [160, 192, 160]
     scale_factor = 1.
     write_LPBA40(image_size, source_path, output_path, scale_factor)
-    hdf5_path = '../../datasets/hdf5/LPBA40.h5'
-    output_dir = r'G:\biomdeical\registration\data\datasets'
-    extract_hdf5(hdf5_path, output_dir)
+    # hdf5_path = '../../datasets/hdf5/LPBA40.h5'
+    # output_dir = r'G:\biomdeical\registration\data\datasets'
+    # extract_hdf5(hdf5_path, output_dir)

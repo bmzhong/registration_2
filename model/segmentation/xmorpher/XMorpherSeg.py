@@ -693,8 +693,8 @@ class XMorpher(nn.Module):
         self.norm = norm_layer(self.num_features)
         self.norm2 = norm_layer(self.embed_dim)
 
-        self.conv_num_classes1 = nn.Conv3d(embed_dim, num_classes, kernel_size=3, stride=1)
-        self.conv_num_classes2 = nn.Conv3d(embed_dim, num_classes, kernel_size=3, stride=1)
+        self.conv_num_classes1 = nn.Conv3d(embed_dim, num_classes, kernel_size=3, stride=1,padding=1)
+        self.conv_num_classes2 = nn.Conv3d(embed_dim, num_classes, kernel_size=3, stride=1,padding=1)
 
         self.reverse_patch_embedding1 = nn.ConvTranspose3d(num_classes, num_classes, kernel_size=patch_size,
                                                            stride=patch_size)
@@ -799,3 +799,18 @@ class XMorpherSeg(nn.Module):
             moving = self.transpose3d(moving)
             fixed = self.transpose3d(fixed)
         return moving, fixed
+
+if __name__=='__main__':
+    n_channels = 1
+    batch_size = 1
+    # D, H, W = 132, 114, 80
+    D, H, W = 128, 128, 128
+
+    move_images = torch.randn((batch_size, n_channels, D, H, W))
+    fix_images = torch.randn((batch_size, n_channels, D, H, W))
+
+    Reger = XMorpherSeg(n_channels=n_channels, num_classes=7)
+    result = Reger(move_images, fix_images)
+    print(result)
+    for item in result:
+        print(item.shape)

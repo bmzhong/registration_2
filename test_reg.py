@@ -11,7 +11,8 @@ from util.data_util.dataset import PairDataset
 from torch.utils.data import DataLoader
 import json
 
-from util.metric.registration_metric import jacobian_determinant, ssim_metric, folds_percent_metric
+from util.metric.registration_metric import jacobian_determinant, ssim_metric, folds_percent_metric, SDLogJ_metric, \
+    mse_metric
 from util.metric.segmentation_metric import dice_metric, ASD_metric, HD_metric
 from util.util import update_dict, mean_dict, std_dict
 from util.visual.image_util import write_image, save_image_figure, save_deformation_figure, save_det_figure, \
@@ -28,7 +29,7 @@ def test_reg(config, basedir, checkpoint=None, model_config=None):
 
     csv_writer.writerow([str(time.asctime())])
 
-    header_names = ['dice', 'ASD', 'HD', 'SSIM', 'folds_percent']
+    header_names = ['dice', 'ASD', 'HD', 'SSIM', 'folds_percent', 'SDLogJ', 'MSE']
     csv_writer.writerow(["moving_fixed"] + header_names)
 
     with open(config['TestConfig']['data_path'], 'r') as f:
@@ -142,4 +143,7 @@ def compute_reg_metric(dvf, warp_volume1, warp_label1, volume2, label2):
     metric_dict['HD'] = HD_metric(warp_label1, label2).item()
     metric_dict['SSIM'] = ssim_metric(warp_volume1, volume2)
     metric_dict['folds_percent'] = folds_percent_metric(dvf).item()
+    metric_dict['SDLogJ'] = SDLogJ_metric(dvf).item()
+    metric_dict['MSE'] = mse_metric(warp_volume1, volume2).item()
+
     return metric_dict

@@ -129,7 +129,7 @@ class RandomPairDataset(Dataset):
 
         img1_name = self.data_names[index]
 
-        img2_name = 'atlas' if self.atlas else np.random.choice(self.data_names)
+        img2_name = self.atlas if self.atlas else np.random.choice(self.data_names)
 
         img1 = self.file[img1_name]
         img2 = self.file[img2_name]
@@ -152,13 +152,26 @@ class RandomPairDataset(Dataset):
         if self.transform is None:
             return img['id1'], img['volume1'], img['label1'], img['id2'], img['volume2'], img['label2']
 
-        img['volume1'] = self.transform(img['volume1'])
-        img['volume2'] = self.transform(img['volume2'])
+        img = self.process_transform(img)
 
         return img['id1'], img['volume1'], img['label1'], img['id2'], img['volume2'], img['label2']
 
     def __len__(self):
         return len(self.data_names)
+
+    def process_transform(self, img):
+        if 'label1' in img.keys() and img['label1'] == []:
+            img.pop('label1')
+        if 'label2' in img.keys() and img['label2'] == []:
+            img.pop('label2')
+
+        img = self.transform(img)
+
+        if 'label1' not in img.keys():
+            img['label1'] = []
+        if 'label2' not in img.keys():
+            img['label2'] = []
+        return img
 
     @staticmethod
     def as_type_to_tensor(img):
