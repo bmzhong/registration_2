@@ -4,7 +4,7 @@ TrainConfig:
   start_new_model: True
   max_save_num: 2                 # numbers that checkpoint files saved; default 2
   gpu: "0"
-  data_path: "datasets/json/LPBA40.json"
+  data_path: "datasets/json/LPBA40_test.json"
   epoch: 50
   batchsize: 1
   checkpoint: ""
@@ -16,12 +16,12 @@ TrainConfig:
 
 TestConfig:
   checkpoint: ""
-  data_path: "datasets/json/LPBA40.json"
+  data_path: "datasets/json/LPBA40_test.json"
   save_image: True
   gpu: "0"
 
 ModelConfig:
-  type: "vxm_diff"
+  type: "VoxelMorph"
 
 
 

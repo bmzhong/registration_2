@@ -143,7 +143,7 @@ def mk_grid_img(grid_step, line_thickness=1, grid_sz=(160, 192, 224)):
     for i in range(0, grid_img.shape[2], grid_step):
         grid_img[:, :, i + line_thickness - 1] = 1
     grid_img = grid_img[None, None, ...]
-    grid_img = torch.from_numpy(grid_img).cuda()
+    grid_img = torch.from_numpy(grid_img)
     return grid_img
 
 

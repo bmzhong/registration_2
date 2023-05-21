@@ -9,6 +9,8 @@ def get_args():
 
     parser.add_argument("--config_path", type=str)
     parser.add_argument("--output_path", type=str)
+    parser.add_argument("--start_new_model", type=str)
+    parser.add_argument("--checkpoint", type=str)
 
     parser.add_argument("--train_data_path", type=str, default=None)
     parser.add_argument("--train_gpu", type=str, default=None)
@@ -30,11 +32,13 @@ def get_args():
     parser.add_argument("--similarity_loss_type", type=str, default=None)
     parser.add_argument("--similarity_loss_weight", type=float, default=None)
 
-    parser.add_argument("--segmentation_loss_use", action='store_true', default=None)
+    parser.add_argument("--segmentation_loss_use",
+                        action='store_true', default=None)
     parser.add_argument("--segmentation_loss_type", type=str, default=None)
     parser.add_argument("--segmentation_loss_weight", type=float, default=None)
 
-    parser.add_argument("--gradient_loss_use", action='store_true', default=None)
+    parser.add_argument("--gradient_loss_use",
+                        action='store_true', default=None)
     parser.add_argument("--gradient_loss_weight", type=float, default=None)
 
     args = parser.parse_args()
@@ -54,6 +58,16 @@ if __name__ == '__main__':
 
     if args.train_gpu is not None:
         config['TrainConfig']['gpu'] = args.train_gpu
+    
+    if args.checkpoint is not None:
+        config['TrainConfig']['checkpoint'] = args.checkpoint
+        config['OptimConfig']['load_checkpoint'] = True
+        
+    if args.start_new_model is not None:
+        if args.start_new_model == 'False':
+            config['TrainConfig']['start_new_model'] = False
+        elif args.start_new_model == 'True':
+            config['TrainConfig']['start_new_model'] = True
 
     if args.epoch is not None:
         config['TrainConfig']['epoch'] = args.epoch

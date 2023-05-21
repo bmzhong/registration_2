@@ -1,16 +1,17 @@
 {
-    "dataset_path": "datasets/hdf5/LPBA40.h5",
+    "dataset_path": "datasets/hdf5/Error_160_LPBA40.h5",
     "dataset_size": 40,
     "image_size": [
-        128,
-        128,
-        128
+        160,
+        192,
+        160
     ],
     "normalize": [
         0.0,
         1.0
     ],
     "region_number": 7,
+    "registration_type": 0,
     "atlas": "S01",
     "train_size": 28,
     "val_size": 3,
@@ -285,7 +286,7 @@
         "S39": false,
         "S05": false,
         "S02": false,
-        "S01": true
+        "S01": false
     },
     "seg_5": {
         "S17": false,
@@ -302,7 +303,7 @@
         "S16": true,
         "S34": false,
         "S09": false,
-        "S33": true,
+        "S33": false,
         "S03": false,
         "S28": false,
         "S14": false,
@@ -327,7 +328,7 @@
         "S18": true,
         "S37": false,
         "S10": true,
-        "S15": true,
+        "S15": false,
         "S07": true,
         "S19": false,
         "S16": false,
@@ -355,7 +356,7 @@
         "S40": true,
         "S22": true,
         "S38": true,
-        "S18": true,
+        "S18": false,
         "S37": true,
         "S10": true,
         "S15": true,

@@ -18,6 +18,7 @@
     "train_pair_size": 756,
     "val_pair_size": 12,
     "test_pair_size": 56,
+    "registration_type": 0,
     "train": [
         "S38",
         "S03",

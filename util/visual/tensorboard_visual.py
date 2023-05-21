@@ -11,7 +11,7 @@ import SimpleITK as sitk
 import matplotlib.pyplot as plt
 from util.visual.visual_registration import preview_3D_deformation, preview_3D_vector_field, RGB_dvf, PlotGrid_3d, \
     comput_fig
-from util.visual.visual_image import preview_image
+from util.visual.visual_image import preview_image, MidpointNormalize
 
 
 def tensorboard_visual_segmentation(mode, name, writer, step, volume, predict, target, interval=10):
@@ -105,7 +105,7 @@ def tensorboard_visual_dvf(name, dvf, writer, step):
 
 
 def tensorboard_visual_det(name, det, writer, step, **kwargs):
-    figure = preview_image(det, **kwargs)
+    figure = preview_image(det,  **kwargs)
     plt.suptitle(name, fontsize=25)
     figure.tight_layout()
     writer.add_figure(name, figure, step)

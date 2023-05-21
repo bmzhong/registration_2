@@ -222,7 +222,7 @@ def train_seg_reg(config, basedir):
 
                         tensorboard_visual_det(name=tag + '/det', det=det, writer=writer, step=epoch,
                                                normalize_by='slice',
-                                               threshold=0, cmap='b')
+                                               threshold=0, cmap='Blues')
                         tensorboard_visual_warp_grid(name=tag + '/warp_grid', warp_grid=warp_grid[0][0].cpu(),
                                                      writer=writer,
                                                      step=epoch)

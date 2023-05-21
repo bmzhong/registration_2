@@ -2,52 +2,52 @@ import monai
 import numpy as np
 from preprocess.preprocess_hdf5.hdf5_utils import *
 
-Mindboggle_group_config = [
-    ("Frontal lobe", [1002, 1010, 1012, 1014, 1018, 1019, 1020, 1026, 1027, 1028] +
-     [2002, 2010, 2012, 2014, 2018, 2019, 2020, 2026, 2027, 2028]),
-    ("Parietal lobe", [1003, 1008, 1022, 1024, 1029] +
-     [2003, 2008, 2022, 2024, 2029]),
-    ("Temporal lobe", [1006, 1009, 1015, 1016, 1030] +
-     [2006, 2009, 2015, 2016, 2030]),
-    ("Occipital lobe", [1005, 1025, 1021] +
-     [2005, 2025, 2021]),
-    ("Insular cortex", [1007, 1011, 1013] +
-     [2007, 2011, 2013]),
-    ("Cingulate gyrus", [1023] + [2023]),
-    ("Central sulcus", [1017] + [2017]),
-    ("Lateral fissure", [1031, 1034, 1035] + [2031, 2034, 2035])
-]
+# label 25
+# GROUP_CONFIG = {
+#     'parietal_lobe_1': ['postcentral', 'supramarginal', 'superior parietal', 'inferior parietal', ' precuneus'],
+#     'frontal_lobe_2': ['superior frontal', 'middle frontal', 'inferior frontal', 'lateral orbitofrontal',
+#                        'medial orbitofrontal', 'precentral', 'paracentral'],
+#     'occipital_lobe_3': ['lingual', 'pericalcarine', 'cuneus', 'lateral occipital'],
+#     'temporal_lobe_4': ['entorhinal', 'parahippocampal', 'fusiform', 'superior temporal', 'middle temporal',
+#                         'inferior temporal', 'transverse temporal'],
+#     'cingulate_lobe_5': ['cingulate', 'insula'],
+# }
+# label 31
+GROUP_CONFIG = {
+    'parietal_lobe_1': ['postcentral', 'supramarginal', 'superior parietal', 'inferior parietal', ' precuneus'],
+    'frontal_lobe_2': ['caudal middle frontal', 'lateral orbitofrontal', 'medial orbitofrontal', 'paracentral',
+                       'pars opercularis', 'pars orbitalis', 'pars triangularis', 'precentral',
+                       'rostral middle frontal', 'superior frontal'],
+    'occipital_lobe_3': ['lingual', 'pericalcarine', 'cuneus', 'lateral occipital'],
+    'temporal_lobe_4': ['entorhinal', 'parahippocampal', 'fusiform', 'superior temporal', 'middle temporal',
+                        'inferior temporal', 'transverse temporal'],
+    'cingulate_lobe_5': ['caudal anterior cingulate', 'insula', 'isthmus cingulate', 'posterior cingulate',
+                         'rostral anterior cingulate'],
+}
 
 
-# def group_label(label):
-#     label_merged = np.zeros(label.shape, dtype=np.int32)
-#     for i, (name, id_list) in enumerate(Mindboggle_group_config):
-#         # region = np.logical_and(label >= start, True)
-#         region = np.argwhere(label in id_list)
-#         label_merged[region] = i + 1
-#     return label_merged
-
-
-# def get_Mindboggle101_label_map():
-#     source_path = r'G:\biomdeical\registration\public_data\MindBoggle101\MindBoggle101_from_official_webset' \
-#                 r'\Mindboggle101_individuals\Mindboggle101_volumes\merge\HLN-12-1\labels.DKT31.manual.MNI152.nii.gz'
-#     label = sitk.ReadImage(source_path)
-# 
-#     label = sitk.GetArrayFromImage(label)
-#     label_unique = list(np.unique(label))
-#     label_unique.sort()
-#     label_map = dict()
-#     for i in range(len(label_unique)):
-#         label_map[label_unique[i]] = i
-#     print(label_map)
-#     return label_map
+def get_Mindboggle101_label_map():
+    label_name = './mind101_label_31.txt'
+    d = {}
+    with open(label_name) as f:
+        for line in f:
+            if line != '\r\n':
+                (value, key) = line.strip().split(',')
+                d[key.strip().strip('"')] = int(value)
+    name_to_new_id = dict()
+    for key in GROUP_CONFIG:
+        label_id = int(key.split('_')[-1])
+        for structure in GROUP_CONFIG[key]:
+            name_to_new_id['left ' + structure.strip()] = label_id
+            name_to_new_id['right ' + structure.strip()] = label_id
+    label_map = dict()
+    for name in name_to_new_id.keys():
+        label_map[d[name]] = name_to_new_id[name]
+    return label_map
 
 
 def write_Mindboggle101(image_size, source_path, output_path, scale_factor):
-    label_map = dict()
-    for i, (name, id_list) in enumerate(Mindboggle_group_config):
-        for id in id_list:
-            label_map[id] = i + 1
+    label_map = get_Mindboggle101_label_map()
 
     if os.path.exists(output_path):
         os.remove(output_path)
@@ -65,7 +65,6 @@ def write_Mindboggle101(image_size, source_path, output_path, scale_factor):
             label_path = os.path.join(img_dir, label_name)
 
             volume = sitk.ReadImage(volume_path)
-            # volume = resize_image_itk(volume, image_size, sitk.sitkLinear)
             volume = sitk.GetArrayFromImage(volume)
             volume = volume.astype(np.float64)
             volume = volume[np.newaxis, ...]
@@ -76,9 +75,7 @@ def write_Mindboggle101(image_size, source_path, output_path, scale_factor):
             volume = volume.astype(np.float32)
 
             label = sitk.ReadImage(label_path)
-            # label = resize_image_itk(label, image_size, sitk.sitkNearestNeighbor)
             label = sitk.GetArrayFromImage(label)
-            # label = group_label(label)
             label = label.astype(np.int32)
 
             new_label = np.zeros(label.shape, label.dtype)
@@ -88,7 +85,6 @@ def write_Mindboggle101(image_size, source_path, output_path, scale_factor):
 
             label_value = np.unique(label).tolist()
             print(label_value)
-            assert len(label_value) == 9
             label = label[np.newaxis, ...]
             label = label_resize(label)
             label = label.squeeze(dim=0)
@@ -100,7 +96,7 @@ def write_Mindboggle101(image_size, source_path, output_path, scale_factor):
     # file.attrs['label_map'] = [[origin_label, target_label] for origin_label, target_label in label_map.items()]
     file.attrs['image_size'] = image_size
     file.attrs['dataset_size'] = len(file.keys())
-    file.attrs['region_number'] = len(Mindboggle_group_config)
+    file.attrs['region_number'] = len(np.unique(list(label_map.values())))
     file.attrs['normalize'] = [0, scale_factor]
     file.close()
 
@@ -108,10 +104,10 @@ def write_Mindboggle101(image_size, source_path, output_path, scale_factor):
 if __name__ == '__main__':
     source_path = r'G:\biomdeical\registration\public_data\MindBoggle101\MindBoggle101_from_official_webset' \
                   r'\Mindboggle101_individuals\Mindboggle101_volumes\merge'
-    output_path = '../../datasets/hdf5/Mindboggle101.h5'
-    image_size = [128, 128, 128]
+    output_path = '../../datasets/hdf5/5_192_Mindboggle101.h5'
+    image_size = [160, 192, 160]
     scale_factor = 1.
     write_Mindboggle101(image_size, source_path, output_path, scale_factor)
-    hdf5_path = '../../datasets/hdf5/Mindboggle101.h5'
-    output_dir = r'G:\biomdeical\registration\data\datasets'
-    extract_hdf5(hdf5_path, output_dir)
+#     hdf5_path = '../../datasets/hdf5/Mindboggle101.h5'
+#     output_dir = r'G:\biomdeical\registration\data\datasets'
+#     extract_hdf5(hdf5_path, output_dir)

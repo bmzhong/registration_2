@@ -7,7 +7,7 @@ from tqdm import tqdm
 
 from model.registration.SpatialNetwork import SpatialTransformer
 from model.registration.model_util import get_reg_model
-from util.data_util.dataset import PairDataset
+from util.data_util.dataset import PairDataset, TestPairDataset
 from torch.utils.data import DataLoader
 import json
 
@@ -35,7 +35,12 @@ def test_reg(config, basedir, checkpoint=None, model_config=None):
     with open(config['TestConfig']['data_path'], 'r') as f:
         dataset_config = json.load(f)
     num_classes = dataset_config['region_number'] + 1
-    test_dataset = PairDataset(dataset_config, 'test_pair')
+    if dataset_config['registration_type'] == 1 or dataset_config['registration_type'] == 2:
+        atlas = dataset_config['atlas']
+    else:
+        atlas = None
+    test_dataset = TestPairDataset(dataset_config, dataset_type='test',
+                                   registration_type=dataset_config['registration_type'], atlas=atlas)
     print(f'test dataset size: {len(test_dataset)}')
     test_loader = DataLoader(test_dataset, batch_size=1, shuffle=False)
 
@@ -112,7 +117,7 @@ def test_reg(config, basedir, checkpoint=None, model_config=None):
                 save_dvf_figure(output_dir, 'displacement_vector_field' + tag, dvf[0].detach().cpu())
                 det = jacobian_determinant(dvf[0].detach().cpu())
                 save_det_figure(output_dir, 'jacobian_determinant' + tag, det, normalize_by='slice', threshold=0,
-                                cmap='gray')
+                                cmap='Blues')
                 save_RGB_dvf_figure(output_dir, 'rgb_dvf' + tag, dvf[0].detach().cpu())
                 save_RGB_deformation_2_figure(output_dir, 'deformation_2' + tag, dvf[0].detach().cpu())
                 save_warp_grid_figure(output_dir, 'warp_grid' + tag, warp_grid[0][0].detach().cpu())

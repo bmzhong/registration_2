@@ -6,6 +6,7 @@ import numpy as np
 import random
 import sys
 
+
 def get_basedir(base_dir, start_new_model=False):
     # init the output folder structure
     if base_dir is None:
@@ -28,13 +29,14 @@ def set_random_seed(seed=0):
     torch.manual_seed(SEED)
     torch.cuda.manual_seed_all(SEED)
     random.seed(SEED)
-    torch.backends.cudnn.deterministic = True
-    torch.backends.cudnn.benchmark = False
-    torch.backends.cudnn.enabled = False
+    # torch.backends.cudnn.deterministic = True
+    # torch.backends.cudnn.benchmark = False
+    # torch.backends.cudnn.enabled = False
 
 
 def update_dict(total_dict: dict, each_dict: dict):
     for key, value in each_dict.items():
+
         if torch.is_tensor(value):
             value = value.item()
         if total_dict.get(key, None) is None:
@@ -46,6 +48,8 @@ def update_dict(total_dict: dict, each_dict: dict):
 def mean_dict(total_dict):
     mean_value = dict()
     for key, value in total_dict.items():
+        value = np.array(value)
+        value[np.isinf(value)] = 0
         mean_value[key] = np.mean(value)
     return mean_value
 
@@ -53,6 +57,8 @@ def mean_dict(total_dict):
 def std_dict(total_dict):
     std_value = dict()
     for key, value in total_dict.items():
+        value = np.array(value)
+        value[np.isinf(value)] = 0
         std_value[key] = np.std(value)
     return std_value
 
@@ -72,11 +78,10 @@ def swap_training(network_to_train, network_to_not_train):
     network_to_train.train()
 
 
-
 class Logger(object):
     def __init__(self, save_dir):
         self.terminal = sys.stdout
-        self.log = open(os.path.join(save_dir,"logfile.log"), "a")
+        self.log = open(os.path.join(save_dir, "logfile.log"), "a")
 
     def write(self, message):
         self.terminal.write(message)

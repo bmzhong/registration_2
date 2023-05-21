@@ -12,28 +12,29 @@ def pkload(fname):
         return pickle.load(f)
 
 
-source_path = r"G:\biomdeical\registration\public_data\OASIS\OASIS_L2R_2021_task03\OASIS_L2R_2021_task03\All\*.pkl"
-output_path = r"G:\biomdeical\registration\public_data\OASIS\OASIS_L2R_2021_task03\OASIS_L2R_2021_task03\AII_nii"
-paths = glob.glob(source_path, recursive=True)
-labels = []
-for path in tqdm(paths):
-    image, label = pkload(path)
-    labels.append(list(np.unique(label)))
-    base_name = os.path.basename(path).split('.')[0]
-    image = sitk.GetImageFromArray(image)
-    label = sitk.GetImageFromArray(label)
-    _path = os.path.join(output_path, base_name)
-    os.makedirs(_path, exist_ok=True)
-    sitk.WriteImage(image, os.path.join(_path, "volume.nii.gz"))
-    sitk.WriteImage(label, os.path.join(_path, "label.nii.gz"))
+# source_path = r"G:\biomdeical\registration\public_data\OASIS\OASIS_L2R_2021_task03\OASIS_L2R_2021_task03\All\*.pkl"
+# output_path = r"G:\biomdeical\registration\public_data\OASIS\OASIS_L2R_2021_task03\OASIS_L2R_2021_task03\AII_nii"
+# paths = glob.glob(source_path, recursive=True)
+# labels = []
+# for path in tqdm(paths):
+#     image, label = pkload(path)
+#     labels.append(list(np.unique(label)))
+#     base_name = os.path.basename(path).split('.')[0]
+#     image = sitk.GetImageFromArray(image)
+#     label = sitk.GetImageFromArray(label)
+#     _path = os.path.join(output_path, base_name)
+#     os.makedirs(_path, exist_ok=True)
+#     sitk.WriteImage(image, os.path.join(_path, "volume.nii.gz"))
+#     sitk.WriteImage(label, os.path.join(_path, "label.nii.gz"))
 
 # with open("./IXI_label.pkl", 'wb') as f:
 #     pickle.dump(labels, f)
 
-# path = "./IXI_label.pkl"
-# labels = pkload(path)
-# atlas = labels[0]
-# print("atlas: ", len(atlas))
+path = "./IXI_label.pkl"
+labels = pkload(path)
+print(labels)
+atlas = labels[0]
+print("atlas: ", len(atlas))
 # result = []
 # lens = []
 # min_index = -1

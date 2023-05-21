@@ -40,9 +40,14 @@ def train_reg(config, basedir):
     # val_dataset = PairDataset(dataset_config, 'val_pair')
 
     seg = dataset_config[config['TrainConfig']['seg']] if len(config['TrainConfig']['seg']) > 0 else None
-
-    train_dataset = RandomPairDataset(dataset_config, 'train', seg=seg)
-    val_dataset = RandomPairDataset(dataset_config, 'val')
+    if dataset_config['registration_type'] == 1 or dataset_config['registration_type'] == 2:
+        atlas = dataset_config['atlas']
+    else:
+        atlas = None
+    train_dataset = RandomPairDataset(dataset_config, dataset_type='train',
+                                      registration_type=dataset_config['registration_type'], seg=seg, atlas=atlas)
+    val_dataset = RandomPairDataset(dataset_config, dataset_type='val',
+                                    registration_type=dataset_config['registration_type'], atlas=atlas)
 
     print(f'train dataset size: {len(train_dataset)}')
     print(f'val dataset size: {len(val_dataset)}')
@@ -207,7 +212,7 @@ def train_reg(config, basedir):
 
                         tensorboard_visual_det(name=tag + '/det', det=det, writer=writer, step=epoch,
                                                normalize_by='slice',
-                                               threshold=0, cmap='b')
+                                               threshold=0, cmap='Blues')
                         tensorboard_visual_warp_grid(name=tag + '/warp_grid', warp_grid=warp_grid[0][0].detach().cpu(),
                                                      writer=writer,
                                                      step=epoch)
@@ -294,9 +299,9 @@ def get_loss_function(config):
 def compute_reg_metric(dvf, warp_volume1, warp_label1, volume2, label2):
     metric_dict = dict()
     metric_dict['dice'] = dice_metric(warp_label1, label2).item()
-    metric_dict['ASD'] = ASD_metric(warp_label1, label2).item()
-    metric_dict['HD'] = HD_metric(warp_label1, label2).item()
-    metric_dict['SSIM'] = ssim_metric(warp_volume1, volume2)
+    # metric_dict['ASD'] = ASD_metric(warp_label1, label2).item()
+    # metric_dict['HD'] = HD_metric(warp_label1, label2).item()
+    # metric_dict['SSIM'] = ssim_metric(warp_volume1, volume2)
     metric_dict['folds_percent'] = folds_percent_metric(dvf).item()
     # metric_dict['folds_count'] = folds_count_metric(dvf).item()
     # metric_dict['mse'] = mse_metric(warp_volume1, volume2).item()

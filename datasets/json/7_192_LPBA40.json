@@ -1,0 +1,384 @@
+{
+    "dataset_path": "datasets/hdf5/7_192_LPBA40.h5",
+    "dataset_size": 40,
+    "image_size": [
+        160,
+        192,
+        160
+    ],
+    "normalize": [
+        0.0,
+        1.0
+    ],
+    "region_number": 7,
+    "registration_type": 1,
+    "atlas": "S01",
+    "train_size": 28,
+    "val_size": 3,
+    "test_size": 8,
+    "train_pairs_size": 28,
+    "val_pairs_size": 3,
+    "test_pairs_size": 8,
+    "train": [
+        "S17",
+        "S04",
+        "S40",
+        "S22",
+        "S38",
+        "S18",
+        "S37",
+        "S10",
+        "S15",
+        "S07",
+        "S19",
+        "S16",
+        "S34",
+        "S09",
+        "S33",
+        "S03",
+        "S28",
+        "S14",
+        "S32",
+        "S26",
+        "S08",
+        "S25",
+        "S23",
+        "S21",
+        "S11",
+        "S39",
+        "S05",
+        "S02"
+    ],
+    "val": [
+        "S24",
+        "S36",
+        "S06"
+    ],
+    "test": [
+        "S30",
+        "S29",
+        "S20",
+        "S27",
+        "S31",
+        "S13",
+        "S12",
+        "S35"
+    ],
+    "train_pair": [
+        [
+            "S17",
+            "S01"
+        ],
+        [
+            "S04",
+            "S01"
+        ],
+        [
+            "S40",
+            "S01"
+        ],
+        [
+            "S22",
+            "S01"
+        ],
+        [
+            "S38",
+            "S01"
+        ],
+        [
+            "S18",
+            "S01"
+        ],
+        [
+            "S37",
+            "S01"
+        ],
+        [
+            "S10",
+            "S01"
+        ],
+        [
+            "S15",
+            "S01"
+        ],
+        [
+            "S07",
+            "S01"
+        ],
+        [
+            "S19",
+            "S01"
+        ],
+        [
+            "S16",
+            "S01"
+        ],
+        [
+            "S34",
+            "S01"
+        ],
+        [
+            "S09",
+            "S01"
+        ],
+        [
+            "S33",
+            "S01"
+        ],
+        [
+            "S03",
+            "S01"
+        ],
+        [
+            "S28",
+            "S01"
+        ],
+        [
+            "S14",
+            "S01"
+        ],
+        [
+            "S32",
+            "S01"
+        ],
+        [
+            "S26",
+            "S01"
+        ],
+        [
+            "S08",
+            "S01"
+        ],
+        [
+            "S25",
+            "S01"
+        ],
+        [
+            "S23",
+            "S01"
+        ],
+        [
+            "S21",
+            "S01"
+        ],
+        [
+            "S11",
+            "S01"
+        ],
+        [
+            "S39",
+            "S01"
+        ],
+        [
+            "S05",
+            "S01"
+        ],
+        [
+            "S02",
+            "S01"
+        ]
+    ],
+    "val_pair": [
+        [
+            "S24",
+            "S01"
+        ],
+        [
+            "S36",
+            "S01"
+        ],
+        [
+            "S06",
+            "S01"
+        ]
+    ],
+    "test_pair": [
+        [
+            "S30",
+            "S01"
+        ],
+        [
+            "S29",
+            "S01"
+        ],
+        [
+            "S20",
+            "S01"
+        ],
+        [
+            "S27",
+            "S01"
+        ],
+        [
+            "S31",
+            "S01"
+        ],
+        [
+            "S13",
+            "S01"
+        ],
+        [
+            "S12",
+            "S01"
+        ],
+        [
+            "S35",
+            "S01"
+        ]
+    ],
+    "seg_0": {
+        "S17": false,
+        "S04": false,
+        "S40": false,
+        "S22": false,
+        "S38": false,
+        "S18": false,
+        "S37": false,
+        "S10": false,
+        "S15": false,
+        "S07": false,
+        "S19": false,
+        "S16": false,
+        "S34": false,
+        "S09": false,
+        "S33": false,
+        "S03": false,
+        "S28": false,
+        "S14": false,
+        "S32": false,
+        "S26": false,
+        "S08": false,
+        "S25": false,
+        "S23": false,
+        "S21": false,
+        "S11": false,
+        "S39": false,
+        "S05": false,
+        "S02": false,
+        "S01": false
+    },
+    "seg_1": {
+        "S17": false,
+        "S04": false,
+        "S40": false,
+        "S22": false,
+        "S38": false,
+        "S18": false,
+        "S37": false,
+        "S10": false,
+        "S15": false,
+        "S07": false,
+        "S19": false,
+        "S16": false,
+        "S34": false,
+        "S09": true,
+        "S33": false,
+        "S03": false,
+        "S28": false,
+        "S14": false,
+        "S32": false,
+        "S26": false,
+        "S08": false,
+        "S25": false,
+        "S23": false,
+        "S21": false,
+        "S11": false,
+        "S39": false,
+        "S05": false,
+        "S02": false,
+        "S01": false
+    },
+    "seg_5": {
+        "S17": false,
+        "S04": false,
+        "S40": false,
+        "S22": false,
+        "S38": false,
+        "S18": false,
+        "S37": false,
+        "S10": false,
+        "S15": false,
+        "S07": false,
+        "S19": false,
+        "S16": true,
+        "S34": false,
+        "S09": false,
+        "S33": false,
+        "S03": false,
+        "S28": false,
+        "S14": false,
+        "S32": false,
+        "S26": true,
+        "S08": false,
+        "S25": false,
+        "S23": false,
+        "S21": true,
+        "S11": false,
+        "S39": false,
+        "S05": true,
+        "S02": false,
+        "S01": true
+    },
+    "seg_14": {
+        "S17": true,
+        "S04": true,
+        "S40": true,
+        "S22": false,
+        "S38": false,
+        "S18": true,
+        "S37": false,
+        "S10": true,
+        "S15": false,
+        "S07": true,
+        "S19": false,
+        "S16": false,
+        "S34": false,
+        "S09": true,
+        "S33": true,
+        "S03": false,
+        "S28": true,
+        "S14": true,
+        "S32": false,
+        "S26": false,
+        "S08": false,
+        "S25": false,
+        "S23": true,
+        "S21": true,
+        "S11": true,
+        "S39": false,
+        "S05": false,
+        "S02": false,
+        "S01": true
+    },
+    "seg_28": {
+        "S17": true,
+        "S04": true,
+        "S40": true,
+        "S22": true,
+        "S38": true,
+        "S18": false,
+        "S37": true,
+        "S10": true,
+        "S15": true,
+        "S07": true,
+        "S19": true,
+        "S16": true,
+        "S34": true,
+        "S09": true,
+        "S33": true,
+        "S03": true,
+        "S28": true,
+        "S14": true,
+        "S32": true,
+        "S26": true,
+        "S08": true,
+        "S25": true,
+        "S23": true,
+        "S21": true,
+        "S11": true,
+        "S39": true,
+        "S05": true,
+        "S02": true,
+        "S01": true
+    }
+}

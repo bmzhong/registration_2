@@ -1,0 +1,1932 @@
+{
+    "dataset_path": "datasets/hdf5/5_192_Mindboggle101.h5",
+    "dataset_size": 85,
+    "image_size": [
+        160,
+        192,
+        160
+    ],
+    "normalize": [
+        0.0,
+        1.0
+    ],
+    "region_number": 5,
+    "atlas": "",
+    "registration_type": 0,
+    "train_size": 59,
+    "val_size": 8,
+    "test_size": 18,
+    "train_pair_size": 342,
+    "val_pair_size": 5,
+    "test_pair_size": 30,
+    "train": [
+        "OASIS-TRT-20-15",
+        "OASIS-TRT-20-20",
+        "OASIS-TRT-20-5",
+        "MMRR-21-10",
+        "NKI-TRT-20-6",
+        "NKI-TRT-20-11",
+        "NKI-RS-22-14",
+        "MMRR-21-7",
+        "OASIS-TRT-20-19",
+        "Twins-2-2",
+        "NKI-TRT-20-3",
+        "NKI-TRT-20-19",
+        "MMRR-21-11",
+        "MMRR-21-4",
+        "MMRR-21-6",
+        "NKI-RS-22-7",
+        "NKI-RS-22-5",
+        "MMRR-21-12",
+        "OASIS-TRT-20-4",
+        "OASIS-TRT-20-17",
+        "Afterthought-1",
+        "NKI-RS-22-21",
+        "NKI-RS-22-15",
+        "MMRR-21-19",
+        "NKI-RS-22-22",
+        "NKI-RS-22-10",
+        "MMRR-21-18",
+        "NKI-RS-22-19",
+        "NKI-TRT-20-4",
+        "OASIS-TRT-20-14",
+        "Colin27-1",
+        "NKI-RS-22-2",
+        "OASIS-TRT-20-18",
+        "MMRR-21-3",
+        "NKI-TRT-20-8",
+        "MMRR-21-8",
+        "NKI-RS-22-17",
+        "NKI-TRT-20-17",
+        "NKI-TRT-20-15",
+        "OASIS-TRT-20-9",
+        "Twins-2-1",
+        "MMRR-21-9",
+        "OASIS-TRT-20-6",
+        "NKI-RS-22-12",
+        "NKI-RS-22-4",
+        "NKI-TRT-20-12",
+        "NKI-RS-22-6",
+        "OASIS-TRT-20-11",
+        "NKI-TRT-20-5",
+        "MMRR-21-2",
+        "OASIS-TRT-20-16",
+        "NKI-RS-22-3",
+        "MMRR-3T7T-2-2",
+        "MMRR-21-16",
+        "OASIS-TRT-20-8",
+        "OASIS-TRT-20-13",
+        "OASIS-TRT-20-10",
+        "NKI-TRT-20-13",
+        "NKI-TRT-20-10"
+    ],
+    "val": [
+        "NKI-RS-22-8",
+        "NKI-RS-22-11",
+        "OASIS-TRT-20-1",
+        "NKI-TRT-20-14",
+        "NKI-TRT-20-9",
+        "NKI-TRT-20-2",
+        "HLN-12-3",
+        "NKI-RS-22-18"
+    ],
+    "test": [
+        "OASIS-TRT-20-2",
+        "NKI-RS-22-20",
+        "NKI-TRT-20-20",
+        "MMRR-21-13",
+        "NKI-TRT-20-16",
+        "MMRR-21-20",
+        "NKI-RS-22-13",
+        "NKI-RS-22-9",
+        "MMRR-21-5",
+        "OASIS-TRT-20-12",
+        "MMRR-21-15",
+        "NKI-TRT-20-1",
+        "NKI-TRT-20-18",
+        "OASIS-TRT-20-3",
+        "OASIS-TRT-20-7",
+        "NKI-TRT-20-7",
+        "MMRR-21-14",
+        "NKI-RS-22-1"
+    ],
+    "train_pair": [
+        [
+            "OASIS-TRT-20-15",
+            "NKI-RS-22-15"
+        ],
+        [
+            "OASIS-TRT-20-15",
+            "NKI-RS-22-5"
+        ],
+        [
+            "OASIS-TRT-20-15",
+            "MMRR-21-16"
+        ],
+        [
+            "OASIS-TRT-20-15",
+            "OASIS-TRT-20-19"
+        ],
+        [
+            "OASIS-TRT-20-15",
+            "NKI-TRT-20-5"
+        ],
+        [
+            "OASIS-TRT-20-15",
+            "NKI-TRT-20-13"
+        ],
+        [
+            "OASIS-TRT-20-20",
+            "OASIS-TRT-20-16"
+        ],
+        [
+            "OASIS-TRT-20-20",
+            "NKI-RS-22-7"
+        ],
+        [
+            "OASIS-TRT-20-20",
+            "MMRR-3T7T-2-2"
+        ],
+        [
+            "OASIS-TRT-20-20",
+            "NKI-RS-22-2"
+        ],
+        [
+            "OASIS-TRT-20-20",
+            "NKI-RS-22-19"
+        ],
+        [
+            "OASIS-TRT-20-20",
+            "NKI-TRT-20-11"
+        ],
+        [
+            "OASIS-TRT-20-5",
+            "NKI-RS-22-17"
+        ],
+        [
+            "OASIS-TRT-20-5",
+            "NKI-RS-22-7"
+        ],
+        [
+            "OASIS-TRT-20-5",
+            "MMRR-21-4"
+        ],
+        [
+            "OASIS-TRT-20-5",
+            "MMRR-21-7"
+        ],
+        [
+            "OASIS-TRT-20-5",
+            "OASIS-TRT-20-17"
+        ],
+        [
+            "OASIS-TRT-20-5",
+            "OASIS-TRT-20-13"
+        ],
+        [
+            "MMRR-21-10",
+            "NKI-RS-22-12"
+        ],
+        [
+            "MMRR-21-10",
+            "NKI-RS-22-19"
+        ],
+        [
+            "MMRR-21-10",
+            "NKI-RS-22-14"
+        ],
+        [
+            "MMRR-21-10",
+            "OASIS-TRT-20-20"
+        ],
+        [
+            "MMRR-21-10",
+            "NKI-TRT-20-15"
+        ],
+        [
+            "MMRR-21-10",
+            "OASIS-TRT-20-9"
+        ],
+        [
+            "NKI-TRT-20-6",
+            "Afterthought-1"
+        ],
+        [
+            "NKI-TRT-20-6",
+            "OASIS-TRT-20-11"
+        ],
+        [
+            "NKI-TRT-20-6",
+            "NKI-RS-22-7"
+        ],
+        [
+            "NKI-TRT-20-6",
+            "NKI-TRT-20-15"
+        ],
+        [
+            "NKI-TRT-20-6",
+            "NKI-RS-22-14"
+        ],
+        [
+            "NKI-TRT-20-6",
+            "NKI-RS-22-3"
+        ],
+        [
+            "NKI-TRT-20-11",
+            "MMRR-3T7T-2-2"
+        ],
+        [
+            "NKI-TRT-20-11",
+            "MMRR-21-6"
+        ],
+        [
+            "NKI-TRT-20-11",
+            "NKI-RS-22-15"
+        ],
+        [
+            "NKI-TRT-20-11",
+            "OASIS-TRT-20-14"
+        ],
+        [
+            "NKI-TRT-20-11",
+            "NKI-RS-22-14"
+        ],
+        [
+            "NKI-TRT-20-11",
+            "NKI-RS-22-17"
+        ],
+        [
+            "NKI-RS-22-14",
+            "NKI-RS-22-5"
+        ],
+        [
+            "NKI-RS-22-14",
+            "MMRR-21-18"
+        ],
+        [
+            "NKI-RS-22-14",
+            "NKI-TRT-20-15"
+        ],
+        [
+            "NKI-RS-22-14",
+            "MMRR-21-12"
+        ],
+        [
+            "NKI-RS-22-14",
+            "MMRR-21-19"
+        ],
+        [
+            "NKI-RS-22-14",
+            "Colin27-1"
+        ],
+        [
+            "MMRR-21-7",
+            "NKI-RS-22-7"
+        ],
+        [
+            "MMRR-21-7",
+            "MMRR-3T7T-2-2"
+        ],
+        [
+            "MMRR-21-7",
+            "OASIS-TRT-20-10"
+        ],
+        [
+            "MMRR-21-7",
+            "NKI-TRT-20-12"
+        ],
+        [
+            "MMRR-21-7",
+            "MMRR-21-3"
+        ],
+        [
+            "MMRR-21-7",
+            "OASIS-TRT-20-11"
+        ],
+        [
+            "OASIS-TRT-20-19",
+            "OASIS-TRT-20-10"
+        ],
+        [
+            "OASIS-TRT-20-19",
+            "MMRR-21-16"
+        ],
+        [
+            "OASIS-TRT-20-19",
+            "MMRR-21-11"
+        ],
+        [
+            "OASIS-TRT-20-19",
+            "OASIS-TRT-20-18"
+        ],
+        [
+            "OASIS-TRT-20-19",
+            "OASIS-TRT-20-8"
+        ],
+        [
+            "OASIS-TRT-20-19",
+            "Colin27-1"
+        ],
+        [
+            "Twins-2-2",
+            "NKI-RS-22-3"
+        ],
+        [
+            "Twins-2-2",
+            "NKI-TRT-20-10"
+        ],
+        [
+            "Twins-2-2",
+            "MMRR-21-6"
+        ],
+        [
+            "Twins-2-2",
+            "NKI-RS-22-17"
+        ],
+        [
+            "Twins-2-2",
+            "NKI-TRT-20-15"
+        ],
+        [
+            "Twins-2-2",
+            "NKI-RS-22-22"
+        ],
+        [
+            "NKI-TRT-20-3",
+            "OASIS-TRT-20-6"
+        ],
+        [
+            "NKI-TRT-20-3",
+            "MMRR-21-11"
+        ],
+        [
+            "NKI-TRT-20-3",
+            "NKI-TRT-20-8"
+        ],
+        [
+            "NKI-TRT-20-3",
+            "NKI-TRT-20-17"
+        ],
+        [
+            "NKI-TRT-20-3",
+            "NKI-RS-22-15"
+        ],
+        [
+            "NKI-TRT-20-3",
+            "NKI-RS-22-17"
+        ],
+        [
+            "NKI-TRT-20-19",
+            "MMRR-21-7"
+        ],
+        [
+            "NKI-TRT-20-19",
+            "MMRR-21-8"
+        ],
+        [
+            "NKI-TRT-20-19",
+            "OASIS-TRT-20-4"
+        ],
+        [
+            "NKI-TRT-20-19",
+            "MMRR-21-12"
+        ],
+        [
+            "NKI-TRT-20-19",
+            "NKI-TRT-20-12"
+        ],
+        [
+            "NKI-TRT-20-19",
+            "NKI-RS-22-10"
+        ],
+        [
+            "MMRR-21-11",
+            "NKI-TRT-20-19"
+        ],
+        [
+            "MMRR-21-11",
+            "NKI-TRT-20-8"
+        ],
+        [
+            "MMRR-21-11",
+            "OASIS-TRT-20-19"
+        ],
+        [
+            "MMRR-21-11",
+            "NKI-RS-22-2"
+        ],
+        [
+            "MMRR-21-11",
+            "OASIS-TRT-20-17"
+        ],
+        [
+            "MMRR-21-11",
+            "OASIS-TRT-20-5"
+        ],
+        [
+            "MMRR-21-4",
+            "OASIS-TRT-20-9"
+        ],
+        [
+            "MMRR-21-4",
+            "MMRR-21-2"
+        ],
+        [
+            "MMRR-21-4",
+            "OASIS-TRT-20-14"
+        ],
+        [
+            "MMRR-21-4",
+            "MMRR-21-11"
+        ],
+        [
+            "MMRR-21-4",
+            "OASIS-TRT-20-5"
+        ],
+        [
+            "MMRR-21-4",
+            "NKI-RS-22-14"
+        ],
+        [
+            "MMRR-21-6",
+            "OASIS-TRT-20-15"
+        ],
+        [
+            "MMRR-21-6",
+            "NKI-RS-22-3"
+        ],
+        [
+            "MMRR-21-6",
+            "OASIS-TRT-20-16"
+        ],
+        [
+            "MMRR-21-6",
+            "NKI-RS-22-7"
+        ],
+        [
+            "MMRR-21-6",
+            "OASIS-TRT-20-18"
+        ],
+        [
+            "MMRR-21-6",
+            "NKI-RS-22-6"
+        ],
+        [
+            "NKI-RS-22-7",
+            "OASIS-TRT-20-15"
+        ],
+        [
+            "NKI-RS-22-7",
+            "NKI-RS-22-17"
+        ],
+        [
+            "NKI-RS-22-7",
+            "Twins-2-2"
+        ],
+        [
+            "NKI-RS-22-7",
+            "OASIS-TRT-20-14"
+        ],
+        [
+            "NKI-RS-22-7",
+            "MMRR-21-11"
+        ],
+        [
+            "NKI-RS-22-7",
+            "OASIS-TRT-20-20"
+        ],
+        [
+            "NKI-RS-22-5",
+            "MMRR-21-19"
+        ],
+        [
+            "NKI-RS-22-5",
+            "NKI-TRT-20-11"
+        ],
+        [
+            "NKI-RS-22-5",
+            "MMRR-21-9"
+        ],
+        [
+            "NKI-RS-22-5",
+            "NKI-RS-22-21"
+        ],
+        [
+            "NKI-RS-22-5",
+            "NKI-RS-22-2"
+        ],
+        [
+            "NKI-RS-22-5",
+            "NKI-TRT-20-6"
+        ],
+        [
+            "MMRR-21-12",
+            "OASIS-TRT-20-10"
+        ],
+        [
+            "MMRR-21-12",
+            "OASIS-TRT-20-16"
+        ],
+        [
+            "MMRR-21-12",
+            "NKI-TRT-20-11"
+        ],
+        [
+            "MMRR-21-12",
+            "OASIS-TRT-20-19"
+        ],
+        [
+            "MMRR-21-12",
+            "NKI-TRT-20-13"
+        ],
+        [
+            "MMRR-21-12",
+            "OASIS-TRT-20-4"
+        ],
+        [
+            "OASIS-TRT-20-4",
+            "MMRR-3T7T-2-2"
+        ],
+        [
+            "OASIS-TRT-20-4",
+            "MMRR-21-11"
+        ],
+        [
+            "OASIS-TRT-20-4",
+            "NKI-RS-22-14"
+        ],
+        [
+            "OASIS-TRT-20-4",
+            "OASIS-TRT-20-20"
+        ],
+        [
+            "OASIS-TRT-20-4",
+            "OASIS-TRT-20-17"
+        ],
+        [
+            "OASIS-TRT-20-4",
+            "MMRR-21-19"
+        ],
+        [
+            "OASIS-TRT-20-17",
+            "Twins-2-1"
+        ],
+        [
+            "OASIS-TRT-20-17",
+            "NKI-RS-22-2"
+        ],
+        [
+            "OASIS-TRT-20-17",
+            "NKI-RS-22-14"
+        ],
+        [
+            "OASIS-TRT-20-17",
+            "NKI-RS-22-12"
+        ],
+        [
+            "OASIS-TRT-20-17",
+            "NKI-TRT-20-13"
+        ],
+        [
+            "OASIS-TRT-20-17",
+            "NKI-TRT-20-8"
+        ],
+        [
+            "Afterthought-1",
+            "Twins-2-2"
+        ],
+        [
+            "Afterthought-1",
+            "NKI-TRT-20-19"
+        ],
+        [
+            "Afterthought-1",
+            "MMRR-21-19"
+        ],
+        [
+            "Afterthought-1",
+            "NKI-RS-22-14"
+        ],
+        [
+            "Afterthought-1",
+            "NKI-TRT-20-5"
+        ],
+        [
+            "Afterthought-1",
+            "OASIS-TRT-20-19"
+        ],
+        [
+            "NKI-RS-22-21",
+            "OASIS-TRT-20-9"
+        ],
+        [
+            "NKI-RS-22-21",
+            "OASIS-TRT-20-20"
+        ],
+        [
+            "NKI-RS-22-21",
+            "OASIS-TRT-20-6"
+        ],
+        [
+            "NKI-RS-22-21",
+            "Twins-2-1"
+        ],
+        [
+            "NKI-RS-22-21",
+            "NKI-TRT-20-12"
+        ],
+        [
+            "NKI-RS-22-21",
+            "NKI-RS-22-15"
+        ],
+        [
+            "NKI-RS-22-15",
+            "NKI-RS-22-19"
+        ],
+        [
+            "NKI-RS-22-15",
+            "NKI-TRT-20-15"
+        ],
+        [
+            "NKI-RS-22-15",
+            "OASIS-TRT-20-18"
+        ],
+        [
+            "NKI-RS-22-15",
+            "NKI-RS-22-14"
+        ],
+        [
+            "NKI-RS-22-15",
+            "OASIS-TRT-20-16"
+        ],
+        [
+            "NKI-RS-22-15",
+            "MMRR-21-6"
+        ],
+        [
+            "MMRR-21-19",
+            "OASIS-TRT-20-19"
+        ],
+        [
+            "MMRR-21-19",
+            "Twins-2-1"
+        ],
+        [
+            "MMRR-21-19",
+            "MMRR-21-10"
+        ],
+        [
+            "MMRR-21-19",
+            "NKI-TRT-20-17"
+        ],
+        [
+            "MMRR-21-19",
+            "OASIS-TRT-20-9"
+        ],
+        [
+            "MMRR-21-19",
+            "NKI-RS-22-2"
+        ],
+        [
+            "NKI-RS-22-22",
+            "NKI-TRT-20-12"
+        ],
+        [
+            "NKI-RS-22-22",
+            "NKI-RS-22-14"
+        ],
+        [
+            "NKI-RS-22-22",
+            "NKI-RS-22-21"
+        ],
+        [
+            "NKI-RS-22-22",
+            "NKI-TRT-20-4"
+        ],
+        [
+            "NKI-RS-22-22",
+            "OASIS-TRT-20-13"
+        ],
+        [
+            "NKI-RS-22-22",
+            "NKI-TRT-20-8"
+        ],
+        [
+            "NKI-RS-22-10",
+            "Twins-2-2"
+        ],
+        [
+            "NKI-RS-22-10",
+            "NKI-RS-22-2"
+        ],
+        [
+            "NKI-RS-22-10",
+            "NKI-RS-22-21"
+        ],
+        [
+            "NKI-RS-22-10",
+            "NKI-TRT-20-12"
+        ],
+        [
+            "NKI-RS-22-10",
+            "MMRR-21-12"
+        ],
+        [
+            "NKI-RS-22-10",
+            "NKI-TRT-20-13"
+        ],
+        [
+            "MMRR-21-18",
+            "MMRR-21-2"
+        ],
+        [
+            "MMRR-21-18",
+            "Twins-2-2"
+        ],
+        [
+            "MMRR-21-18",
+            "NKI-RS-22-22"
+        ],
+        [
+            "MMRR-21-18",
+            "MMRR-21-6"
+        ],
+        [
+            "MMRR-21-18",
+            "NKI-TRT-20-19"
+        ],
+        [
+            "MMRR-21-18",
+            "NKI-TRT-20-10"
+        ],
+        [
+            "NKI-RS-22-19",
+            "OASIS-TRT-20-13"
+        ],
+        [
+            "NKI-RS-22-19",
+            "NKI-RS-22-4"
+        ],
+        [
+            "NKI-RS-22-19",
+            "MMRR-21-8"
+        ],
+        [
+            "NKI-RS-22-19",
+            "NKI-RS-22-6"
+        ],
+        [
+            "NKI-RS-22-19",
+            "OASIS-TRT-20-16"
+        ],
+        [
+            "NKI-RS-22-19",
+            "Twins-2-1"
+        ],
+        [
+            "NKI-TRT-20-4",
+            "OASIS-TRT-20-14"
+        ],
+        [
+            "NKI-TRT-20-4",
+            "NKI-RS-22-7"
+        ],
+        [
+            "NKI-TRT-20-4",
+            "NKI-TRT-20-8"
+        ],
+        [
+            "NKI-TRT-20-4",
+            "NKI-TRT-20-13"
+        ],
+        [
+            "NKI-TRT-20-4",
+            "OASIS-TRT-20-17"
+        ],
+        [
+            "NKI-TRT-20-4",
+            "NKI-RS-22-14"
+        ],
+        [
+            "OASIS-TRT-20-14",
+            "MMRR-21-2"
+        ],
+        [
+            "OASIS-TRT-20-14",
+            "NKI-RS-22-15"
+        ],
+        [
+            "OASIS-TRT-20-14",
+            "Afterthought-1"
+        ],
+        [
+            "OASIS-TRT-20-14",
+            "MMRR-21-19"
+        ],
+        [
+            "OASIS-TRT-20-14",
+            "NKI-TRT-20-11"
+        ],
+        [
+            "OASIS-TRT-20-14",
+            "NKI-RS-22-22"
+        ],
+        [
+            "Colin27-1",
+            "MMRR-21-9"
+        ],
+        [
+            "Colin27-1",
+            "Afterthought-1"
+        ],
+        [
+            "Colin27-1",
+            "MMRR-21-10"
+        ],
+        [
+            "Colin27-1",
+            "MMRR-21-3"
+        ],
+        [
+            "Colin27-1",
+            "NKI-TRT-20-13"
+        ],
+        [
+            "Colin27-1",
+            "MMRR-21-12"
+        ],
+        [
+            "NKI-RS-22-2",
+            "OASIS-TRT-20-19"
+        ],
+        [
+            "NKI-RS-22-2",
+            "OASIS-TRT-20-14"
+        ],
+        [
+            "NKI-RS-22-2",
+            "MMRR-21-9"
+        ],
+        [
+            "NKI-RS-22-2",
+            "NKI-TRT-20-6"
+        ],
+        [
+            "NKI-RS-22-2",
+            "OASIS-TRT-20-20"
+        ],
+        [
+            "NKI-RS-22-2",
+            "NKI-RS-22-19"
+        ],
+        [
+            "OASIS-TRT-20-18",
+            "NKI-TRT-20-4"
+        ],
+        [
+            "OASIS-TRT-20-18",
+            "NKI-RS-22-10"
+        ],
+        [
+            "OASIS-TRT-20-18",
+            "Twins-2-1"
+        ],
+        [
+            "OASIS-TRT-20-18",
+            "MMRR-21-2"
+        ],
+        [
+            "OASIS-TRT-20-18",
+            "NKI-TRT-20-3"
+        ],
+        [
+            "OASIS-TRT-20-18",
+            "NKI-RS-22-19"
+        ],
+        [
+            "MMRR-21-3",
+            "NKI-RS-22-6"
+        ],
+        [
+            "MMRR-21-3",
+            "OASIS-TRT-20-18"
+        ],
+        [
+            "MMRR-21-3",
+            "OASIS-TRT-20-11"
+        ],
+        [
+            "MMRR-21-3",
+            "NKI-RS-22-7"
+        ],
+        [
+            "MMRR-21-3",
+            "MMRR-21-6"
+        ],
+        [
+            "MMRR-21-3",
+            "NKI-RS-22-17"
+        ],
+        [
+            "NKI-TRT-20-8",
+            "NKI-TRT-20-3"
+        ],
+        [
+            "NKI-TRT-20-8",
+            "MMRR-21-2"
+        ],
+        [
+            "NKI-TRT-20-8",
+            "NKI-RS-22-15"
+        ],
+        [
+            "NKI-TRT-20-8",
+            "NKI-RS-22-6"
+        ],
+        [
+            "NKI-TRT-20-8",
+            "NKI-TRT-20-13"
+        ],
+        [
+            "NKI-TRT-20-8",
+            "OASIS-TRT-20-19"
+        ],
+        [
+            "MMRR-21-8",
+            "MMRR-21-18"
+        ],
+        [
+            "MMRR-21-8",
+            "MMRR-21-6"
+        ],
+        [
+            "MMRR-21-8",
+            "Twins-2-2"
+        ],
+        [
+            "MMRR-21-8",
+            "NKI-RS-22-5"
+        ],
+        [
+            "MMRR-21-8",
+            "NKI-TRT-20-5"
+        ],
+        [
+            "MMRR-21-8",
+            "NKI-RS-22-10"
+        ],
+        [
+            "NKI-RS-22-17",
+            "NKI-RS-22-22"
+        ],
+        [
+            "NKI-RS-22-17",
+            "NKI-TRT-20-17"
+        ],
+        [
+            "NKI-RS-22-17",
+            "NKI-TRT-20-10"
+        ],
+        [
+            "NKI-RS-22-17",
+            "OASIS-TRT-20-4"
+        ],
+        [
+            "NKI-RS-22-17",
+            "OASIS-TRT-20-15"
+        ],
+        [
+            "NKI-RS-22-17",
+            "OASIS-TRT-20-18"
+        ],
+        [
+            "NKI-TRT-20-17",
+            "OASIS-TRT-20-5"
+        ],
+        [
+            "NKI-TRT-20-17",
+            "NKI-RS-22-3"
+        ],
+        [
+            "NKI-TRT-20-17",
+            "NKI-RS-22-12"
+        ],
+        [
+            "NKI-TRT-20-17",
+            "OASIS-TRT-20-8"
+        ],
+        [
+            "NKI-TRT-20-17",
+            "NKI-TRT-20-12"
+        ],
+        [
+            "NKI-TRT-20-17",
+            "OASIS-TRT-20-17"
+        ],
+        [
+            "NKI-TRT-20-15",
+            "NKI-RS-22-22"
+        ],
+        [
+            "NKI-TRT-20-15",
+            "MMRR-21-11"
+        ],
+        [
+            "NKI-TRT-20-15",
+            "NKI-TRT-20-8"
+        ],
+        [
+            "NKI-TRT-20-15",
+            "MMRR-21-3"
+        ],
+        [
+            "NKI-TRT-20-15",
+            "MMRR-21-6"
+        ],
+        [
+            "NKI-TRT-20-15",
+            "NKI-RS-22-17"
+        ],
+        [
+            "OASIS-TRT-20-9",
+            "OASIS-TRT-20-13"
+        ],
+        [
+            "OASIS-TRT-20-9",
+            "OASIS-TRT-20-6"
+        ],
+        [
+            "OASIS-TRT-20-9",
+            "Afterthought-1"
+        ],
+        [
+            "OASIS-TRT-20-9",
+            "NKI-RS-22-4"
+        ],
+        [
+            "OASIS-TRT-20-9",
+            "OASIS-TRT-20-8"
+        ],
+        [
+            "OASIS-TRT-20-9",
+            "Twins-2-2"
+        ],
+        [
+            "Twins-2-1",
+            "MMRR-21-18"
+        ],
+        [
+            "Twins-2-1",
+            "NKI-TRT-20-15"
+        ],
+        [
+            "Twins-2-1",
+            "Twins-2-2"
+        ],
+        [
+            "Twins-2-1",
+            "NKI-RS-22-19"
+        ],
+        [
+            "Twins-2-1",
+            "MMRR-3T7T-2-2"
+        ],
+        [
+            "Twins-2-1",
+            "OASIS-TRT-20-19"
+        ],
+        [
+            "MMRR-21-9",
+            "OASIS-TRT-20-18"
+        ],
+        [
+            "MMRR-21-9",
+            "MMRR-21-10"
+        ],
+        [
+            "MMRR-21-9",
+            "OASIS-TRT-20-6"
+        ],
+        [
+            "MMRR-21-9",
+            "OASIS-TRT-20-4"
+        ],
+        [
+            "MMRR-21-9",
+            "MMRR-21-19"
+        ],
+        [
+            "MMRR-21-9",
+            "MMRR-3T7T-2-2"
+        ],
+        [
+            "OASIS-TRT-20-6",
+            "MMRR-21-10"
+        ],
+        [
+            "OASIS-TRT-20-6",
+            "OASIS-TRT-20-15"
+        ],
+        [
+            "OASIS-TRT-20-6",
+            "OASIS-TRT-20-11"
+        ],
+        [
+            "OASIS-TRT-20-6",
+            "NKI-TRT-20-11"
+        ],
+        [
+            "OASIS-TRT-20-6",
+            "NKI-TRT-20-5"
+        ],
+        [
+            "OASIS-TRT-20-6",
+            "OASIS-TRT-20-9"
+        ],
+        [
+            "NKI-RS-22-12",
+            "MMRR-21-2"
+        ],
+        [
+            "NKI-RS-22-12",
+            "MMRR-21-19"
+        ],
+        [
+            "NKI-RS-22-12",
+            "OASIS-TRT-20-16"
+        ],
+        [
+            "NKI-RS-22-12",
+            "NKI-TRT-20-11"
+        ],
+        [
+            "NKI-RS-22-12",
+            "NKI-TRT-20-6"
+        ],
+        [
+            "NKI-RS-22-12",
+            "OASIS-TRT-20-17"
+        ],
+        [
+            "NKI-RS-22-4",
+            "OASIS-TRT-20-5"
+        ],
+        [
+            "NKI-RS-22-4",
+            "MMRR-21-7"
+        ],
+        [
+            "NKI-RS-22-4",
+            "Afterthought-1"
+        ],
+        [
+            "NKI-RS-22-4",
+            "MMRR-21-9"
+        ],
+        [
+            "NKI-RS-22-4",
+            "MMRR-21-11"
+        ],
+        [
+            "NKI-RS-22-4",
+            "NKI-RS-22-2"
+        ],
+        [
+            "NKI-TRT-20-12",
+            "OASIS-TRT-20-5"
+        ],
+        [
+            "NKI-TRT-20-12",
+            "OASIS-TRT-20-14"
+        ],
+        [
+            "NKI-TRT-20-12",
+            "MMRR-21-18"
+        ],
+        [
+            "NKI-TRT-20-12",
+            "MMRR-21-6"
+        ],
+        [
+            "NKI-TRT-20-12",
+            "OASIS-TRT-20-9"
+        ],
+        [
+            "NKI-TRT-20-12",
+            "NKI-TRT-20-4"
+        ],
+        [
+            "NKI-RS-22-6",
+            "OASIS-TRT-20-10"
+        ],
+        [
+            "NKI-RS-22-6",
+            "NKI-RS-22-7"
+        ],
+        [
+            "NKI-RS-22-6",
+            "NKI-RS-22-2"
+        ],
+        [
+            "NKI-RS-22-6",
+            "NKI-TRT-20-8"
+        ],
+        [
+            "NKI-RS-22-6",
+            "OASIS-TRT-20-17"
+        ],
+        [
+            "NKI-RS-22-6",
+            "MMRR-21-4"
+        ],
+        [
+            "OASIS-TRT-20-11",
+            "MMRR-3T7T-2-2"
+        ],
+        [
+            "OASIS-TRT-20-11",
+            "NKI-TRT-20-5"
+        ],
+        [
+            "OASIS-TRT-20-11",
+            "NKI-RS-22-15"
+        ],
+        [
+            "OASIS-TRT-20-11",
+            "OASIS-TRT-20-14"
+        ],
+        [
+            "OASIS-TRT-20-11",
+            "NKI-RS-22-21"
+        ],
+        [
+            "NKI-TRT-20-5",
+            "OASIS-TRT-20-13"
+        ],
+        [
+            "NKI-TRT-20-5",
+            "NKI-RS-22-3"
+        ],
+        [
+            "NKI-TRT-20-5",
+            "OASIS-TRT-20-20"
+        ],
+        [
+            "NKI-TRT-20-5",
+            "NKI-RS-22-12"
+        ],
+        [
+            "NKI-TRT-20-5",
+            "OASIS-TRT-20-5"
+        ],
+        [
+            "MMRR-21-2",
+            "Twins-2-1"
+        ],
+        [
+            "MMRR-21-2",
+            "MMRR-21-12"
+        ],
+        [
+            "MMRR-21-2",
+            "MMRR-21-8"
+        ],
+        [
+            "MMRR-21-2",
+            "OASIS-TRT-20-10"
+        ],
+        [
+            "MMRR-21-2",
+            "NKI-TRT-20-17"
+        ],
+        [
+            "OASIS-TRT-20-16",
+            "MMRR-21-11"
+        ],
+        [
+            "OASIS-TRT-20-16",
+            "NKI-RS-22-12"
+        ],
+        [
+            "OASIS-TRT-20-16",
+            "OASIS-TRT-20-17"
+        ],
+        [
+            "OASIS-TRT-20-16",
+            "OASIS-TRT-20-14"
+        ],
+        [
+            "OASIS-TRT-20-16",
+            "NKI-RS-22-6"
+        ],
+        [
+            "NKI-RS-22-3",
+            "NKI-RS-22-10"
+        ],
+        [
+            "NKI-RS-22-3",
+            "NKI-RS-22-2"
+        ],
+        [
+            "NKI-RS-22-3",
+            "NKI-RS-22-15"
+        ],
+        [
+            "NKI-RS-22-3",
+            "NKI-TRT-20-4"
+        ],
+        [
+            "NKI-RS-22-3",
+            "MMRR-21-12"
+        ],
+        [
+            "MMRR-3T7T-2-2",
+            "NKI-RS-22-5"
+        ],
+        [
+            "MMRR-3T7T-2-2",
+            "NKI-RS-22-2"
+        ],
+        [
+            "MMRR-3T7T-2-2",
+            "NKI-RS-22-15"
+        ],
+        [
+            "MMRR-3T7T-2-2",
+            "MMRR-21-16"
+        ],
+        [
+            "MMRR-3T7T-2-2",
+            "NKI-RS-22-6"
+        ],
+        [
+            "MMRR-21-16",
+            "OASIS-TRT-20-11"
+        ],
+        [
+            "MMRR-21-16",
+            "NKI-TRT-20-3"
+        ],
+        [
+            "MMRR-21-16",
+            "MMRR-21-4"
+        ],
+        [
+            "MMRR-21-16",
+            "NKI-TRT-20-10"
+        ],
+        [
+            "MMRR-21-16",
+            "MMRR-21-19"
+        ],
+        [
+            "OASIS-TRT-20-8",
+            "OASIS-TRT-20-13"
+        ],
+        [
+            "OASIS-TRT-20-8",
+            "MMRR-21-3"
+        ],
+        [
+            "OASIS-TRT-20-8",
+            "NKI-RS-22-2"
+        ],
+        [
+            "OASIS-TRT-20-8",
+            "OASIS-TRT-20-17"
+        ],
+        [
+            "OASIS-TRT-20-8",
+            "MMRR-3T7T-2-2"
+        ],
+        [
+            "OASIS-TRT-20-13",
+            "MMRR-21-8"
+        ],
+        [
+            "OASIS-TRT-20-13",
+            "OASIS-TRT-20-9"
+        ],
+        [
+            "OASIS-TRT-20-13",
+            "NKI-TRT-20-12"
+        ],
+        [
+            "OASIS-TRT-20-13",
+            "NKI-RS-22-21"
+        ],
+        [
+            "OASIS-TRT-20-13",
+            "NKI-RS-22-15"
+        ],
+        [
+            "OASIS-TRT-20-10",
+            "NKI-RS-22-12"
+        ],
+        [
+            "OASIS-TRT-20-10",
+            "MMRR-21-8"
+        ],
+        [
+            "OASIS-TRT-20-10",
+            "OASIS-TRT-20-18"
+        ],
+        [
+            "OASIS-TRT-20-10",
+            "NKI-TRT-20-15"
+        ],
+        [
+            "OASIS-TRT-20-10",
+            "MMRR-21-19"
+        ],
+        [
+            "NKI-TRT-20-13",
+            "OASIS-TRT-20-20"
+        ],
+        [
+            "NKI-TRT-20-13",
+            "NKI-TRT-20-17"
+        ],
+        [
+            "NKI-TRT-20-13",
+            "NKI-RS-22-7"
+        ],
+        [
+            "NKI-TRT-20-13",
+            "NKI-TRT-20-12"
+        ],
+        [
+            "NKI-TRT-20-13",
+            "MMRR-21-2"
+        ],
+        [
+            "NKI-TRT-20-10",
+            "MMRR-21-10"
+        ],
+        [
+            "NKI-TRT-20-10",
+            "NKI-RS-22-7"
+        ],
+        [
+            "NKI-TRT-20-10",
+            "OASIS-TRT-20-19"
+        ],
+        [
+            "NKI-TRT-20-10",
+            "MMRR-21-8"
+        ],
+        [
+            "NKI-TRT-20-10",
+            "OASIS-TRT-20-15"
+        ]
+    ],
+    "val_pair": [
+        [
+            "NKI-RS-22-8",
+            "NKI-TRT-20-9"
+        ],
+        [
+            "NKI-RS-22-11",
+            "NKI-TRT-20-14"
+        ],
+        [
+            "OASIS-TRT-20-1",
+            "NKI-RS-22-8"
+        ],
+        [
+            "NKI-TRT-20-14",
+            "OASIS-TRT-20-1"
+        ],
+        [
+            "NKI-TRT-20-9",
+            "NKI-RS-22-18"
+        ]
+    ],
+    "test_pair": [
+        [
+            "OASIS-TRT-20-2",
+            "NKI-TRT-20-20"
+        ],
+        [
+            "OASIS-TRT-20-2",
+            "OASIS-TRT-20-12"
+        ],
+        [
+            "NKI-RS-22-20",
+            "NKI-TRT-20-16"
+        ],
+        [
+            "NKI-RS-22-20",
+            "MMRR-21-20"
+        ],
+        [
+            "NKI-TRT-20-20",
+            "NKI-TRT-20-18"
+        ],
+        [
+            "NKI-TRT-20-20",
+            "NKI-TRT-20-16"
+        ],
+        [
+            "MMRR-21-13",
+            "OASIS-TRT-20-7"
+        ],
+        [
+            "MMRR-21-13",
+            "MMRR-21-15"
+        ],
+        [
+            "NKI-TRT-20-16",
+            "OASIS-TRT-20-2"
+        ],
+        [
+            "NKI-TRT-20-16",
+            "NKI-RS-22-1"
+        ],
+        [
+            "MMRR-21-20",
+            "OASIS-TRT-20-2"
+        ],
+        [
+            "MMRR-21-20",
+            "NKI-TRT-20-1"
+        ],
+        [
+            "NKI-RS-22-13",
+            "OASIS-TRT-20-7"
+        ],
+        [
+            "NKI-RS-22-13",
+            "MMRR-21-20"
+        ],
+        [
+            "NKI-RS-22-9",
+            "OASIS-TRT-20-3"
+        ],
+        [
+            "NKI-RS-22-9",
+            "NKI-TRT-20-20"
+        ],
+        [
+            "MMRR-21-5",
+            "NKI-RS-22-9"
+        ],
+        [
+            "MMRR-21-5",
+            "OASIS-TRT-20-7"
+        ],
+        [
+            "OASIS-TRT-20-12",
+            "MMRR-21-15"
+        ],
+        [
+            "OASIS-TRT-20-12",
+            "MMRR-21-14"
+        ],
+        [
+            "MMRR-21-15",
+            "NKI-RS-22-1"
+        ],
+        [
+            "MMRR-21-15",
+            "NKI-RS-22-13"
+        ],
+        [
+            "NKI-TRT-20-1",
+            "OASIS-TRT-20-12"
+        ],
+        [
+            "NKI-TRT-20-1",
+            "NKI-RS-22-9"
+        ],
+        [
+            "NKI-TRT-20-18",
+            "MMRR-21-20"
+        ],
+        [
+            "OASIS-TRT-20-3",
+            "NKI-RS-22-13"
+        ],
+        [
+            "OASIS-TRT-20-7",
+            "NKI-TRT-20-18"
+        ],
+        [
+            "NKI-TRT-20-7",
+            "OASIS-TRT-20-7"
+        ],
+        [
+            "MMRR-21-14",
+            "NKI-TRT-20-18"
+        ],
+        [
+            "NKI-RS-22-1",
+            "OASIS-TRT-20-7"
+        ]
+    ],
+    "seg_0": {
+        "OASIS-TRT-20-15": false,
+        "OASIS-TRT-20-20": false,
+        "OASIS-TRT-20-5": false,
+        "MMRR-21-10": false,
+        "NKI-TRT-20-6": false,
+        "NKI-TRT-20-11": false,
+        "NKI-RS-22-14": false,
+        "MMRR-21-7": false,
+        "OASIS-TRT-20-19": false,
+        "Twins-2-2": false,
+        "NKI-TRT-20-3": false,
+        "NKI-TRT-20-19": false,
+        "MMRR-21-11": false,
+        "MMRR-21-4": false,
+        "MMRR-21-6": false,
+        "NKI-RS-22-7": false,
+        "NKI-RS-22-5": false,
+        "MMRR-21-12": false,
+        "OASIS-TRT-20-4": false,
+        "OASIS-TRT-20-17": false,
+        "Afterthought-1": false,
+        "NKI-RS-22-21": false,
+        "NKI-RS-22-15": false,
+        "MMRR-21-19": false,
+        "NKI-RS-22-22": false,
+        "NKI-RS-22-10": false,
+        "MMRR-21-18": false,
+        "NKI-RS-22-19": false,
+        "NKI-TRT-20-4": false,
+        "OASIS-TRT-20-14": false,
+        "Colin27-1": false,
+        "NKI-RS-22-2": false,
+        "OASIS-TRT-20-18": false,
+        "MMRR-21-3": false,
+        "NKI-TRT-20-8": false,
+        "MMRR-21-8": false,
+        "NKI-RS-22-17": false,
+        "NKI-TRT-20-17": false,
+        "NKI-TRT-20-15": false,
+        "OASIS-TRT-20-9": false,
+        "Twins-2-1": false,
+        "MMRR-21-9": false,
+        "OASIS-TRT-20-6": false,
+        "NKI-RS-22-12": false,
+        "NKI-RS-22-4": false,
+        "NKI-TRT-20-12": false,
+        "NKI-RS-22-6": false,
+        "OASIS-TRT-20-11": false,
+        "NKI-TRT-20-5": false,
+        "MMRR-21-2": false,
+        "OASIS-TRT-20-16": false,
+        "NKI-RS-22-3": false,
+        "MMRR-3T7T-2-2": false,
+        "MMRR-21-16": false,
+        "OASIS-TRT-20-8": false,
+        "OASIS-TRT-20-13": false,
+        "OASIS-TRT-20-10": false,
+        "NKI-TRT-20-13": false,
+        "NKI-TRT-20-10": false
+    },
+    "seg_1": {
+        "OASIS-TRT-20-15": false,
+        "OASIS-TRT-20-20": false,
+        "OASIS-TRT-20-5": false,
+        "MMRR-21-10": false,
+        "NKI-TRT-20-6": false,
+        "NKI-TRT-20-11": false,
+        "NKI-RS-22-14": false,
+        "MMRR-21-7": false,
+        "OASIS-TRT-20-19": false,
+        "Twins-2-2": false,
+        "NKI-TRT-20-3": false,
+        "NKI-TRT-20-19": false,
+        "MMRR-21-11": false,
+        "MMRR-21-4": false,
+        "MMRR-21-6": false,
+        "NKI-RS-22-7": false,
+        "NKI-RS-22-5": false,
+        "MMRR-21-12": false,
+        "OASIS-TRT-20-4": false,
+        "OASIS-TRT-20-17": false,
+        "Afterthought-1": false,
+        "NKI-RS-22-21": false,
+        "NKI-RS-22-15": false,
+        "MMRR-21-19": false,
+        "NKI-RS-22-22": false,
+        "NKI-RS-22-10": true,
+        "MMRR-21-18": false,
+        "NKI-RS-22-19": false,
+        "NKI-TRT-20-4": false,
+        "OASIS-TRT-20-14": false,
+        "Colin27-1": false,
+        "NKI-RS-22-2": false,
+        "OASIS-TRT-20-18": false,
+        "MMRR-21-3": false,
+        "NKI-TRT-20-8": false,
+        "MMRR-21-8": false,
+        "NKI-RS-22-17": false,
+        "NKI-TRT-20-17": false,
+        "NKI-TRT-20-15": false,
+        "OASIS-TRT-20-9": false,
+        "Twins-2-1": false,
+        "MMRR-21-9": false,
+        "OASIS-TRT-20-6": false,
+        "NKI-RS-22-12": false,
+        "NKI-RS-22-4": false,
+        "NKI-TRT-20-12": false,
+        "NKI-RS-22-6": false,
+        "OASIS-TRT-20-11": false,
+        "NKI-TRT-20-5": false,
+        "MMRR-21-2": false,
+        "OASIS-TRT-20-16": false,
+        "NKI-RS-22-3": false,
+        "MMRR-3T7T-2-2": false,
+        "MMRR-21-16": false,
+        "OASIS-TRT-20-8": false,
+        "OASIS-TRT-20-13": false,
+        "OASIS-TRT-20-10": false,
+        "NKI-TRT-20-13": false,
+        "NKI-TRT-20-10": false
+    },
+    "seg_5": {
+        "OASIS-TRT-20-15": false,
+        "OASIS-TRT-20-20": false,
+        "OASIS-TRT-20-5": false,
+        "MMRR-21-10": false,
+        "NKI-TRT-20-6": false,
+        "NKI-TRT-20-11": true,
+        "NKI-RS-22-14": false,
+        "MMRR-21-7": false,
+        "OASIS-TRT-20-19": false,
+        "Twins-2-2": false,
+        "NKI-TRT-20-3": false,
+        "NKI-TRT-20-19": false,
+        "MMRR-21-11": false,
+        "MMRR-21-4": false,
+        "MMRR-21-6": false,
+        "NKI-RS-22-7": false,
+        "NKI-RS-22-5": false,
+        "MMRR-21-12": false,
+        "OASIS-TRT-20-4": false,
+        "OASIS-TRT-20-17": false,
+        "Afterthought-1": false,
+        "NKI-RS-22-21": false,
+        "NKI-RS-22-15": false,
+        "MMRR-21-19": false,
+        "NKI-RS-22-22": true,
+        "NKI-RS-22-10": false,
+        "MMRR-21-18": true,
+        "NKI-RS-22-19": false,
+        "NKI-TRT-20-4": false,
+        "OASIS-TRT-20-14": false,
+        "Colin27-1": false,
+        "NKI-RS-22-2": false,
+        "OASIS-TRT-20-18": false,
+        "MMRR-21-3": false,
+        "NKI-TRT-20-8": false,
+        "MMRR-21-8": false,
+        "NKI-RS-22-17": false,
+        "NKI-TRT-20-17": true,
+        "NKI-TRT-20-15": false,
+        "OASIS-TRT-20-9": false,
+        "Twins-2-1": false,
+        "MMRR-21-9": false,
+        "OASIS-TRT-20-6": false,
+        "NKI-RS-22-12": false,
+        "NKI-RS-22-4": false,
+        "NKI-TRT-20-12": false,
+        "NKI-RS-22-6": false,
+        "OASIS-TRT-20-11": false,
+        "NKI-TRT-20-5": false,
+        "MMRR-21-2": false,
+        "OASIS-TRT-20-16": false,
+        "NKI-RS-22-3": false,
+        "MMRR-3T7T-2-2": false,
+        "MMRR-21-16": false,
+        "OASIS-TRT-20-8": true,
+        "OASIS-TRT-20-13": false,
+        "OASIS-TRT-20-10": false,
+        "NKI-TRT-20-13": false,
+        "NKI-TRT-20-10": false
+    },
+    "seg_29": {
+        "OASIS-TRT-20-15": true,
+        "OASIS-TRT-20-20": false,
+        "OASIS-TRT-20-5": true,
+        "MMRR-21-10": true,
+        "NKI-TRT-20-6": true,
+        "NKI-TRT-20-11": true,
+        "NKI-RS-22-14": false,
+        "MMRR-21-7": false,
+        "OASIS-TRT-20-19": true,
+        "Twins-2-2": true,
+        "NKI-TRT-20-3": true,
+        "NKI-TRT-20-19": false,
+        "MMRR-21-11": true,
+        "MMRR-21-4": false,
+        "MMRR-21-6": true,
+        "NKI-RS-22-7": false,
+        "NKI-RS-22-5": false,
+        "MMRR-21-12": true,
+        "OASIS-TRT-20-4": false,
+        "OASIS-TRT-20-17": false,
+        "Afterthought-1": true,
+        "NKI-RS-22-21": false,
+        "NKI-RS-22-15": false,
+        "MMRR-21-19": true,
+        "NKI-RS-22-22": false,
+        "NKI-RS-22-10": false,
+        "MMRR-21-18": true,
+        "NKI-RS-22-19": true,
+        "NKI-TRT-20-4": true,
+        "OASIS-TRT-20-14": false,
+        "Colin27-1": true,
+        "NKI-RS-22-2": false,
+        "OASIS-TRT-20-18": false,
+        "MMRR-21-3": false,
+        "NKI-TRT-20-8": true,
+        "MMRR-21-8": true,
+        "NKI-RS-22-17": false,
+        "NKI-TRT-20-17": true,
+        "NKI-TRT-20-15": true,
+        "OASIS-TRT-20-9": true,
+        "Twins-2-1": false,
+        "MMRR-21-9": true,
+        "OASIS-TRT-20-6": true,
+        "NKI-RS-22-12": false,
+        "NKI-RS-22-4": true,
+        "NKI-TRT-20-12": false,
+        "NKI-RS-22-6": false,
+        "OASIS-TRT-20-11": true,
+        "NKI-TRT-20-5": true,
+        "MMRR-21-2": false,
+        "OASIS-TRT-20-16": true,
+        "NKI-RS-22-3": false,
+        "MMRR-3T7T-2-2": false,
+        "MMRR-21-16": false,
+        "OASIS-TRT-20-8": false,
+        "OASIS-TRT-20-13": false,
+        "OASIS-TRT-20-10": true,
+        "NKI-TRT-20-13": false,
+        "NKI-TRT-20-10": false
+    },
+    "seg_59": {
+        "OASIS-TRT-20-15": true,
+        "OASIS-TRT-20-20": true,
+        "OASIS-TRT-20-5": true,
+        "MMRR-21-10": true,
+        "NKI-TRT-20-6": true,
+        "NKI-TRT-20-11": true,
+        "NKI-RS-22-14": true,
+        "MMRR-21-7": true,
+        "OASIS-TRT-20-19": true,
+        "Twins-2-2": true,
+        "NKI-TRT-20-3": true,
+        "NKI-TRT-20-19": true,
+        "MMRR-21-11": true,
+        "MMRR-21-4": true,
+        "MMRR-21-6": true,
+        "NKI-RS-22-7": true,
+        "NKI-RS-22-5": true,
+        "MMRR-21-12": true,
+        "OASIS-TRT-20-4": true,
+        "OASIS-TRT-20-17": true,
+        "Afterthought-1": true,
+        "NKI-RS-22-21": true,
+        "NKI-RS-22-15": true,
+        "MMRR-21-19": true,
+        "NKI-RS-22-22": true,
+        "NKI-RS-22-10": true,
+        "MMRR-21-18": true,
+        "NKI-RS-22-19": true,
+        "NKI-TRT-20-4": true,
+        "OASIS-TRT-20-14": true,
+        "Colin27-1": true,
+        "NKI-RS-22-2": true,
+        "OASIS-TRT-20-18": true,
+        "MMRR-21-3": true,
+        "NKI-TRT-20-8": true,
+        "MMRR-21-8": true,
+        "NKI-RS-22-17": true,
+        "NKI-TRT-20-17": true,
+        "NKI-TRT-20-15": true,
+        "OASIS-TRT-20-9": true,
+        "Twins-2-1": true,
+        "MMRR-21-9": true,
+        "OASIS-TRT-20-6": true,
+        "NKI-RS-22-12": true,
+        "NKI-RS-22-4": true,
+        "NKI-TRT-20-12": true,
+        "NKI-RS-22-6": true,
+        "OASIS-TRT-20-11": true,
+        "NKI-TRT-20-5": true,
+        "MMRR-21-2": true,
+        "OASIS-TRT-20-16": true,
+        "NKI-RS-22-3": true,
+        "MMRR-3T7T-2-2": true,
+        "MMRR-21-16": true,
+        "OASIS-TRT-20-8": true,
+        "OASIS-TRT-20-13": true,
+        "OASIS-TRT-20-10": true,
+        "NKI-TRT-20-13": true,
+        "NKI-TRT-20-10": true
+    }
+}

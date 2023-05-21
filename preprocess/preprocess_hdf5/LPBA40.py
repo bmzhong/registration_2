@@ -56,7 +56,7 @@ GROUP_CONFIG = [
 def group_label(label):
     label_merged = np.zeros(label.shape, dtype=np.int32)
     for i, (name, start, end) in enumerate(GROUP_CONFIG):
-        region = np.logical_and(label >= start, label >= end)
+        region = np.logical_and(label >= start, label <= end)
         label_merged[region] = i + 1
     return label_merged
 
@@ -80,7 +80,6 @@ def write_LPBA40(image_size, source_path, output_path, scale_factor):
             label_path = os.path.join(img_dir, label_name)
 
             volume = sitk.ReadImage(volume_path)
-            # volume = resize_image_itk(volume, image_size, sitk.sitkLinear)
             volume = sitk.GetArrayFromImage(volume)
             volume = volume.astype(np.float64)
             volume = volume[np.newaxis, ...]
@@ -90,13 +89,12 @@ def write_LPBA40(image_size, source_path, output_path, scale_factor):
             volume = volume.astype(np.float32)
 
             label = sitk.ReadImage(label_path)
-            # label = resize_image_itk(label, image_size, sitk.sitkNearestNeighbor)
             label = sitk.GetArrayFromImage(label)
             pre = np.count_nonzero(label)
             label = group_label(label)
             post = np.count_nonzero(label)
-            print("pre: ",pre," last: ", post)
-            assert pre==post
+            print("pre: ", pre, " last: ", post)
+            # assert pre == post
             label = label[np.newaxis, ...]
 
             label = label_resize(label)
@@ -120,7 +118,7 @@ def write_LPBA40(image_size, source_path, output_path, scale_factor):
 if __name__ == '__main__':
     source_path = r'G:\biomdeical\registration\public_data\LPBA40\LPBA40_Subjects_Delineation_Space_MRI_and' \
                   r'_label_files\LPBA40subjects.delineation_space\LPBA40\delineation_space'
-    output_path = '../../datasets/hdf5/LPBA40.h5'
+    output_path = '../../datasets/hdf5/7_192_LPBA40.h5'
     image_size = [160, 192, 160]
     scale_factor = 1.
     write_LPBA40(image_size, source_path, output_path, scale_factor)

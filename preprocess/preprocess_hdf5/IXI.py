@@ -4,11 +4,17 @@ import monai
 import numpy as np
 from preprocess.preprocess_hdf5.hdf5_utils import *
 
-label_ids = [2, 3, 41, 42] + [4, 7, 8, 43, 46, 47]
+
+# label_ids = [2, 3, 41, 42] + [4, 7, 8, 43, 46, 47]
 
 
 def write_IXI(image_size, source_path, output_path, scale_factor):
+    label_ids = [0, 2, 3, 4, 5, 7, 8, 10, 11, 12, 13, 14, 15, 16, 17, 18, 24, 26,
+                 28, 30, 31, 41, 42, 43, 44, 46, 47, 49, 50, 51, 52, 53, 54, 58, 60, 62,
+                 63, 72, 77, 80, 85, 251, 252, 253, 254, 255]
+    print(len(label_ids))
     label_map = dict()
+
     for i, id in enumerate(label_ids):
         label_map[id] = i + 1
 
@@ -48,7 +54,7 @@ def write_IXI(image_size, source_path, output_path, scale_factor):
             label = new_label
 
             label_value = np.unique(label).tolist()
-            print(label_value)
+            print(len(label_value))
 
             label = label[np.newaxis, ...]
             label = label_resize(label)
@@ -68,7 +74,6 @@ def write_IXI(image_size, source_path, output_path, scale_factor):
     train_path = r"G:\biomdeical\registration\public_data\IXI\IXI_data\IXI_data\Train"
     val_path = r"G:\biomdeical\registration\public_data\IXI\IXI_data\IXI_data\Val"
     test_path = r"G:\biomdeical\registration\public_data\IXI\IXI_data\IXI_data\Test"
-
 
     train_names, val_names, test_names = [], [], []
     for path in os.listdir(train_path):
@@ -111,13 +116,12 @@ def write_IXI(image_size, source_path, output_path, scale_factor):
 
 
 if __name__ == '__main__':
-    hdf5_path = '../../datasets/hdf5/IXI.h5'
-    # split_train_val_test(hdf5_path)
-    # source_path = r'G:\biomdeical\registration\public_data\IXI\IXI_data\IXI_data_nii\subject'
-    # output_path = '../../datasets/hdf5/IXI.h5'
-    # image_size = [128, 128, 128]
-    # scale_factor = 1.
-    # write_IXI(image_size, source_path, output_path, scale_factor)
+    # hdf5_path = '../../datasets/hdf5/IXI.h5'
+    source_path = r'G:\biomdeical\registration\public_data\IXI\IXI_data\IXI_data_nii\subject'
+    output_path = '../../datasets/hdf5/45_192_IXI.h5'
+    image_size = [160, 192, 160]
+    scale_factor = 1.
+    write_IXI(image_size, source_path, output_path, scale_factor)
     # hdf5_path = '../../datasets/hdf5/IXI.h5'
     # output_dir = r'G:\biomdeical\registration\data\datasets'
     # extract_hdf5(hdf5_path, output_dir)

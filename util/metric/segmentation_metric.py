@@ -18,7 +18,11 @@ def dice_coefficient(predict, target):
 
     intersection = (predict * target).sum()
 
-    return (2. * intersection) / (predict.sum() + target.sum())
+    two_sum = predict.sum() + target.sum()
+
+    return 2. * intersection / two_sum if two_sum > 1e-6 else 0.
+
+    # return (2. * intersection) / (predict.sum() + target.sum())
 
 
 def dice_metric(predict, target, background=False):
@@ -38,18 +42,21 @@ def dice_metric(predict, target, background=False):
     for i in range(start, num_classes):
         total_dice = total_dice + dice_coefficient(predict[:, i], target[:, i])
 
-    mean_dice = total_dice / num_classes if background else total_dice / (num_classes - 1)
+    mean_dice = total_dice / \
+        num_classes if background else total_dice / (num_classes - 1)
 
     return mean_dice
 
 
 def ASD_metric(predict, target):
-    ASD = monai.metrics.compute_average_surface_distance(predict, target, include_background=False, symmetric=False)
+    ASD = monai.metrics.compute_average_surface_distance(
+        predict, target, include_background=False, symmetric=False)
     return torch.mean(ASD)
 
 
 def HD_metric(predict, target):
-    HD = monai.metrics.compute_hausdorff_distance(predict, target, include_background=False)
+    HD = monai.metrics.compute_hausdorff_distance(
+        predict, target, include_background=False)
     return torch.mean(HD)
 
 

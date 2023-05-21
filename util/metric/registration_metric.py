@@ -58,17 +58,18 @@ def folds_percent_metric(dvf):
 
 
 def SDLogJ_metric(dvf):
-    dvf = torch.clamp(dvf, min=1e-9, max=1e9)
-    dvf = torch.log(dvf)
-    return torch.std(dvf)
+    B = dvf.shape[0]
+    result = 0.
+    for i in range(B):
+        det = torch.from_numpy(jacobian_determinant(dvf[i].cpu().numpy()))
+        det = torch.clamp(det, min=1e-9, max=1e9)
+        det = torch.log(det)
+        result = result + torch.std(det)
+    return result / B
 
 
 def mse_metric(predict, target):
     return torch.mean((predict - target) ** 2)
-
-
-def nmse_metric(predict, target):
-    return torch.sum((predict - target) ** 2) / torch.sum(target ** 2)
 
 
 def ssim_metric(predict, target):
