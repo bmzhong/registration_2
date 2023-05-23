@@ -18,7 +18,7 @@ from util.loss.GradientLoss import GradientLoss
 from util.loss.BendingEnergyLoss import BendingEnergyLoss
 from util.metric.registration_metric import folds_count_metric, folds_percent_metric, mse_metric, jacobian_determinant, \
     ssim_metric
-from util.metric.segmentation_metric import dice_metric, ASD_metric, HD_metric
+from util.metric.segmentation_metric import dice_metric, ASD_metric, HD_metric, dice_metric2, ASD_metric2, HD_metric2
 from util.visual.tensorboard_visual import tensorboard_visual_deformation
 from util import loss
 from util.visual.visual_registration import mk_grid_img
@@ -35,7 +35,7 @@ def train_reg(config, basedir):
     """
     with open(config['TrainConfig']['data_path'], 'r') as f:
         dataset_config = json.load(f)
-    num_classes = dataset_config['region_number'] + 1
+    num_classes = dataset_config['region_number']
     # train_dataset = PairDataset(dataset_config, 'train_pair')
     # val_dataset = PairDataset(dataset_config, 'val_pair')
 
@@ -118,20 +118,16 @@ def train_reg(config, basedir):
             loss_dict['total_loss'].backward()
             optimizer.step()
             update_dict(train_losses_dict, loss_dict)
+            if label1 != [] and label2 != []:
+                warp_volume1 = STN_bilinear(volume1, dvf)
+                warp_label1 = STN_nearest(label1.float(), dvf)
 
-            # warp_volume1 = STN_bilinear(volume1, dvf)
-            # warp_label1 = STN_nearest(label1.float(), dvf)
-            #
-            # axis_order = (0, label1.dim() - 1) + tuple(range(1, label1.dim() - 1))
-            # warp_label1_one_hot = F.one_hot(warp_label1.squeeze(dim=1).long(), num_classes=num_classes).permute(
-            #     axis_order).contiguous()
-            # label2_one_hot = F.one_hot(label2.squeeze(dim=1).long(), num_classes=num_classes).permute(
-            #     axis_order).contiguous()
-            # metric_dict = compute_reg_metric(dvf.clone().detach(), warp_volume1.clone().detach(),
-            #                                  warp_label1_one_hot.clone().detach(),
-            #                                  volume2.clone().detach(), label2_one_hot.clone().detach())
-            #
-            # update_dict(train_metrics_dict, metric_dict)
+                metric_dict = compute_reg_metric(dvf.clone().detach(), warp_volume1.clone().detach(),
+                                                 warp_label1.clone().detach(),
+                                                 volume2.clone().detach(), label2.clone().detach(), num_classes)
+
+                update_dict(train_metrics_dict, metric_dict)
+
             step += 1
 
         mean_train_loss_dict = mean_dict(train_losses_dict)
@@ -176,15 +172,10 @@ def train_reg(config, basedir):
                     warp_volume1 = STN_bilinear(volume1, dvf)
                     warp_label1 = STN_nearest(label1.float(), dvf).type(torch.uint8)
 
-                    axis_order = (0, label1.dim() - 1) + tuple(range(1, label1.dim() - 1))
-                    warp_label1_one_hot = F.one_hot(warp_label1.squeeze(dim=1).long(), num_classes=num_classes).permute(
-                        axis_order).contiguous()
-                    label2_one_hot = F.one_hot(label2.squeeze(dim=1).long(), num_classes=num_classes).permute(
-                        axis_order).contiguous()
-
                     metric_dict = compute_reg_metric(dvf.clone().detach(), warp_volume1.clone().detach(),
-                                                     warp_label1_one_hot.clone().detach(),
-                                                     volume2.clone().detach(), label2_one_hot.clone().detach())
+                                                     warp_label1.clone().detach(),
+                                                     volume2.clone().detach(), label2.clone().detach(), num_classes)
+
                     update_dict(val_metrics_dict, metric_dict)
                     if val_count < 8:
                         grid_img = raw_grid_img.repeat(dvf.shape[0], 1, 1, 1, 1)
@@ -296,11 +287,11 @@ def get_loss_function(config):
     return loss_function_dict
 
 
-def compute_reg_metric(dvf, warp_volume1, warp_label1, volume2, label2):
+def compute_reg_metric(dvf, warp_volume1, warp_label1, volume2, label2, num_classes):
     metric_dict = dict()
-    metric_dict['dice'] = dice_metric(warp_label1, label2).item()
-    # metric_dict['ASD'] = ASD_metric(warp_label1, label2).item()
-    # metric_dict['HD'] = HD_metric(warp_label1, label2).item()
+    metric_dict['dice'] = dice_metric2(warp_label1, label2, num_classes).item()
+    # metric_dict['ASD'] = ASD_metric2(warp_label1, label2, num_classes).item()
+    # metric_dict['HD'] = HD_metric2(warp_label1, label2, num_classes).item()
     # metric_dict['SSIM'] = ssim_metric(warp_volume1, volume2)
     metric_dict['folds_percent'] = folds_percent_metric(dvf).item()
     # metric_dict['folds_count'] = folds_count_metric(dvf).item()

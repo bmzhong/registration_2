@@ -303,6 +303,10 @@ if __name__ == '__main__':
     # LPBA40_output_path = '../../datasets/json/7_192_LPBA40.json'
     # write_LPBA40_json(LPBA40_path, LPBA40_output_path)
 
+    # LPBA40_path = '../../datasets/hdf5/7_192_LPBA40.h5'
+    # LPBA40_output_path = '../../datasets/json/7_192_LPBA40.json'
+    # write_LPBA40_json(LPBA40_path, LPBA40_output_path)
+
     # Mindboggle101_path = '../../datasets/hdf5/45_192_IXI.h5'
     # Mindboggle101_output_path = '../../datasets/json/45_192_IXI.json'
     # write_json(Mindboggle101_path, Mindboggle101_output_path, train_size=0.7,
@@ -318,9 +322,9 @@ if __name__ == '__main__':
     # write_json(LPBA40_path, LPBA40_output_path,train_size=0.7,
     #            val_size=0.1, test_size=0.2, sampling_ratio=1.)
 
-    IXI_path = '../../datasets/hdf5/45_128_IXI.h5'
-    IXI_output_path = '../../datasets/json/45_128_IXI.json'
-    write_IXI_json(IXI_path, IXI_output_path)
+    # IXI_path = '../../datasets/hdf5/45_128_IXI.h5'
+    # IXI_output_path = '../../datasets/json/45_128_IXI.json'
+    # write_IXI_json(IXI_path, IXI_output_path)
 
     # soma_nuclei_4_path = '../../datasets/hdf5/soma_nuclei.h5'
     # soma_nuclei_4_output_path = '../../datasets/json/soma_nuclei.json'

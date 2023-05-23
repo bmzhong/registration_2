@@ -25,7 +25,7 @@ def dice_coefficient(predict, target):
     # return (2. * intersection) / (predict.sum() + target.sum())
 
 
-def dice_metric(predict, target, background=False):
+def dice_metric(predict, target):
     """
     predict: B, C, D, H, W
     target:  B, C, D, H, W
@@ -34,30 +34,102 @@ def dice_metric(predict, target, background=False):
     assert predict.shape == target.shape, "predict and target must have the same shape"
 
     num_classes = target.shape[1]
-
     total_dice = 0.
+    count = 0
 
-    start = 0 if background else 1
+    for i in range(1, num_classes):
+        if torch.any(target[:, i]):
+            count = count + 1
+            total_dice = total_dice + dice_coefficient(predict[:, i], target[:, i])
 
-    for i in range(start, num_classes):
-        total_dice = total_dice + dice_coefficient(predict[:, i], target[:, i])
+    return total_dice / count if count > 0 else 0.
 
-    mean_dice = total_dice / \
-        num_classes if background else total_dice / (num_classes - 1)
 
-    return mean_dice
+def dice_metric2(predict, target, num_classes):
+    """
+    predict: B, 1, D, H, W
+    target:  B, 1, D, H, W
+    """
+    total_dice = 0.
+    count = 0
+    for i in range(1, num_classes + 1):
+        predict_i = (predict == i).float()
+        target_i = (target == i).float()
+        if torch.any(target_i):
+            count = count + 1
+            total_dice = total_dice + dice_coefficient(predict_i, target_i)
+    return total_dice / count if count > 0 else 0.
 
 
 def ASD_metric(predict, target):
-    ASD = monai.metrics.compute_average_surface_distance(
-        predict, target, include_background=False, symmetric=False)
-    return torch.mean(ASD)
+    """
+    predict: B, C, D, H, W
+    target:  B, C, D, H, W
+    """
+    num_classes = target.shape[1]
+    total_ASD = 0.
+    count = 0
+    for i in range(1, num_classes):
+        predict_i = predict[:, i].unsqueeze(dim=1)
+        target_i = target[:, i].unsqueeze(dim=1)
+        if torch.any(predict_i) and torch.any(target_i):
+            count = count + 1
+            ASD_i = monai.metrics.compute_average_surface_distance(predict_i, target_i, include_background=True)
+            total_ASD = total_ASD + torch.mean(ASD_i)
+
+    return total_ASD / count if count > 0 else torch.inf
+
+
+def ASD_metric2(predict, target, num_classes):
+    """
+    predict: B, 1, D, H, W
+    target:  B, 1, D, H, W
+    """
+    total_ASD = 0.
+    count = 0
+    for i in range(1, num_classes + 1):
+        predict_i = (predict == i).float()
+        target_i = (target == i).float()
+        if torch.any(predict_i) and torch.any(target_i):
+            count = count + 1
+            ASD_i = monai.metrics.compute_average_surface_distance(predict_i, target_i, include_background=True)
+            total_ASD = total_ASD + torch.mean(ASD_i)
+    return total_ASD / count if count > 0 else torch.inf
 
 
 def HD_metric(predict, target):
-    HD = monai.metrics.compute_hausdorff_distance(
-        predict, target, include_background=False)
-    return torch.mean(HD)
+    """
+    predict: B, C, D, H, W
+    target:  B, C, D, H, W
+    """
+    num_classes = target.shape[1]
+    total_HD = 0.
+    count = 0
+    for i in range(1, num_classes):
+        predict_i = predict[:, i].unsqueeze(dim=1)
+        target_i = target[:, i].unsqueeze(dim=1)
+        if torch.any(predict_i) and torch.any(target_i):
+            count = count + 1
+            HD_i = monai.metrics.compute_hausdorff_distance(predict_i, target_i, include_background=True)
+            total_HD = total_HD + torch.mean(HD_i)
+    return total_HD / count if count > 0 else torch.inf
+
+
+def HD_metric2(predict, target, num_classes):
+    """
+    predict: B, 1, D, H, W
+    target:  B, 1, D, H, W
+    """
+    total_HD = 0.
+    count = 0
+    for i in range(1, num_classes + 1):
+        predict_i = (predict == i).float()
+        target_i = (target == i).float()
+        if torch.any(predict_i) and torch.any(target_i):
+            count = count + 1
+            HD_i = monai.metrics.compute_hausdorff_distance(predict_i, target_i, include_background=True)
+            total_HD = total_HD + torch.mean(HD_i)
+    return total_HD / count if count > 0 else torch.inf
 
 
 if __name__ == '__main__':

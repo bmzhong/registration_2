@@ -12,8 +12,8 @@ def pkload(fname):
         return pickle.load(f)
 
 
-# source_path = r"G:\biomdeical\registration\public_data\OASIS\OASIS_L2R_2021_task03\OASIS_L2R_2021_task03\All\*.pkl"
-# output_path = r"G:\biomdeical\registration\public_data\OASIS\OASIS_L2R_2021_task03\OASIS_L2R_2021_task03\AII_nii"
+# source_path = r"G:\biomdeical\registration\public_data\IXI\IXI_data\IXI_data\**\*.pkl"
+# output_path = r"G:\biomdeical\registration\public_data\IXI\IXI_data\IXI_data_nii\subject"
 # paths = glob.glob(source_path, recursive=True)
 # labels = []
 # for path in tqdm(paths):

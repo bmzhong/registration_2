@@ -15,9 +15,9 @@ TrainConfig:
 #  writer_board_interval: 10
 
 TestConfig:
-  checkpoint: ""
+  checkpoint: "output/reg/debug/debug1/checkpoint/best_epoch.pth"
   data_path: "datasets/json/LPBA40_test.json"
-  save_image: True
+  save_image: False
   gpu: "0"
 
 ModelConfig:

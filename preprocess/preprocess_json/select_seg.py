@@ -26,7 +26,6 @@ def select_seg(M_list, dataset_config, output_path):
             seg[dataset_config['atlas']] = False
         seg_true_list = np.random.choice(train_data_names, size=M, replace=False).tolist()
         if M > 1 and dataset_config.get('atlas', '') != '' and dataset_config['atlas'] not in seg_true_list:
-            seg_true_list.pop()
             seg_true_list.append(dataset_config['atlas'])
         print(seg_true_list)
         seg_true_dict = {name: True for name in seg_true_list}
@@ -40,13 +39,13 @@ if __name__ == '__main__':
     random.seed(0)
     np.random.seed(0)
 
-    # data_path = '../../datasets/json/45_128_IXI_2.json'
-    # with open(data_path, 'r') as f:
-    #     dataset_config = json.load(f)
-    # train_size = dataset_config['train_size']
-    # M_list = [0, 1, 5, int(train_size * 0.5), int(train_size * 1.0)]
-    # output_path = data_path
-    # select_seg(M_list=M_list, dataset_config=dataset_config, output_path=output_path)
+    data_path = '../../datasets/json/LPBA40_test.json'
+    with open(data_path, 'r') as f:
+        dataset_config = json.load(f)
+    train_size = dataset_config['train_size']
+    M_list = [0, 1, 5, int(train_size * 0.5), int(train_size * 1.0)]
+    output_path = data_path
+    select_seg(M_list=M_list, dataset_config=dataset_config, output_path=output_path)
 
     # data_path = '../../datasets/json/5_192_Mindboggle101.json'
     # with open(data_path, 'r') as f:
@@ -64,13 +63,13 @@ if __name__ == '__main__':
     # output_path = data_path
     # select_seg(M_list=M_list, dataset_config=dataset_config, output_path=output_path)
 
-    data_path = '../../datasets/json/45_128_IXI.json'
-    with open(data_path, 'r') as f:
-        dataset_config = json.load(f)
-    train_size = dataset_config['train_size']
-    M_list = [0, 1, 5, int(train_size * 0.5), int(train_size * 1.0)]
-    output_path = data_path
-    select_seg(M_list=M_list, dataset_config=dataset_config, output_path=output_path)
+    # data_path = '../../datasets/json/45_128_IXI.json'
+    # with open(data_path, 'r') as f:
+    #     dataset_config = json.load(f)
+    # train_size = dataset_config['train_size']
+    # M_list = [0, 1, 5, int(train_size * 0.5), int(train_size * 1.0)]
+    # output_path = data_path
+    # select_seg(M_list=M_list, dataset_config=dataset_config, output_path=output_path)
 
     # data_path = '../../datasets/json/35_224_OASIS.json'
     # with open(data_path, 'r') as f:

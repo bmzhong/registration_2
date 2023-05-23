@@ -13,7 +13,7 @@ import json
 
 from util.metric.registration_metric import jacobian_determinant, ssim_metric, folds_percent_metric, SDLogJ_metric, \
     mse_metric
-from util.metric.segmentation_metric import dice_metric, ASD_metric, HD_metric
+from util.metric.segmentation_metric import dice_metric, ASD_metric, HD_metric, dice_metric2, ASD_metric2, HD_metric2
 from util.util import update_dict, mean_dict, std_dict
 from util.visual.image_util import write_image, save_image_figure, save_deformation_figure, save_det_figure, \
     save_dvf_figure, save_RGB_dvf_figure, save_RGB_deformation_2_figure, save_warp_grid_figure
@@ -29,12 +29,13 @@ def test_reg(config, basedir, checkpoint=None, model_config=None):
 
     csv_writer.writerow([str(time.asctime())])
 
-    header_names = ['dice', 'ASD', 'HD', 'SSIM', 'folds_percent', 'SDLogJ', 'MSE']
+    # header_names = ['dice', 'ASD', 'HD', 'SSIM', 'folds_percent', 'SDLogJ', 'MSE']
+    header_names = ['dice', 'dice2', 'ASD', 'ASD2', 'HD', 'HD2', 'SSIM', 'folds_percent', 'SDLogJ', 'MSE']
     csv_writer.writerow(["moving_fixed"] + header_names)
 
     with open(config['TestConfig']['data_path'], 'r') as f:
         dataset_config = json.load(f)
-    num_classes = dataset_config['region_number'] + 1
+    num_classes = dataset_config['region_number']+1
     if dataset_config['registration_type'] == 1 or dataset_config['registration_type'] == 2:
         atlas = dataset_config['atlas']
     else:
@@ -90,7 +91,8 @@ def test_reg(config, basedir, checkpoint=None, model_config=None):
                 axis_order).contiguous()
             metric_dict = compute_reg_metric(dvf.clone().detach(), warp_volume1.clone().detach(),
                                              warp_label1_one_hot.clone().detach(),
-                                             volume2.clone().detach(), label2_one_hot.clone().detach())
+                                             volume2.clone().detach(), label2_one_hot.clone().detach(),
+                                             warp_label1, label2, dataset_config['region_number'])
             update_dict(test_metrics_dict, metric_dict)
             grid_img = raw_grid_img.repeat(dvf.shape[0], 1, 1, 1, 1)
             warp_grid = STN_bilinear(grid_img.float(), dvf)
@@ -141,11 +143,18 @@ def test_reg(config, basedir, checkpoint=None, model_config=None):
     csv_file.close()
 
 
-def compute_reg_metric(dvf, warp_volume1, warp_label1, volume2, label2):
+def compute_reg_metric(dvf, warp_volume1, warp_label1_one_hot, volume2, label2_one_hot, warp_label1, label2,
+                       num_classes):
     metric_dict = dict()
-    metric_dict['dice'] = dice_metric(warp_label1, label2).item()
-    metric_dict['ASD'] = ASD_metric(warp_label1, label2).item()
-    metric_dict['HD'] = HD_metric(warp_label1, label2).item()
+    metric_dict['dice'] = dice_metric(warp_label1_one_hot, label2_one_hot).item()
+    metric_dict['dice2'] = dice_metric2(warp_label1, label2, num_classes).item()
+
+    metric_dict['ASD'] = ASD_metric(warp_label1_one_hot, label2_one_hot).item()
+    metric_dict['ASD2'] = ASD_metric2(warp_label1, label2, num_classes).item()
+
+    metric_dict['HD'] = HD_metric(warp_label1_one_hot, label2_one_hot).item()
+    metric_dict['HD2'] = HD_metric2(warp_label1, label2, num_classes).item()
+
     metric_dict['SSIM'] = ssim_metric(warp_volume1, volume2)
     metric_dict['folds_percent'] = folds_percent_metric(dvf).item()
     metric_dict['SDLogJ'] = SDLogJ_metric(dvf).item()

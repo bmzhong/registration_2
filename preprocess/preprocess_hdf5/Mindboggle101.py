@@ -102,12 +102,14 @@ def write_Mindboggle101(image_size, source_path, output_path, scale_factor):
 
 
 if __name__ == '__main__':
-    source_path = r'G:\biomdeical\registration\public_data\MindBoggle101\MindBoggle101_from_official_webset' \
-                  r'\Mindboggle101_individuals\Mindboggle101_volumes\merge'
-    output_path = '../../datasets/hdf5/5_192_Mindboggle101.h5'
-    image_size = [160, 192, 160]
-    scale_factor = 1.
-    write_Mindboggle101(image_size, source_path, output_path, scale_factor)
+    a=get_Mindboggle101_label_map()
+    print(len(a))
+    # source_path = r'G:\biomdeical\registration\public_data\MindBoggle101\MindBoggle101_from_official_webset' \
+    #               r'\Mindboggle101_individuals\Mindboggle101_volumes\merge'
+    # output_path = '../../datasets/hdf5/5_192_Mindboggle101.h5'
+    # image_size = [160, 192, 160]
+    # scale_factor = 1.
+    # write_Mindboggle101(image_size, source_path, output_path, scale_factor)
 #     hdf5_path = '../../datasets/hdf5/Mindboggle101.h5'
 #     output_dir = r'G:\biomdeical\registration\data\datasets'
 #     extract_hdf5(hdf5_path, output_dir)
