@@ -16,12 +16,14 @@ TrainConfig:
 
 TestConfig:
   checkpoint: "output/reg/debug/debug1/checkpoint/best_epoch.pth"
+#  checkpoint: ""
   data_path: "datasets/json/LPBA40_test.json"
   save_image: False
   gpu: "0"
 
 ModelConfig:
   type: "VoxelMorph"
+  mask_type: ""
 
 
 

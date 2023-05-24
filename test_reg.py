@@ -29,13 +29,12 @@ def test_reg(config, basedir, checkpoint=None, model_config=None):
 
     csv_writer.writerow([str(time.asctime())])
 
-    # header_names = ['dice', 'ASD', 'HD', 'SSIM', 'folds_percent', 'SDLogJ', 'MSE']
-    header_names = ['dice', 'dice2', 'ASD', 'ASD2', 'HD', 'HD2', 'SSIM', 'folds_percent', 'SDLogJ', 'MSE']
+    header_names = ['dice', 'ASD', 'HD', 'SSIM', 'folds_percent', 'SDLogJ', 'MSE']
     csv_writer.writerow(["moving_fixed"] + header_names)
 
     with open(config['TestConfig']['data_path'], 'r') as f:
         dataset_config = json.load(f)
-    num_classes = dataset_config['region_number']+1
+    num_classes = dataset_config['region_number']
     if dataset_config['registration_type'] == 1 or dataset_config['registration_type'] == 2:
         atlas = dataset_config['atlas']
     else:
@@ -84,15 +83,8 @@ def test_reg(config, basedir, checkpoint=None, model_config=None):
             warp_volume1 = STN_bilinear(volume1, dvf)
             warp_label1 = STN_nearest(label1.float(), dvf).type(torch.uint8)
 
-            axis_order = (0, label1.dim() - 1) + tuple(range(1, label1.dim() - 1))
-            warp_label1_one_hot = F.one_hot(warp_label1.squeeze(dim=1).long(), num_classes=num_classes).permute(
-                axis_order).contiguous()
-            label2_one_hot = F.one_hot(label2.squeeze(dim=1).long(), num_classes=num_classes).permute(
-                axis_order).contiguous()
-            metric_dict = compute_reg_metric(dvf.clone().detach(), warp_volume1.clone().detach(),
-                                             warp_label1_one_hot.clone().detach(),
-                                             volume2.clone().detach(), label2_one_hot.clone().detach(),
-                                             warp_label1, label2, dataset_config['region_number'])
+            metric_dict = compute_reg_metric(dvf, warp_volume1, warp_label1, volume2, label2,
+                                             dataset_config['region_number'])
             update_dict(test_metrics_dict, metric_dict)
             grid_img = raw_grid_img.repeat(dvf.shape[0], 1, 1, 1, 1)
             warp_grid = STN_bilinear(grid_img.float(), dvf)
@@ -143,18 +135,11 @@ def test_reg(config, basedir, checkpoint=None, model_config=None):
     csv_file.close()
 
 
-def compute_reg_metric(dvf, warp_volume1, warp_label1_one_hot, volume2, label2_one_hot, warp_label1, label2,
-                       num_classes):
+def compute_reg_metric(dvf, warp_volume1, warp_label1, volume2, label2, num_classes):
     metric_dict = dict()
-    metric_dict['dice'] = dice_metric(warp_label1_one_hot, label2_one_hot).item()
-    metric_dict['dice2'] = dice_metric2(warp_label1, label2, num_classes).item()
-
-    metric_dict['ASD'] = ASD_metric(warp_label1_one_hot, label2_one_hot).item()
-    metric_dict['ASD2'] = ASD_metric2(warp_label1, label2, num_classes).item()
-
-    metric_dict['HD'] = HD_metric(warp_label1_one_hot, label2_one_hot).item()
-    metric_dict['HD2'] = HD_metric2(warp_label1, label2, num_classes).item()
-
+    metric_dict['dice'] = dice_metric2(warp_label1, label2, num_classes).item()
+    metric_dict['ASD'] = ASD_metric2(warp_label1, label2, num_classes).item()
+    metric_dict['HD'] = HD_metric2(warp_label1, label2, num_classes).item()
     metric_dict['SSIM'] = ssim_metric(warp_volume1, volume2)
     metric_dict['folds_percent'] = folds_percent_metric(dvf).item()
     metric_dict['SDLogJ'] = SDLogJ_metric(dvf).item()

@@ -1,5 +1,7 @@
 import json
 from tqdm import tqdm
+
+from model.registration.mask_util import process_mask
 from model.registration.model_util import get_reg_model
 import torch
 import os
@@ -92,6 +94,8 @@ def train_reg(config, basedir):
     step = 0
     best_val_dice_metric = -1. * float('inf')
 
+    mask_type = config['ModelConfig']['mask_type']
+    print(f"mask_type {mask_type}")
     for epoch in range(1, config["TrainConfig"]["epoch"] + 1):
         """
          ------------------------------------------------
@@ -107,6 +111,9 @@ def train_reg(config, basedir):
 
             volume2 = volume2.to(device)
             label2 = label2.to(device) if label2 != [] else label2
+            if mask_type != '':
+                volume1, volume2, label1, label2 = process_mask(volume1, volume2, label1, label2, num_classes,
+                                                                mask_type=mask_type, probability=0.5)
 
             optimizer.zero_grad()
 
@@ -118,15 +125,15 @@ def train_reg(config, basedir):
             loss_dict['total_loss'].backward()
             optimizer.step()
             update_dict(train_losses_dict, loss_dict)
-            if label1 != [] and label2 != []:
-                warp_volume1 = STN_bilinear(volume1, dvf)
-                warp_label1 = STN_nearest(label1.float(), dvf)
-
-                metric_dict = compute_reg_metric(dvf.clone().detach(), warp_volume1.clone().detach(),
-                                                 warp_label1.clone().detach(),
-                                                 volume2.clone().detach(), label2.clone().detach(), num_classes)
-
-                update_dict(train_metrics_dict, metric_dict)
+            # if label1 != [] and label2 != []:
+            #     warp_volume1 = STN_bilinear(volume1, dvf)
+            #     warp_label1 = STN_nearest(label1.float(), dvf)
+            #
+            #     metric_dict = compute_reg_metric(dvf.clone().detach(), warp_volume1.clone().detach(),
+            #                                      warp_label1.clone().detach(),
+            #                                      volume2.clone().detach(), label2.clone().detach(), num_classes)
+            #
+            #     update_dict(train_metrics_dict, metric_dict)
 
             step += 1
 
@@ -246,11 +253,19 @@ def compute_reg_loss(config, dvf, loss_function_dict, STN_bilinear, volume1, lab
     if config['LossConfig']['segmentation_loss']['use']:
         loss_dict['segmentation_loss'] = 0.
         if label1 != [] and label2 != []:
-            num_classes = torch.max(label1)
-            for i in range(1, num_classes):
-                loss_dict['segmentation_loss'] = loss_dict['segmentation_loss'] + loss_function_dict[
-                    'segmentation_loss'](
-                    STN_bilinear((label1 == i).float(), dvf), (label2 == i).float())
+            num_classes = torch.max(label1).item()
+            count = 0
+            for i in range(1, num_classes + 1):
+                label1_i = (label1 == i).float()
+                label2_i = (label2 == i).float()
+                if torch.any(label1_i) and torch.any(label2_i):
+                    loss_dict['segmentation_loss'] = loss_dict['segmentation_loss'] + loss_function_dict[
+                        'segmentation_loss'](STN_bilinear(label1_i, dvf), label2_i)
+                    count = count + 1
+                    # loss_dict['segmentation_loss'] = loss_dict['segmentation_loss'] + loss_function_dict[
+                    #     'segmentation_loss'](
+                    #     STN_bilinear((label1 == i).float(), dvf), (label2 == i).float())
+            loss_dict['segmentation_loss'] = loss_dict['segmentation_loss']
 
     if config['LossConfig']['gradient_loss']['use']:
         loss_dict['gradient_loss'] = loss_function_dict['gradient_loss'](dvf)

@@ -24,6 +24,7 @@ def get_args():
     parser.add_argument("--save_image", action='store_true', default=None)
 
     parser.add_argument("--model", type=str, default=None)
+    parser.add_argument("--mask_type", type=str, default=None)
 
     parser.add_argument("--lr", type=float, default=None)
     parser.add_argument("--step_size", type=int, default=None)
@@ -58,11 +59,11 @@ if __name__ == '__main__':
 
     if args.train_gpu is not None:
         config['TrainConfig']['gpu'] = args.train_gpu
-    
+
     if args.checkpoint is not None:
         config['TrainConfig']['checkpoint'] = args.checkpoint
         config['OptimConfig']['load_checkpoint'] = True
-        
+
     if args.start_new_model is not None:
         if args.start_new_model == 'False':
             config['TrainConfig']['start_new_model'] = False
@@ -92,6 +93,9 @@ if __name__ == '__main__':
 
     if args.model is not None:
         config['ModelConfig']['type'] = args.model
+
+    if args.mask_type is not None:
+        config['ModelConfig']['mask_type'] = args.mask_type
 
     if args.lr is not None:
         config['OptimConfig']['optimizer']['params']['lr'] = args.lr

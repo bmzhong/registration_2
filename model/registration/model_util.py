@@ -6,24 +6,7 @@ from model.registration.voxelmorpher import VoxelMorph
 
 
 def get_reg_model(model_config, checkpoint=None, image_size=(128, 128, 128)):
-    if model_config['type'] == 'vxm':
-        reg_net = create_vxm_model(image_size)
-
-    elif model_config['type'] == 'vxm_diff':
-        reg_net = create_vxm_diff_model(image_size)
-
-    elif model_config['type'] == 'vxm_prob':
-        reg_net = create_vxm_prob_model(image_size)
-
-    elif model_config['type'] == 'vxm_diff_prob':
-        reg_net = create_vxm_diff_prob_model(image_size)
-
-    elif model_config['type'] == 'VoxelMorpher_0':
-        nf_enc = [16, 32, 32, 32]
-        nf_dec = [32, 32, 32, 32, 8, 8]
-        reg_net = VoxelMorpher(3, nf_enc, nf_dec)
-
-    elif model_config['type'] == 'VoxelMorph':
+    if  model_config['type'] == 'VoxelMorph':
         reg_net = create_VoxelMorph(image_size)
 
     elif model_config['type'] == 'VoxelMorph_diff':
