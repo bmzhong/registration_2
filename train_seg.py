@@ -34,7 +34,7 @@ def train_seg(config, basedir):
     """
     with open(config['TrainConfig']['data_path'], 'r') as f:
         dataset_config = json.load(f)
-    num_classes = dataset_config['region_number'] + 1
+    num_classes = dataset_config['region_number']
     seg = dataset_config[config['TrainConfig']['seg']] if len(config['TrainConfig']['seg']) > 0 else dict()
     data_names = [key for key, value in seg.items() if value]
     train_dataset = SingleDataset(dataset_config, 'train', data_names=data_names)
@@ -96,7 +96,7 @@ def train_seg(config, basedir):
             predict_softmax = F.softmax(predict, dim=1)
 
             axis_order = (0, label.dim() - 1) + tuple(range(1, label.dim() - 1))
-            label_one_hot = F.one_hot(label.squeeze(dim=1).long(), num_classes=num_classes).permute(
+            label_one_hot = F.one_hot(label.squeeze(dim=1).long(), num_classes=num_classes + 1).permute(
                 axis_order).contiguous()
 
             loss = loss_function(predict_softmax, label_one_hot.float())
@@ -107,7 +107,7 @@ def train_seg(config, basedir):
             train_losses.append(loss.item())
 
             predict_one_hot = F.one_hot(torch.argmax(predict_softmax, dim=1).long(),
-                                        num_classes=num_classes).permute(axis_order).contiguous()
+                                        num_classes=num_classes + 1).permute(axis_order).contiguous()
 
             metric_dict = compute_seg_metric1(predict_one_hot.clone().detach(), label_one_hot.clone().detach())
 
@@ -145,13 +145,14 @@ def train_seg(config, basedir):
                     predict_softmax = F.softmax(predict, dim=1)
 
                     axis_order = (0, label.dim() - 1) + tuple(range(1, label.dim() - 1))
-                    label_one_hot = F.one_hot(label.squeeze(dim=1).long(), num_classes=num_classes).permute(
+                    label_one_hot = F.one_hot(label.squeeze(dim=1).long(), num_classes=num_classes + 1).permute(
                         axis_order).contiguous()
 
                     loss = loss_function(predict_softmax, label_one_hot.float())
                     val_losses.append(loss.item())
 
-                    predict_one_hot = F.one_hot(torch.argmax(predict, dim=1).long(), num_classes=num_classes).permute(
+                    predict_one_hot = F.one_hot(torch.argmax(predict, dim=1).long(),
+                                                num_classes=num_classes + 1).permute(
                         axis_order).contiguous()
 
                     metric_dict = compute_seg_metric(predict_one_hot.clone().detach(), label_one_hot.clone().detach())

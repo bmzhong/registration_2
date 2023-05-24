@@ -27,7 +27,7 @@ def test_seg(config, basedir, checkpoint=None, model_config=None):
     with open(config['TestConfig']['data_path'], 'r') as f:
         dataset_config = json.load(f)
 
-    num_classes = dataset_config['region_number'] + 1
+    num_classes = dataset_config['region_number']
     test_dataset = SingleDataset(dataset_config, 'test')
 
     print(f'test dataset size: {len(test_dataset)}')
@@ -67,10 +67,10 @@ def test_seg(config, basedir, checkpoint=None, model_config=None):
             predict_softmax = F.softmax(predict, dim=1)
 
             axis_order = (0, label.dim() - 1) + tuple(range(1, label.dim() - 1))
-            label_one_hot = F.one_hot(label.squeeze(dim=1).long(), num_classes=num_classes).permute(
+            label_one_hot = F.one_hot(label.squeeze(dim=1).long(), num_classes=num_classes + 1).permute(
                 axis_order).contiguous()
 
-            predict_one_hot = F.one_hot(torch.argmax(predict, dim=1).long(), num_classes=num_classes).permute(
+            predict_one_hot = F.one_hot(torch.argmax(predict, dim=1).long(), num_classes=num_classes + 1).permute(
                 axis_order).contiguous()
 
             metric_dict = compute_seg_metric(predict_one_hot, label_one_hot)
