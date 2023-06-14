@@ -6,9 +6,9 @@ import warnings
 from util.util import set_random_seed, get_basedir, Logger
 from shutil import copyfile
 import yaml
-from train_seg_reg import train_seg_reg
-from test_reg import test_reg
-from test_seg import test_seg
+from python_script.train_seg_reg import train_seg_reg
+from python_script.test_reg import test_reg
+from python_script.test_seg import test_seg
 
 warnings.filterwarnings("ignore")
 
@@ -51,13 +51,13 @@ if __name__ == '__main__':
         os.environ["CUDA_VISIBLE_DEVICES"] = config["TrainConfig"]["gpu"]
         train_seg_reg(config, basedir)
 
-        reg_checkpoint = os.path.join(basedir, "checkpoint", 'reg_best_epoch.pth')
+        reg_checkpoint = os.path.join(basedir, "checkpoint", 'reg_last_epoch.pth')
         reg_test_basedir = get_basedir(os.path.join(basedir, 'reg_test'), config["TrainConfig"]["start_new_model"])
         config["TestConfig"]["gpu"] = config["TrainConfig"]["gpu"]
 
         test_reg(config, reg_test_basedir, checkpoint=reg_checkpoint, model_config=config['ModelConfig']['Reg'])
 
-        seg_checkpoint = os.path.join(basedir, "checkpoint", 'seg_best_epoch.pth')
+        seg_checkpoint = os.path.join(basedir, "checkpoint", 'seg_last_epoch.pth')
         seg_test_basedir = get_basedir(os.path.join(basedir, 'seg_test'), config["TrainConfig"]["start_new_model"])
         config["TestConfig"]["data_path"] = config["TrainConfig"]["data_path"]
         test_seg(config, seg_test_basedir, checkpoint=seg_checkpoint, model_config=config['ModelConfig']['Seg'])

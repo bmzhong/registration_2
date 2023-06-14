@@ -6,16 +6,19 @@ TrainConfig:
   gpu: "0"
   data_path: "datasets/json/LPBA40_test.json"
   epoch: 50
-  batchsize: 1
+  use_mean_teacher: True
+  labeld_bs: 4
+
+  batchsize: 8
   checkpoint: ""
   val_interval: 1
-  seg: "seg_14"
-  inv_label_loss_start_epoch: 0
+  seg: "seg_28"
+
 
 #  writer_board_interval: 10
 
 TestConfig:
-  checkpoint: ""
+  checkpoint: "output/reg/debug/debug1/checkpoint/best_epoch.pth"
 #  checkpoint: ""
   data_path: "datasets/json/LPBA40_test.json"
   save_image: False
@@ -53,11 +56,6 @@ LossConfig:
     type: 'DiceLoss2'
     weight: 1
 
-  inv_label_loss:
-    use: True
-    type: 'DiceLoss2'
-    weight: 1
-
   gradient_loss:
     use: True
     type: 'GradientLoss'
@@ -67,5 +65,6 @@ LossConfig:
     use: False
     type: 'BendingEnergyLoss'
     weight: 1
+
 
 

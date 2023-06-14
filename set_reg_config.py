@@ -11,6 +11,7 @@ def get_args():
     parser.add_argument("--output_path", type=str)
     parser.add_argument("--start_new_model", type=str)
     parser.add_argument("--checkpoint", type=str)
+    parser.add_argument("--inv_label_loss_start_epoch", type=int)
 
     parser.add_argument("--train_data_path", type=str, default=None)
     parser.add_argument("--train_gpu", type=str, default=None)
@@ -18,6 +19,10 @@ def get_args():
     parser.add_argument("--batchsize", type=int, default=None)
     parser.add_argument("--val_interval", type=int, default=None)
     parser.add_argument("--seg", type=str, default=None)
+
+    parser.add_argument("--use_mean_teacher", type=str, default=None)
+    parser.add_argument("--consistency", type=float, default=None)
+    parser.add_argument("--consistency_loss_type", type=int, default=None)
 
     parser.add_argument("--test_data_path", type=str, default=None)
     parser.add_argument("--test_gpu", type=str, default=None)
@@ -29,18 +34,23 @@ def get_args():
     parser.add_argument("--lr", type=float, default=None)
     parser.add_argument("--step_size", type=int, default=None)
 
-    parser.add_argument("--similarity_loss_use", type=bool, default=None)
+    parser.add_argument("--similarity_loss_use", type=str, default=None)
     parser.add_argument("--similarity_loss_type", type=str, default=None)
     parser.add_argument("--similarity_loss_weight", type=float, default=None)
 
-    parser.add_argument("--segmentation_loss_use",
-                        action='store_true', default=None)
+    parser.add_argument("--segmentation_loss_use", type=str, default=None)
     parser.add_argument("--segmentation_loss_type", type=str, default=None)
     parser.add_argument("--segmentation_loss_weight", type=float, default=None)
 
-    parser.add_argument("--gradient_loss_use",
-                        action='store_true', default=None)
+    parser.add_argument("--inv_label_loss_use", type=str, default=None)
+    parser.add_argument("--inv_label_loss_type", type=str, default=None)
+    parser.add_argument("--inv_label_loss_weight", type=float, default=None)
+
+    parser.add_argument("--gradient_loss_use", type=str, default=None)
     parser.add_argument("--gradient_loss_weight", type=float, default=None)
+
+    parser.add_argument("--bending_energy_loss_use", type=str, default=None)
+    parser.add_argument("--bending_energy_loss_weight", type=float, default=None)
 
     args = parser.parse_args()
 
@@ -63,6 +73,10 @@ if __name__ == '__main__':
     if args.checkpoint is not None:
         config['TrainConfig']['checkpoint'] = args.checkpoint
         config['OptimConfig']['load_checkpoint'] = True
+        config['TrainConfig']['start_new_model'] = False
+
+    if args.inv_label_loss_start_epoch is not None:
+        config['TrainConfig']['inv_label_loss_start_epoch'] = args.inv_label_loss_start_epoch
 
     if args.start_new_model is not None:
         if args.start_new_model == 'False':
@@ -81,6 +95,20 @@ if __name__ == '__main__':
 
     if args.seg is not None:
         config['TrainConfig']['seg'] = args.seg
+
+    if args.use_mean_teacher is not None:
+        if args.use_mean_teacher == 'False':
+            config['TrainConfig']['use_mean_teacher'] = False
+        elif args.use_mean_teacher == 'True':
+            config['TrainConfig']['use_mean_teacher'] = True
+        else:
+            raise Exception()
+
+    if args.consistency is not None:
+        config['TrainConfig']['consistency'] = args.consistency
+
+    if args.consistency_loss_type is not None:
+        config['TrainConfig']['consistency_loss_type'] = args.consistency_loss_type
 
     if args.test_data_path is not None:
         config['TestConfig']['data_path'] = args.test_data_path
@@ -104,7 +132,12 @@ if __name__ == '__main__':
         config['OptimConfig']['lr_scheduler']['params']['step_size'] = args.step_size
 
     if args.similarity_loss_use is not None:
-        config['LossConfig']['similarity_loss']['use'] = args.similarity_loss_use
+        if args.similarity_loss_use == "True":
+            config['LossConfig']['similarity_loss']['use'] = True
+        elif args.similarity_loss_use == "False":
+            config['LossConfig']['similarity_loss']['use'] = False
+        else:
+            raise Exception()
 
     if args.similarity_loss_type is not None:
         config['LossConfig']['similarity_loss']['type'] = args.similarity_loss_type
@@ -113,7 +146,12 @@ if __name__ == '__main__':
         config['LossConfig']['similarity_loss']['weight'] = args.similarity_loss_weight
 
     if args.segmentation_loss_use is not None:
-        config['LossConfig']['segmentation_loss']['use'] = args.segmentation_loss_use
+        if args.segmentation_loss_use == "True":
+            config['LossConfig']['segmentation_loss']['use'] = True
+        elif args.segmentation_loss_use == "False":
+            config['LossConfig']['segmentation_loss']['use'] = False
+        else:
+            raise Exception()
 
     if args.segmentation_loss_type is not None:
         config['LossConfig']['segmentation_loss']['type'] = args.segmentation_loss_type
@@ -121,11 +159,32 @@ if __name__ == '__main__':
     if args.segmentation_loss_weight is not None:
         config['LossConfig']['segmentation_loss']['weight'] = args.segmentation_loss_weight
 
-    if args.gradient_loss_use is True:
-        config['LossConfig']['gradient_loss']['use'] = args.gradient_loss_use
+    if args.inv_label_loss_type is not None:
+        config['LossConfig']['inv_label_loss']['type'] = args.inv_label_loss_type
+
+    if args.inv_label_loss_weight is not None:
+        config['LossConfig']['inv_label_loss']['weight'] = args.inv_label_loss_weight
+
+    if args.gradient_loss_use is not None:
+        if args.gradient_loss_use == "True":
+            config['LossConfig']['gradient_loss']['use'] = True
+        elif args.gradient_loss_use == "False":
+            config['LossConfig']['gradient_loss']['use'] = False
+        else:
+            raise Exception()
 
     if args.gradient_loss_weight is not None:
         config['LossConfig']['gradient_loss']['weight'] = args.gradient_loss_weight
+
+    if args.bending_energy_loss_use is not None:
+        if args.bending_energy_loss_use == "True":
+            config['LossConfig']['bending_energy_loss']['use'] = True
+        elif args.bending_energy_loss_use == "False":
+            config['LossConfig']['bending_energy_loss']['use'] = False
+        else:
+            raise Exception()
+    if args.bending_energy_loss_weight is not None:
+        config['LossConfig']['bending_energy_loss']['weight'] = args.bending_energy_loss_weight
 
     basedir = os.path.dirname(args.output_path)
     os.makedirs(basedir, exist_ok=True)

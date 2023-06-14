@@ -80,8 +80,8 @@ def train_seg_x(config, basedir):
     loss_function = DiceLoss(background=True)
     step = 0
     best_val_metric = -1. * float('inf')
-
-    for epoch in range(1, config["TrainConfig"]["epoch"] + 1):
+    start_epoch = torch.load(checkpoint).get("epoch", 1) if checkpoint is not None else 1
+    for epoch in range(start_epoch, config["TrainConfig"]["epoch"] + 1):
         """
          ------------------------------------------------
                  training network
@@ -209,17 +209,21 @@ def train_seg_x(config, basedir):
                 best_val_metric = mean_val_metric_dict['dice']
                 if gpu_num > 1:
                     model_saver.save(os.path.join(basedir, "checkpoint", "best_epoch.pth"),
-                                     {"model": seg_net.module.state_dict(), "optim": optimizer.state_dict()})
+                                     {"epoch": epoch, "model": seg_net.module.state_dict(),
+                                      "optim": optimizer.state_dict()})
                 else:
                     model_saver.save(os.path.join(basedir, "checkpoint", "best_epoch.pth"),
-                                     {"model": seg_net.state_dict(), "optim": optimizer.state_dict()})
+                                     {"epoch": epoch, "model": seg_net.state_dict(),
+                                      "optim": optimizer.state_dict()})
     if gpu_num > 1:
         model_saver.save(
             os.path.join(basedir, "checkpoint", 'last_epoch.pth'),
-            {"model": seg_net.module.state_dict(), "optim": optimizer.state_dict()})
+            {"epoch": config["TrainConfig"]["epoch"], "model": seg_net.module.state_dict(),
+             "optim": optimizer.state_dict()})
     else:
         model_saver.save(os.path.join(basedir, "checkpoint", "last_epoch.pth"),
-                         {"model": seg_net.state_dict(), "optim": optimizer.state_dict()})
+                         {"epoch": config["TrainConfig"]["epoch"], "model": seg_net.state_dict(),
+                          "optim": optimizer.state_dict()})
 
     del seg_net
 

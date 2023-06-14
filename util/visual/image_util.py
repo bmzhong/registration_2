@@ -1,13 +1,46 @@
 import os
 
 import SimpleITK as sitk
+import torch
 
 from util.visual.visual_image import preview_image
 import matplotlib.pyplot as plt
 import os
+import numpy as np
+import nibabel as nib
 
 from util.visual.visual_registration import preview_3D_deformation, preview_3D_vector_field, RGB_dvf, PlotGrid_3d, \
     comput_fig
+
+
+def save_slice(outdir, img_list, name_list, cmap='gray', figsize=(18, 18)):
+    os.makedirs(outdir, exist_ok=True)
+    output_path = os.path.join(outdir, 'slice.png')
+    D, H, W = img_list[0].shape
+
+    imgs = []
+    imgs.append([img[D // 2, :, :, ] for img in img_list])
+    imgs.append([img[:, H // 2, :] for img in img_list])
+    imgs.append([img[:, :, W // 2] for img in img_list])
+    fig, axs = plt.subplots(3, len(imgs), figsize=figsize)
+    for axs_, ims_ in zip(axs, imgs):
+        for ax, im in zip(axs_, ims_):
+            ax.axis('off')
+            ax.imshow(im, origin='lower', cmap=cmap)
+    title = ','.join(name_list)
+    plt.suptitle(title, fontsize=25)
+    fig.tight_layout()
+    plt.savefig(output_path)
+
+
+# def save_flow(savename, I_img, header=None, affine=None):
+#     if header is None or affine is None:
+#         affine = np.diag([1, 1, 1, 1])
+#         new_img = nib.nifti1.Nifti1Image(I_img, affine, header=None)
+#     else:
+#         new_img = nib.nifti1.Nifti1Image(I_img, affine, header=header)
+#
+#     nib.save(new_img, savename)
 
 
 def write_image(outdir, name, img, type):

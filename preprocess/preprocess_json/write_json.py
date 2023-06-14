@@ -110,6 +110,59 @@ def write_json(hdf5_path, output_path, train_size, val_size, test_size, sampling
         json.dump(json_data, f, indent=4)
 
 
+def write_OASIS_json_N(hdf5_path, output_path, train_size, val_size, test_size, sampling_ratio, registration_type, N):
+    h5_file = h5py.File(hdf5_path, 'r')
+    json_data = dict()
+    json_data['dataset_path'] = hdf5_path[hdf5_path.find('datasets'):]
+    json_data['dataset_size'] = int(h5_file.attrs['dataset_size'])
+    json_data['image_size'] = h5_file.attrs['image_size'].tolist()
+    json_data['normalize'] = h5_file.attrs['normalize'].tolist()
+    json_data['region_number'] = int(h5_file.attrs['region_number'])
+    json_data['atlas'] = ''
+    json_data['registration_type'] = registration_type
+    image_names = np.array(list(h5_file.keys()))
+    image_names = image_names[:N]
+    print(f"datasize: {len(image_names)}")
+    train, val_test = train_test_split(image_names, train_size=train_size)
+    val, test = train_test_split(val_test, test_size=test_size / (val_size + test_size))
+
+    train = train.tolist()
+    val = val.tolist()
+    test = test.tolist()
+
+    train_pairs = [[img1, img2] for img1 in train for img2 in train if img1 != img2]
+    val_pairs = [[img1, img2] for img1 in val for img2 in val if img1 != img2]
+    test_pairs = [[img1, img2] for img1 in test for img2 in test if img1 != img2]
+
+    if sampling_ratio < 1.0:
+        train_pairs = random_sampling_pairs(train_pairs, sampling_ratio)
+        val_pairs = random_sampling_pairs(val_pairs, sampling_ratio)
+        test_pairs = random_sampling_pairs(test_pairs, sampling_ratio)
+
+    # pairs_image_show(train_pairs)
+    # pairs_image_show(val_pairs)
+    # pairs_image_show(test_pairs)
+
+    json_data['train_size'] = len(train)
+    json_data['val_size'] = len(val)
+    json_data['test_size'] = len(test)
+
+    json_data['train_pair_size'] = len(train_pairs)
+    json_data['val_pair_size'] = len(val_pairs)
+    json_data['test_pair_size'] = len(test_pairs)
+
+    json_data['train'] = train
+    json_data['val'] = val
+    json_data['test'] = test
+
+    json_data['train_pair'] = train_pairs
+    json_data['val_pair'] = val_pairs
+    json_data['test_pair'] = test_pairs
+
+    with open(output_path, 'w') as f:
+        json.dump(json_data, f, indent=4)
+
+
 def write_soma_nuclei_seretonin_json(hdf5_path, output_path):
     h5_file = h5py.File(hdf5_path, 'r')
     json_data = dict()
@@ -298,6 +351,12 @@ if __name__ == '__main__':
     seed = 0
     random.seed(seed)
     np.random.seed(seed)
+
+    N = 115
+    OASIS_path = '../../datasets/hdf5/35_128_OASIS.h5'
+    OASIS_output_path = '../../datasets/json/35_128_OASIS_' + str(N) + '.json'
+    write_OASIS_json_N(OASIS_path, OASIS_output_path, train_size=0.7,
+                       val_size=0.1, test_size=0.2, sampling_ratio=0.01, registration_type=0, N=N)
 
     # LPBA40_path = '../../datasets/hdf5/7_192_LPBA40.h5'
     # LPBA40_output_path = '../../datasets/json/7_192_LPBA40.json'

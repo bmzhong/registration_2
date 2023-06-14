@@ -8,6 +8,25 @@ import torch
 import matplotlib.pyplot as plt
 
 
+class UnlabeledDataset(Dataset):
+    def __init__(self, dataset_config, dataset_type, transform=None, data_names=None):
+        super(UnlabeledDataset, self).__init__()
+        self.file = HDF5Reader(dataset_config['dataset_path'])
+        self.transform = transform
+        self.data_names = dataset_config[dataset_type] if data_names is None else data_names
+
+    def __getitem__(self, index):
+        img = self.file[self.data_names[index]]
+        id = img['id']
+        volume = img['volume']
+        if self.transform is not None:
+            volume = self.transform(volume)
+        return id, volume
+
+    def __len__(self):
+        return len(self.data_names)
+
+
 class SingleDataset(Dataset):
     def __init__(self, dataset_config, dataset_type, transform=None,
                  seg=None, data_names=None):
@@ -209,7 +228,7 @@ class TestPairDataset(Dataset):
             indices = [i for i in range(len(self.pair_data_names))]
             indices = np.random.choice(indices, size=200, replace=False).tolist()
             self.pair_data_names = np.array(self.pair_data_names)[indices].tolist()
-            
+
     def __getitem__(self, index):
         img1_name, img2_name = self.pair_data_names[index]
 

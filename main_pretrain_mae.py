@@ -1,17 +1,15 @@
 import argparse
 import os
 import sys
-import time
 import warnings
 
-from python_script.test_reg import test_reg
+from python_script.pretrain_mae import pretrain_mae, test_pretrain_mae
 from util.util import set_random_seed, get_basedir, Logger
 from shutil import copyfile
 import yaml
 
-from python_script.train_reg_semi_supervised import train_reg_semi_supervised
-
 warnings.filterwarnings("ignore")
+import time
 
 
 def get_args():
@@ -46,22 +44,21 @@ if __name__ == '__main__':
 
     copyfile(args.config, os.path.join(basedir, "config.yaml"))
     sys.stdout = Logger(basedir)
+
     print(f"base dir is {basedir}")
     start_time = time.time()
     if args.train:
         os.environ["CUDA_VISIBLE_DEVICES"] = config["TrainConfig"]["gpu"]
-        train_reg_semi_supervised(config, basedir)
-
+        pretrain_mae(config, basedir)
         checkpoint = os.path.join(basedir, "checkpoint", 'last_epoch.pth')
         test_basedir = get_basedir(os.path.join(basedir, 'test'), config["TrainConfig"]["start_new_model"])
         config["TestConfig"]["gpu"] = config["TrainConfig"]["gpu"]
         config["TestConfig"]["data_path"] = config["TrainConfig"]["data_path"]
-        test_reg(config, test_basedir, checkpoint=checkpoint)
+        test_pretrain_mae(config, test_basedir, checkpoint=checkpoint)
 
     elif args.test:
-
         os.environ["CUDA_VISIBLE_DEVICES"] = config["TestConfig"]["gpu"]
-        test_reg(config, basedir, checkpoint=args.checkpoint)
+        test_pretrain_mae(config, basedir, checkpoint=args.checkpoint)
     end_time = time.time()
     run_time = end_time - start_time
     print(f"run time: {int(run_time)} s")

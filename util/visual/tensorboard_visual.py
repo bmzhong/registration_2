@@ -45,6 +45,21 @@ def tensorboard_visual_registration(mode, name, writer, step, fix, mov, reg, int
     visual_img_list(tag=tag, title_name=title_name, writer=writer, step=step, img_list=img_list, interval=interval)
 
 
+def tensorboard_visual_mae(mode, name, writer, step, img, mask_img, pred_img, interval=10):
+    """
+    mode: train/val/test
+    name: image name
+    writer: SummaryWriter
+    predict:  D, H, W
+    target:   D, H, W
+    """
+
+    title_name = name + '_img, mask_img, pred_img'
+    img_list = [img, mask_img, pred_img]
+    tag = mode + '/' + name
+    visual_img_list(tag=tag, title_name=title_name, writer=writer, step=step, img_list=img_list, interval=interval)
+
+
 def visual_img_list(tag, title_name, writer, step, img_list, interval):
     # 1, H*rows_number, W*2
     shape = img_list[0].shape
@@ -105,7 +120,7 @@ def tensorboard_visual_dvf(name, dvf, writer, step):
 
 
 def tensorboard_visual_det(name, det, writer, step, **kwargs):
-    figure = preview_image(det,  **kwargs)
+    figure = preview_image(det, **kwargs)
     plt.suptitle(name, fontsize=25)
     figure.tight_layout()
     writer.add_figure(name, figure, step)

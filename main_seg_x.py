@@ -50,7 +50,7 @@ if __name__ == '__main__':
         os.environ["CUDA_VISIBLE_DEVICES"] = config["TrainConfig"]["gpu"]
         train_seg_x(config, basedir)
         torch.cuda.empty_cache()
-        checkpoint = os.path.join(basedir, "checkpoint", 'best_epoch.pth')
+        checkpoint = os.path.join(basedir, "checkpoint", 'last_epoch.pth')
         print(checkpoint)
         test_basedir = get_basedir(os.path.join(basedir, 'test'), config["TrainConfig"]["start_new_model"])
         config["TestConfig"]["gpu"] = config["TrainConfig"]["gpu"]

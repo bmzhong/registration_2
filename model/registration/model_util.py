@@ -24,6 +24,7 @@ def get_reg_model(model_config, checkpoint=None, image_size=(128, 128, 128)):
         raise Exception(f"There are no {model_config['type']}, please check.")
 
     if checkpoint is not None:
+        print(f"load weights from {checkpoint}")
         reg_net.load_state_dict(torch.load(checkpoint)["model"])
 
     return reg_net

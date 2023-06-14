@@ -98,6 +98,8 @@ def test_reg(config, basedir, checkpoint=None, model_config=None):
                 output_dir = os.path.join(basedir, "images", id1[0])
                 write_image(output_dir, id1[0] + '(warped)_' + id2[0], warp_volume1[0][0].detach().cpu(), 'volume')
                 write_image(output_dir, id1[0] + '(warped)_' + id2[0], warp_label1[0][0].detach().cpu(), 'label')
+                flow = dvf[0].detach().cpu().permute(1, 2, 3, 0).contiguous()
+                write_image(output_dir, id1[0] + '_' + id2[0], flow, 'flow')
                 tag = ' ( ' + id1[0] + '_' + id2[0] + ' )'
                 save_image_figure(output_dir, 'mov_image' + tag, volume1[0][0].detach().cpu(), normalize_by='volume')
                 save_image_figure(output_dir, 'mov_label' + tag, label1[0][0].detach().cpu(), normalize_by='slice')
@@ -112,27 +114,27 @@ def test_reg(config, basedir, checkpoint=None, model_config=None):
                 det = jacobian_determinant(dvf[0].detach().cpu())
                 save_det_figure(output_dir, 'jacobian_determinant' + tag, det, normalize_by='slice', threshold=0,
                                 cmap='Blues')
-                save_RGB_dvf_figure(output_dir, 'rgb_dvf' + tag, dvf[0].detach().cpu())
-                save_RGB_deformation_2_figure(output_dir, 'deformation_2' + tag, dvf[0].detach().cpu())
-                save_warp_grid_figure(output_dir, 'warp_grid' + tag, warp_grid[0][0].detach().cpu())
+        save_RGB_dvf_figure(output_dir, 'rgb_dvf' + tag, dvf[0].detach().cpu())
+        save_RGB_deformation_2_figure(output_dir, 'deformation_2' + tag, dvf[0].detach().cpu())
+        save_warp_grid_figure(output_dir, 'warp_grid' + tag, warp_grid[0][0].detach().cpu())
 
-    mean_test_metric_dict = mean_dict(test_metrics_dict)
-    std_metric_dict = std_dict(test_metrics_dict)
+        mean_test_metric_dict = mean_dict(test_metrics_dict)
+        std_metric_dict = std_dict(test_metrics_dict)
 
-    row_list = ["mean"]
-    for metric_name in header_names:
-        row_list.append(f"{mean_test_metric_dict[metric_name]:.6f}")
-    csv_writer.writerow(row_list)
+        row_list = ["mean"]
+        for metric_name in header_names:
+            row_list.append(f"{mean_test_metric_dict[metric_name]:.6f}")
+        csv_writer.writerow(row_list)
 
-    row_list = ["std"]
-    for metric_name in header_names:
-        row_list.append(f"{std_metric_dict[metric_name]:.6f}")
-    csv_writer.writerow(row_list)
+        row_list = ["std"]
+        for metric_name in header_names:
+            row_list.append(f"{std_metric_dict[metric_name]:.6f}")
+        csv_writer.writerow(row_list)
 
-    for key in mean_test_metric_dict.keys():
-        print(f"mean {key}: {mean_test_metric_dict[key]}, std {key}: {std_metric_dict[key]}")
+        for key in mean_test_metric_dict.keys():
+            print(f"mean {key}: {mean_test_metric_dict[key]}, std {key}: {std_metric_dict[key]}")
 
-    csv_file.close()
+        csv_file.close()
 
 
 def compute_reg_metric(dvf, warp_volume1, warp_label1, volume2, label2, num_classes):

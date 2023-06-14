@@ -5,8 +5,8 @@ import warnings
 from util.util import set_random_seed, get_basedir, Logger
 from shutil import copyfile
 import yaml
-from train_reg import train_reg
-from test_reg import test_reg
+from python_script.train_reg import train_reg
+from python_script.test_reg import test_reg
 
 warnings.filterwarnings("ignore")
 import time
@@ -50,7 +50,7 @@ if __name__ == '__main__':
     if args.train:
         os.environ["CUDA_VISIBLE_DEVICES"] = config["TrainConfig"]["gpu"]
         train_reg(config, basedir)
-        checkpoint = os.path.join(basedir, "checkpoint", 'best_epoch.pth')
+        checkpoint = os.path.join(basedir, "checkpoint", 'last_epoch.pth')
         test_basedir = get_basedir(os.path.join(basedir, 'test'), config["TrainConfig"]["start_new_model"])
         config["TestConfig"]["gpu"] = config["TrainConfig"]["gpu"]
         config["TestConfig"]["data_path"] = config["TrainConfig"]["data_path"]

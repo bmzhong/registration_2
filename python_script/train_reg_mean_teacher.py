@@ -1,4 +1,6 @@
 import json
+
+import matplotlib.pyplot as plt
 from tqdm import tqdm
 
 from model.registration.mask_util import process_mask
@@ -25,8 +27,61 @@ from util.visual.tensorboard_visual import tensorboard_visual_deformation
 from util import loss
 from util.visual.visual_registration import mk_grid_img
 
+import numpy as np
 
-def train_reg(config, basedir):
+# consistency = 0.1
+consistency_rampup = 200
+ema_decay = 0.99
+
+
+def sigmoid_rampup(current, rampup_length):
+    """Exponential rampup from https://arxiv.org/abs/1610.02242"""
+    if rampup_length == 0:
+        return 1.0
+    else:
+        current = np.clip(current, 0.0, rampup_length)
+        phase = 1.0 - current / rampup_length
+        return float(np.exp(-5.0 * phase * phase))
+
+
+def get_current_consistency_weight(epoch, consistency):
+    # Consistency ramp-up from https://arxiv.org/abs/1610.02242
+    return consistency * sigmoid_rampup(epoch, consistency_rampup)
+
+
+def plot_weight():
+    import matplotlib.pyplot as plt
+    x = []
+    for i in range(200 - 200, 1000):
+        x.append(get_current_consistency_weight(i, 0.1))
+    plt.plot(x)
+    plt.show()
+
+
+def plot_alpha(alpha=0.99):
+    result = []
+    for i in range(0, 1000):
+        result.append(min(1 - 1 / (i + 1), alpha))
+    print(result)
+    import matplotlib.pyplot as plt
+    plt.plot(result)
+    plt.show()
+
+
+# plot_weight()
+#
+# plot_alpha()
+
+
+def update_ema_variables(model, ema_model, alpha, global_step):
+    # Use the true average until the exponential average is more correct
+    alpha = min(1 - 1 / (global_step + 1), alpha)
+    for ema_param, param in zip(ema_model.parameters(), model.parameters()):
+        ema_param.data.mul_(alpha).add_(1 - alpha, param.data)
+
+
+def train_reg_mean_teacher(config, basedir):
+    print("train function: train_reg_mean_teacher")
     writer = SummaryWriter(log_dir=os.path.join(basedir, "logs"))
     model_saver = ModelSaver(config["TrainConfig"].get("max_save_num", 2))
 
@@ -38,8 +93,6 @@ def train_reg(config, basedir):
     with open(config['TrainConfig']['data_path'], 'r') as f:
         dataset_config = json.load(f)
     num_classes = dataset_config['region_number']
-    # train_dataset = PairDataset(dataset_config, 'train_pair')
-    # val_dataset = PairDataset(dataset_config, 'val_pair')
 
     seg = dataset_config[config['TrainConfig']['seg']] if len(config['TrainConfig']['seg']) > 0 else None
     if dataset_config['registration_type'] == 1 or dataset_config['registration_type'] == 2:
@@ -54,7 +107,7 @@ def train_reg(config, basedir):
     print(f'train dataset size: {len(train_dataset)}')
     print(f'val dataset size: {len(val_dataset)}')
 
-    train_dataloader = DataLoader(train_dataset, config["TrainConfig"]['batchsize'], shuffle=True)
+    train_dataloader = DataLoader(train_dataset, config["TrainConfig"]['batchsize'], shuffle=False)
     val_dataloader = DataLoader(val_dataset, config["TrainConfig"]['batchsize'], shuffle=False)
 
     step_size = config['OptimConfig']['lr_scheduler']['params']['step_size']
@@ -68,7 +121,9 @@ def train_reg(config, basedir):
     checkpoint = None
     if len(config['TrainConfig']['checkpoint']) > 0:
         checkpoint = config['TrainConfig']['checkpoint']
+
     reg_net = get_reg_model(config['ModelConfig'], checkpoint, dataset_config['image_size'])
+
     STN_bilinear = SpatialTransformer(dataset_config['image_size'], mode='bilinear')
     STN_nearest = SpatialTransformer(dataset_config['image_size'], mode='nearest')
 
@@ -94,9 +149,27 @@ def train_reg(config, basedir):
     step = 0
     best_val_dice_metric = -1. * float('inf')
 
-    mask_type = config['ModelConfig']['mask_type']
-    print(f"mask_type {mask_type}")
-    for epoch in range(1, config["TrainConfig"]["epoch"] + 1):
+    use_mean_teacher = config["TrainConfig"]["use_mean_teacher"]
+
+    labeled_bs = config["TrainConfig"]["labeld_bs"]
+    ema_reg_net = None
+    if use_mean_teacher:
+        ema_reg_net = get_reg_model(config['ModelConfig'], checkpoint, dataset_config['image_size'])
+        for param in ema_reg_net.parameters():
+            param.detach_()
+        ema_reg_net.to(device)
+    consistency = config["TrainConfig"].get("consistency", 0.1)
+    consistency_loss_type = config["TrainConfig"].get("consistency_loss_type", 1)
+    print(f"use mean_teacher: {use_mean_teacher}")
+    print(f"labeled_bs: {labeled_bs}")
+    print(f"consistency: {consistency}")
+    print(f"consistency_rampup: {consistency_rampup}")
+    print(f"consistency_loss_type: {consistency_loss_type}")
+    print(f"ema_decay: {ema_decay}")
+    start_ema_epoch = 200.
+    print(f"start_ema_epoch: {start_ema_epoch}")
+    start_epoch = torch.load(checkpoint).get("epoch", 1) if checkpoint is not None else 1
+    for epoch in range(start_epoch, config["TrainConfig"]["epoch"] + 1):
         """
          ------------------------------------------------
                  training network
@@ -104,38 +177,76 @@ def train_reg(config, basedir):
         """
         reg_net.train()
         train_losses_dict = dict()
-        train_metrics_dict = dict()
         for id1, volume1, label1, id2, volume2, label2 in tqdm(train_dataloader):
             volume1 = volume1.to(device)
             label1 = label1.to(device) if label1 != [] else label1
 
             volume2 = volume2.to(device)
             label2 = label2.to(device) if label2 != [] else label2
-            if mask_type != '':
-                volume1, volume2, label1, label2 = process_mask(volume1, volume2, label1, label2, num_classes,
-                                                                mask_type=mask_type, probability=0.5)
 
             optimizer.zero_grad()
 
             dvf = reg_net(volume1, volume2)
 
-            loss_dict = compute_reg_loss(config, dvf, loss_function_dict, STN_bilinear, volume1, label1, volume2,
-                                         label2)
+            loss_dict = compute_reg_loss(config, dvf[:labeled_bs], loss_function_dict, STN_bilinear,
+                                         volume1[:labeled_bs], label1[:labeled_bs], volume2[:labeled_bs],
+                                         label2[:labeled_bs], labeled_bs)
+
+            if use_mean_teacher and volume1[labeled_bs:].shape[0] != 0 and epoch > start_ema_epoch:
+                unlabeled_volume1_batch = volume1[labeled_bs:]
+                unlabeled_volume2_batch = volume2[labeled_bs:]
+                noise1 = torch.clamp(torch.randn_like(unlabeled_volume1_batch) * 0.1, -0.2, 0.2).to(device)
+                noise2 = torch.clamp(torch.randn_like(unlabeled_volume2_batch) * 0.1, -0.2, 0.2).to(device)
+
+                ema_volume1 = unlabeled_volume1_batch + noise1
+                ema_volume2 = unlabeled_volume2_batch + noise2
+
+                with torch.no_grad():
+                    ema_dvf = ema_reg_net(ema_volume1, ema_volume2)
+
+                if epoch < start_ema_epoch:
+                    consistency_loss = 0.0
+                else:
+                    if consistency_loss_type == 1:
+                        unlabeled_warp_volume1 = STN_bilinear(unlabeled_volume1_batch, dvf[labeled_bs:])
+                        eam_unlabeled_warp_volume1 = STN_bilinear(unlabeled_volume1_batch, ema_dvf)
+                        consistency_loss = torch.mean((unlabeled_warp_volume1 - eam_unlabeled_warp_volume1) ** 2)
+                    elif consistency_loss_type == 2:
+                        consistency_loss = torch.mean((dvf[labeled_bs:] - ema_dvf) ** 2)
+                    else:
+                        raise Exception()
+                consistency_weight = get_current_consistency_weight(epoch - start_ema_epoch, consistency)
+                loss_dict['consistency_loss'] = consistency_loss
+                loss_dict['total_loss'] = loss_dict['total_loss'] + consistency_weight * consistency_loss
+
+                writer.add_scalar("train/loss/consistency_loss_iter", consistency_loss, step)
+                writer.add_scalar("train/loss/consistency_loss_iter_mul*weight", consistency_weight * consistency_loss,
+                                  step)
 
             loss_dict['total_loss'].backward()
             optimizer.step()
+
+            if use_mean_teacher and epoch > start_ema_epoch:
+                update_ema_variables(reg_net, ema_reg_net, ema_decay, epoch - start_ema_epoch)
+
             update_dict(train_losses_dict, loss_dict)
-            # if label1 != [] and label2 != []:
-            #     warp_volume1 = STN_bilinear(volume1, dvf)
-            #     warp_label1 = STN_nearest(label1.float(), dvf)
-            #
-            #     metric_dict = compute_reg_metric(dvf.clone().detach(), warp_volume1.clone().detach(),
-            #                                      warp_label1.clone().detach(),
-            #                                      volume2.clone().detach(), label2.clone().detach(), num_classes)
-            #
-            #     update_dict(train_metrics_dict, metric_dict)
 
             step += 1
+
+        if epoch > start_ema_epoch:
+            consistency_weight = get_current_consistency_weight(epoch - start_ema_epoch, consistency)
+            writer.add_scalar("train/consistency_weight", consistency_weight, epoch)
+            alpha = min(1 - 1 / (epoch - start_ema_epoch + 1), ema_decay)
+            writer.add_scalar("train/alpha", alpha, epoch)
+
+        if epoch == start_ema_epoch:
+            if gpu_num > 1:
+                model_saver.save(os.path.join(basedir, "checkpoint", f"epoch_{start_ema_epoch}.pth"),
+                                 {"epoch": epoch, "model": reg_net.module.state_dict(),
+                                  "optim": optimizer.state_dict()})
+            else:
+                model_saver.save(os.path.join(basedir, "checkpoint", f"epoch_{start_ema_epoch}.pth"),
+                                 {"epoch": epoch, "model": reg_net.state_dict(), "optim": optimizer.state_dict()})
 
         mean_train_loss_dict = mean_dict(train_losses_dict)
 
@@ -184,7 +295,7 @@ def train_reg(config, basedir):
                                                      volume2.clone().detach(), label2.clone().detach(), num_classes)
 
                     update_dict(val_metrics_dict, metric_dict)
-                    if val_count < 8:
+                    if val_count < 0:
                         grid_img = raw_grid_img.repeat(dvf.shape[0], 1, 1, 1, 1)
                         warp_grid = STN_bilinear(grid_img.float(), dvf)
                         tensorboard_visual_registration(mode='val', name=id1[0] + '_' + id2[0] + '/img', writer=writer,
@@ -230,21 +341,25 @@ def train_reg(config, basedir):
                 best_val_dice_metric = mean_val_metric_dict['dice']
                 if gpu_num > 1:
                     model_saver.save(os.path.join(basedir, "checkpoint", "best_epoch.pth"),
-                                     {"model": reg_net.module.state_dict(), "optim": optimizer.state_dict()})
+                                     {"epoch": epoch, "model": reg_net.module.state_dict(),
+                                      "optim": optimizer.state_dict()})
                 else:
                     model_saver.save(os.path.join(basedir, "checkpoint", "best_epoch.pth"),
-                                     {"model": reg_net.state_dict(), "optim": optimizer.state_dict()})
+                                     {"epoch": epoch, "model": reg_net.state_dict(),
+                                      "optim": optimizer.state_dict()})
     if gpu_num > 1:
         model_saver.save(
             os.path.join(basedir, "checkpoint", "last_epoch.pth"),
-            {"model": reg_net.module.state_dict(), "optim": optimizer.state_dict()})
+            {"epoch": config["TrainConfig"]["epoch"], "model": reg_net.module.state_dict(),
+             "optim": optimizer.state_dict()})
     else:
         model_saver.save(
             os.path.join(basedir, "checkpoint", "last_epoch.pth"),
-            {"model": reg_net.state_dict(), "optim": optimizer.state_dict()})
+            {"epoch": config["TrainConfig"]["epoch"], "model": reg_net.state_dict(),
+             "optim": optimizer.state_dict()})
 
 
-def compute_reg_loss(config, dvf, loss_function_dict, STN_bilinear, volume1, label1, volume2, label2):
+def compute_reg_loss(config, dvf, loss_function_dict, STN_bilinear, volume1, label1, volume2, label2, labeled_bs=None):
     loss_dict = {}
 
     if config['LossConfig']['similarity_loss']['use']:
@@ -253,18 +368,15 @@ def compute_reg_loss(config, dvf, loss_function_dict, STN_bilinear, volume1, lab
     if config['LossConfig']['segmentation_loss']['use']:
         loss_dict['segmentation_loss'] = 0.
         if label1 != [] and label2 != []:
-            num_classes = torch.max(label1).item()
+            num_classes = torch.max(label1[:labeled_bs]).item()
             count = 0
             for i in range(1, num_classes + 1):
-                label1_i = (label1 == i).float()
-                label2_i = (label2 == i).float()
+                label1_i = (label1[:labeled_bs] == i).float()
+                label2_i = (label2[:labeled_bs] == i).float()
                 if torch.any(label1_i) and torch.any(label2_i):
                     loss_dict['segmentation_loss'] = loss_dict['segmentation_loss'] + loss_function_dict[
-                        'segmentation_loss'](STN_bilinear(label1_i, dvf), label2_i)
+                        'segmentation_loss'](STN_bilinear(label1_i, dvf[:labeled_bs]), label2_i)
                     count = count + 1
-                    # loss_dict['segmentation_loss'] = loss_dict['segmentation_loss'] + loss_function_dict[
-                    #     'segmentation_loss'](
-                    #     STN_bilinear((label1 == i).float(), dvf), (label2 == i).float())
             loss_dict['segmentation_loss'] = loss_dict['segmentation_loss']
 
     if config['LossConfig']['gradient_loss']['use']:

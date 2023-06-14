@@ -13,6 +13,7 @@ def get_seg_model(model_config, num_classes, checkpoint=None):
         raise Exception(f"There are no {model_config['type']}, please check.")
 
     if checkpoint is not None:
+        print(f"load weights from {checkpoint}")
         seg_net.load_state_dict(torch.load(checkpoint)["model"])
 
     return seg_net
