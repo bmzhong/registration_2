@@ -56,6 +56,7 @@ if __name__ == '__main__':
         test_basedir = get_basedir(os.path.join(basedir, 'test'), config["TrainConfig"]["start_new_model"])
         config["TestConfig"]["gpu"] = config["TrainConfig"]["gpu"]
         config["TestConfig"]["data_path"] = config["TrainConfig"]["data_path"]
+        copyfile(args.config, os.path.join(test_basedir, "config.yaml"))
         test_reg(config, test_basedir, checkpoint=checkpoint)
 
     elif args.test:

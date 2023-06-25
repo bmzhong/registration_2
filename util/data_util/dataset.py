@@ -1,3 +1,4 @@
+import collections
 import json
 
 import monai
@@ -208,7 +209,81 @@ class RandomPairDataset(Dataset):
         return img
 
 
-class TestPairDataset(Dataset):
+class ValPairDataset(Dataset):
+    def __init__(self, dataset_config, dataset_type, registration_type, transform=None,
+                 seg=None, atlas=False, data_names=None):
+        super(ValPairDataset, self).__init__()
+        self.file = HDF5Reader(dataset_config['dataset_path'])
+        self.registration_type = registration_type
+        self.transform = transform
+        self.data_names = dataset_config[dataset_type] if data_names is None else data_names
+        self.seg = seg
+        self.atlas = atlas
+        N = len(self.data_names)
+        if self.registration_type == 0:
+            self.data_names = [[name1, name2] for name1 in self.data_names for name2 in self.data_names if
+                               name1 != name2]
+            np.random.shuffle(self.data_names)
+            self.data_names = self.data_names[:N]
+        elif self.registration_type == 1:
+            self.data_names = [[name1, self.atlas] for name1 in self.data_names]
+        elif self.registration_type == 2:
+            self.data_names = [[self.atlas, name2] for name2 in self.data_names]
+        else:
+            raise Exception("registration type error!")
+
+    def __getitem__(self, index):
+        img1_name, img2_name = self.data_names[index]
+        img1 = self.file[img1_name]
+        img2 = self.file[img2_name]
+        if self.seg is not None and self.seg.get(img1_name, True) is False:
+            img1['label'] = []
+
+        if self.seg is not None and self.seg.get(img2_name, True) is False:
+            img2['label'] = []
+
+        img = {'id1': img1['id'],
+               'volume1': img1['volume'],
+               'label1': img1.get('label', []),
+               'id2': img2['id'],
+               'volume2': img2['volume'],
+               'label2': img2.get('label', [])}
+
+        img = self.as_type_to_tensor(img)
+
+        if self.transform is None:
+            return img['id1'], img['volume1'], img['label1'], img['id2'], img['volume2'], img['label2']
+
+        img = self.process_transform(img)
+
+        return img['id1'], img['volume1'], img['label1'], img['id2'], img['volume2'], img['label2']
+
+    def __len__(self):
+        return len(self.data_names)
+
+    def process_transform(self, img):
+        if 'label1' in img.keys() and img['label1'] == []:
+            img.pop('label1')
+        if 'label2' in img.keys() and img['label2'] == []:
+            img.pop('label2')
+
+        img = self.transform(img)
+
+        if 'label1' not in img.keys():
+            img['label1'] = []
+        if 'label2' not in img.keys():
+            img['label2'] = []
+        return img
+
+    @staticmethod
+    def as_type_to_tensor(img):
+        for key, value in img.items():
+            if isinstance(value, np.ndarray):
+                img[key] = torch.from_numpy(img[key])
+        return img
+
+
+class InferPairDataset(Dataset):
     def __init__(self, dataset_config, dataset_type, registration_type, transform=None,
                  seg=None, atlas=False, data_names=None):
         self.file = HDF5Reader(dataset_config['dataset_path'])
@@ -224,10 +299,10 @@ class TestPairDataset(Dataset):
             self.pair_data_names = [[self.atlas, name1] for name1 in data_names]
         else:
             raise Exception("registration type error!")
-        if len(self.pair_data_names) > 200:
-            indices = [i for i in range(len(self.pair_data_names))]
-            indices = np.random.choice(indices, size=200, replace=False).tolist()
-            self.pair_data_names = np.array(self.pair_data_names)[indices].tolist()
+        # if len(self.pair_data_names) > 200:
+        #     indices = [i for i in range(len(self.pair_data_names))]
+        #     indices = np.random.choice(indices, size=200, replace=False).tolist()
+        #     self.pair_data_names = np.array(self.pair_data_names)[indices].tolist()
 
     def __getitem__(self, index):
         img1_name, img2_name = self.pair_data_names[index]

@@ -11,7 +11,7 @@ from model.registration.SpatialNetwork import SpatialTransformer
 import torch.nn.functional as F
 from util.Optimizer import Optimizer
 from util.ModelSaver import ModelSaver
-from util.data_util.dataset import PairDataset, RandomPairDataset
+from util.data_util.dataset import PairDataset, RandomPairDataset, ValPairDataset
 from util.visual.tensorboard_visual import visual_gradient, tensorboard_visual_registration, tensorboard_visual_dvf, \
     tensorboard_visual_det, tensorboard_visual_RGB_dvf, tensorboard_visual_deformation_2, tensorboard_visual_warp_grid
 from util.util import update_dict
@@ -48,7 +48,7 @@ def train_reg_inv_label(config, basedir):
         atlas = None
     train_dataset = RandomPairDataset(dataset_config, dataset_type='train',
                                       registration_type=dataset_config['registration_type'], seg=seg, atlas=atlas)
-    val_dataset = RandomPairDataset(dataset_config, dataset_type='val',
+    val_dataset = ValPairDataset(dataset_config, dataset_type='val',
                                     registration_type=dataset_config['registration_type'], atlas=atlas)
 
     print(f'train dataset size: {len(train_dataset)}')
@@ -144,6 +144,11 @@ def train_reg_inv_label(config, basedir):
         print(f"Epoch {epoch}/{config['TrainConfig']['epoch']}:")
         for loss_type, loss_value in mean_train_loss_dict.items():
             writer.add_scalar("train/loss/" + loss_type, loss_value, epoch)
+        if mean_train_loss_dict.get("inv_label_loss", None) is not None:
+            weight_inv_label_loss = mean_train_loss_dict["inv_label_loss"] * config['LossConfig']["inv_label_loss"][
+                'weight']
+            writer.add_scalar("train/loss/inv_label_loss*weight", weight_inv_label_loss, epoch)
+
         print(f"training total loss: {mean_train_loss_dict['total_loss']}")
 
         # mean_train_metric_dict = mean_dict(train_metrics_dict)
@@ -152,7 +157,7 @@ def train_reg_inv_label(config, basedir):
         # print(f"training dice: {mean_train_metric_dict['dice']}")
         writer.add_scalar("lr", optimizer.get_cur_lr(), epoch)
 
-        visual_gradient(reg_net, writer, epoch)
+        # visual_gradient(reg_net, writer, epoch)
 
         """
          ------------------------------------------------

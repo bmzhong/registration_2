@@ -51,12 +51,10 @@ class MaskedAutoencoderViT3D(nn.Module):
 
     def initialize_weights(self):
         print("initialize weights")
-        pos_embed = get_3d_sincos_pos_embed(self.pos_embed.shape[-1], np.array(self.img_size) // self.patch_size,
-                                            cls_token=True)
+        pos_embed = get_3d_sincos_pos_embed(self.pos_embed.shape[-1], np.array(self.img_size) // self.patch_size, cls_token=True)
         self.pos_embed.data.copy_(torch.from_numpy(pos_embed).float().unsqueeze(0))
 
-        decoder_pos_embed = get_3d_sincos_pos_embed(self.decoder_pos_embed.shape[-1],
-                                                    np.array(self.img_size) // self.patch_size,
+        decoder_pos_embed = get_3d_sincos_pos_embed(self.decoder_pos_embed.shape[-1], np.array(self.img_size) // self.patch_size,
                                                     cls_token=True)
         self.decoder_pos_embed.data.copy_(torch.from_numpy(decoder_pos_embed).float().unsqueeze(0))
 
@@ -194,7 +192,7 @@ class MaskedAutoencoderViT3D(nn.Module):
         loss = (loss * mask).sum() / mask.sum()  # mean loss on removed patches
         return loss
 
-    def forward(self, imgs, mask_ratio=0.75):
+    def forward(self, imgs, mask_ratio=0.01):
         latent, mask, ids_restore = self.forward_encoder(imgs, mask_ratio)
         pred = self.forward_decoder(latent, ids_restore)  # [N, L, p*p*3]
         loss = self.forward_loss(imgs, pred, mask)
@@ -205,7 +203,7 @@ def mae_vit_base_patch16_dec512d8b(**kwargs):
     model = MaskedAutoencoderViT3D(
         patch_size=16, embed_dim=768, depth=12, num_heads=12,
         decoder_embed_dim=512, decoder_depth=8, decoder_num_heads=16,
-        mlp_ratio=4, norm_layer=partial(nn.LayerNorm, eps=1e-6), **kwargs)
+        mlp_ratio=4, **kwargs)
     return model
 
 
@@ -213,7 +211,7 @@ def mae_vit_large_patch16_dec512d8b(**kwargs):
     model = MaskedAutoencoderViT3D(
         patch_size=16, embed_dim=1024, depth=24, num_heads=16,
         decoder_embed_dim=512, decoder_depth=8, decoder_num_heads=16,
-        mlp_ratio=4, norm_layer=partial(nn.LayerNorm, eps=1e-6), **kwargs)
+        mlp_ratio=4, **kwargs)
     return model
 
 
@@ -221,7 +219,7 @@ def mae_vit_huge_patch14_dec512d8b(**kwargs):
     model = MaskedAutoencoderViT3D(
         patch_size=14, embed_dim=1280, depth=32, num_heads=16,
         decoder_embed_dim=512, decoder_depth=8, decoder_num_heads=16,
-        mlp_ratio=4, norm_layer=partial(nn.LayerNorm, eps=1e-6), **kwargs)
+        mlp_ratio=4, **kwargs)
     return model
 
 

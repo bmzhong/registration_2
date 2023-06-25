@@ -7,7 +7,7 @@ from tqdm import tqdm
 
 from model.registration.SpatialNetwork import SpatialTransformer
 from model.registration.model_util import get_reg_model
-from util.data_util.dataset import PairDataset, TestPairDataset
+from util.data_util.dataset import PairDataset, InferPairDataset
 from torch.utils.data import DataLoader
 import json
 
@@ -27,9 +27,10 @@ def test_reg(config, basedir, checkpoint=None, model_config=None):
     csv_file = open(os.path.join(basedir, "result.csv"), 'a', encoding='utf-8', newline='')
     csv_writer = csv.writer(csv_file)
 
-    csv_writer.writerow([str(time.asctime())])
+    # csv_writer.writerow([str(time.asctime())])
 
-    header_names = ['dice', 'ASD', 'HD', 'SSIM', 'folds_percent', 'SDLogJ', 'MSE']
+    # header_names = ['dice', 'ASD', 'HD', 'SSIM', 'folds_percent', 'SDLogJ', 'MSE']
+    header_names = ['dice','SSIM', 'folds_percent']
     csv_writer.writerow(["moving_fixed"] + header_names)
 
     with open(config['TestConfig']['data_path'], 'r') as f:
@@ -39,8 +40,8 @@ def test_reg(config, basedir, checkpoint=None, model_config=None):
         atlas = dataset_config['atlas']
     else:
         atlas = None
-    test_dataset = TestPairDataset(dataset_config, dataset_type='test',
-                                   registration_type=dataset_config['registration_type'], atlas=atlas)
+    test_dataset = InferPairDataset(dataset_config, dataset_type='test',
+                                    registration_type=dataset_config['registration_type'], atlas=atlas)
     print(f'test dataset size: {len(test_dataset)}')
     test_loader = DataLoader(test_dataset, batch_size=1, shuffle=False)
 
@@ -92,7 +93,7 @@ def test_reg(config, basedir, checkpoint=None, model_config=None):
             row_list = [id1[0] + "_" + id2[0]]
             for metric_name in header_names:
                 row_list.append(f"{metric_dict[metric_name]:.6f}")
-            csv_writer.writerow(row_list)
+            # csv_writer.writerow(row_list)
 
             if config["TestConfig"]["save_image"]:
                 output_dir = os.path.join(basedir, "images", id1[0])
@@ -140,11 +141,11 @@ def test_reg(config, basedir, checkpoint=None, model_config=None):
 def compute_reg_metric(dvf, warp_volume1, warp_label1, volume2, label2, num_classes):
     metric_dict = dict()
     metric_dict['dice'] = dice_metric2(warp_label1, label2, num_classes).item()
-    metric_dict['ASD'] = ASD_metric2(warp_label1, label2, num_classes).item()
-    metric_dict['HD'] = HD_metric2(warp_label1, label2, num_classes).item()
+    # metric_dict['ASD'] = ASD_metric2(warp_label1, label2, num_classes).item()
+    # metric_dict['HD'] = HD_metric2(warp_label1, label2, num_classes).item()
     metric_dict['SSIM'] = ssim_metric(warp_volume1, volume2)
     metric_dict['folds_percent'] = folds_percent_metric(dvf).item()
-    metric_dict['SDLogJ'] = SDLogJ_metric(dvf).item()
-    metric_dict['MSE'] = mse_metric(warp_volume1, volume2).item()
+    # metric_dict['SDLogJ'] = SDLogJ_metric(dvf).item()
+    # metric_dict['MSE'] = mse_metric(warp_volume1, volume2).item()
 
     return metric_dict

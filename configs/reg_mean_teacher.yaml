@@ -4,28 +4,28 @@ TrainConfig:
   start_new_model: True
   max_save_num: 2                 # numbers that checkpoint files saved; default 2
   gpu: "0"
-  data_path: "datasets/json/LPBA40_test.json"
-  epoch: 50
+  data_path: "datasets/json/5_192_Mindboggle101.json"
+  epoch: 1000
   use_mean_teacher: True
-  labeld_bs: 4
-
-  batchsize: 8
+  consistency: 0.1
+  consistency_loss_type: 1
+  labeld_bs: 2
+  batchsize: 4  
   checkpoint: ""
   val_interval: 1
-  seg: "seg_28"
+  seg: "seg_59"
 
 
 #  writer_board_interval: 10
 
 TestConfig:
-  checkpoint: "output/reg/debug/debug1/checkpoint/best_epoch.pth"
-#  checkpoint: ""
-  data_path: "datasets/json/LPBA40_test.json"
+  checkpoint: ""
+  data_path: "datasets/json/5_192_Mindboggle101.json"
   save_image: False
   gpu: "0"
 
 ModelConfig:
-  type: "VoxelMorph"
+  type: "vxm_diff"
   mask_type: ""
 
 
@@ -35,12 +35,12 @@ OptimConfig:
   optimizer:
     type: "Adam"
     params:
-      lr: 0.0001
+      lr: 0.0005
   lr_scheduler:
     type: "StepLR"
     params:
-      step_size: 700
-      gamma: 0.8
+      step_size: 50
+      gamma: 0.5
       warmup: True
       warmup_steps: 100
 

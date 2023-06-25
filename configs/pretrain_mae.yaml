@@ -3,20 +3,18 @@
 TrainConfig:
   start_new_model: True
   max_save_num: 2                 # numbers that checkpoint files saved; default 2
-  gpu: ""
-  data_path: "datasets/json/35_128_OASIS_115.json"
-  epoch: 50
+  gpu: "2"
+  data_path: "datasets/json/35_128_OASIS.json"
+  epoch: 1000
   batchsize: 1
   checkpoint: ""
-  val_interval: 1
+  val_interval: 10
 
-
-#  writer_board_interval: 10
 
 TestConfig:
   checkpoint: ""
 #  checkpoint: ""
-  data_path: "datasets/json/35_128_OASIS_115.json"
+  data_path: "datasets/json/35_128_OASIS.json"
   save_image: True
   gpu: "0"
 
@@ -30,12 +28,12 @@ OptimConfig:
   optimizer:
     type: "Adam"
     params:
-      lr: 0.001
+      lr: 0.0001
   lr_scheduler:
     type: "StepLR"
     params:
-      step_size: 700
-      gamma: 0.8
+      step_size: 100
+      gamma: 0.7
       warmup: True
       warmup_steps: 100
 
