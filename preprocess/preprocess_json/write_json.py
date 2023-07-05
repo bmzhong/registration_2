@@ -308,6 +308,49 @@ def write_LPBA40_json(hdf5_path, output_path):
         json.dump(json_data, f, indent=4)
 
 
+def write_IXI_json_ratio(hdf5_path, output_path, ratio):
+    h5_file = h5py.File(hdf5_path, 'r')
+    json_data = dict()
+    json_data['dataset_path'] = hdf5_path[hdf5_path.find('datasets'):]
+    json_data['dataset_size'] = int(h5_file.attrs['dataset_size'])
+    json_data['image_size'] = h5_file.attrs['image_size'].tolist()
+    json_data['normalize'] = h5_file.attrs['normalize'].tolist()
+    json_data['region_number'] = int(h5_file.attrs['region_number'])
+    json_data['atlas'] = 'atlas'
+    json_data['registration_type'] = 1
+
+    train = h5_file.attrs['train'].tolist()
+    val = h5_file.attrs['val'].tolist()
+    test = h5_file.attrs['test'].tolist()
+
+    train = train[:int(len(train) * ratio)]
+    val = val[:int(len(val) * ratio)]
+    test = test[:int(len(test) * ratio)]
+
+    train_pair = [[name, 'atlas'] for name in train]
+    val_pair = [[name, 'atlas'] for name in val]
+    test_pair = [[name, 'atlas'] for name in test]
+
+    json_data['train_size'] = len(train)
+    json_data['val_size'] = len(val)
+    json_data['test_size'] = len(test)
+    json_data['dataset_size'] = len(train) + len(val) + len(test)
+    json_data['train_pairs_size'] = len(train_pair)
+    json_data['val_pairs_size'] = len(val_pair)
+    json_data['test_pairs_size'] = len(test_pair)
+
+    json_data['train'] = train
+    json_data['val'] = val
+    json_data['test'] = test
+
+    json_data['train_pair'] = train_pair
+    json_data['val_pair'] = val_pair
+    json_data['test_pair'] = test_pair
+
+    with open(output_path, 'w') as f:
+        json.dump(json_data, f, indent=4)
+
+
 def write_IXI_json(hdf5_path, output_path):
     h5_file = h5py.File(hdf5_path, 'r')
     json_data = dict()
@@ -352,11 +395,16 @@ if __name__ == '__main__':
     random.seed(seed)
     np.random.seed(seed)
 
-    N = 115
-    OASIS_path = '../../datasets/hdf5/35_128_OASIS.h5'
-    OASIS_output_path = '../../datasets/json/35_128_OASIS_' + str(N) + '.json'
-    write_OASIS_json_N(OASIS_path, OASIS_output_path, train_size=0.7,
-                       val_size=0.1, test_size=0.2, sampling_ratio=0.01, registration_type=0, N=N)
+    ratio = 1 / 3
+    IXI_path = '../../datasets/hdf5/45_128_IXI.h5'
+    IXI_output_path = '../../datasets/json/45_128_IXI_191.json'
+    write_IXI_json_ratio(IXI_path, IXI_output_path, ratio)
+
+    # N = 115
+    # OASIS_path = '../../datasets/hdf5/35_128_OASIS.h5'
+    # OASIS_output_path = '../../datasets/json/35_128_OASIS_' + str(N) + '.json'
+    # write_OASIS_json_N(OASIS_path, OASIS_output_path, train_size=0.7,
+    #                    val_size=0.1, test_size=0.2, sampling_ratio=0.01, registration_type=0, N=N)
 
     # LPBA40_path = '../../datasets/hdf5/7_192_LPBA40.h5'
     # LPBA40_output_path = '../../datasets/json/7_192_LPBA40.json'

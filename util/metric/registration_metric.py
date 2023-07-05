@@ -14,14 +14,14 @@ def jacobian_determinant(vf):
     namely the map that sends point (x,y,z) to the point (x,y,z)+vf[:,x,y,z].
     This function computes a jacobian determinant by taking discrete differences in each spatial direction.
 
-    Returns a numpy array of shape (H-1,W-1,D-1).
+    Returns a array of shape (H-1,W-1,D-1).
     """
 
     _, H, W, D = vf.shape
 
     # Compute discrete spatial derivatives
-    def diff_and_trim(array, axis): return np.diff(
-        array, axis=axis)[:, :(H - 1), :(W - 1), :(D - 1)]
+    def diff_and_trim(array, dim): return torch.diff(
+        array, dim=dim)[:, :(H - 1), :(W - 1), :(D - 1)]
 
     dx = diff_and_trim(vf, 1)
     dy = diff_and_trim(vf, 2)
@@ -43,7 +43,7 @@ def folds_count_metric(dvf):
     """
     dvf: B, 3, D, H, W
     """
-    dvf = dvf.cpu().numpy()
+    dvf = dvf
     B = dvf.shape[0]
     count = 0
     for i in range(B):
@@ -51,17 +51,18 @@ def folds_count_metric(dvf):
         count = count + (det <= 0).sum()
     return count / B
 
-
 def folds_percent_metric(dvf):
     folds_num = folds_count_metric(dvf)
     return (folds_num / np.prod(dvf.shape[2:]).item()) * 100.
+
+
 
 
 def SDLogJ_metric(dvf):
     B = dvf.shape[0]
     result = 0.
     for i in range(B):
-        det = torch.from_numpy(jacobian_determinant(dvf[i].cpu().numpy()))
+        det = jacobian_determinant(dvf[i])
         det = torch.clamp(det, min=1e-9, max=1e9)
         det = torch.log(det)
         result = result + torch.std(det)

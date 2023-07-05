@@ -12,6 +12,7 @@ def get_args():
     parser.add_argument("--start_new_model", type=str)
     parser.add_argument("--checkpoint", type=str)
     parser.add_argument("--inv_label_loss_start_epoch", type=int)
+    parser.add_argument("--max_save_num", type=int)
 
     parser.add_argument("--train_data_path", type=str, default=None)
     parser.add_argument("--train_gpu", type=str, default=None)
@@ -19,6 +20,7 @@ def get_args():
     parser.add_argument("--batchsize", type=int, default=None)
     parser.add_argument("--val_interval", type=int, default=None)
     parser.add_argument("--seg", type=str, default=None)
+    parser.add_argument("--consistency_rampup", type=int, default=None)
 
     parser.add_argument("--use_mean_teacher", type=str, default=None)
     parser.add_argument("--consistency", type=float, default=None)
@@ -70,6 +72,9 @@ if __name__ == '__main__':
     if args.train_gpu is not None:
         config['TrainConfig']['gpu'] = args.train_gpu
 
+    if args.max_save_num is not None:
+        config['TrainConfig']['max_save_num'] = args.max_save_num
+
     if args.checkpoint is not None:
         config['TrainConfig']['checkpoint'] = args.checkpoint
         config['OptimConfig']['load_checkpoint'] = True
@@ -95,6 +100,9 @@ if __name__ == '__main__':
 
     if args.seg is not None:
         config['TrainConfig']['seg'] = args.seg
+
+    if args.consistency_rampup is not None:
+        config['TrainConfig']['consistency_rampup'] = args.consistency_rampup
 
     if args.use_mean_teacher is not None:
         if args.use_mean_teacher == 'False':

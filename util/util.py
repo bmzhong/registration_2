@@ -82,11 +82,15 @@ class Logger(object):
     def __init__(self, save_dir):
         self.terminal = sys.stdout
         self.log = open(os.path.join(save_dir, "logfile.log"), "a")
+        self.count = 0
 
     def write(self, message):
         self.terminal.write(message)
         self.log.write(message)
+        self.count += 1
+        if self.count % 10 == 0:
+            self.flush()
 
     def flush(self):
-        pass
+        self.log.flush()
 

@@ -1,4 +1,7 @@
 import json
+import time
+from shutil import copyfile
+
 from tqdm import tqdm
 
 from model.registration.mask_util import process_mask
@@ -27,6 +30,10 @@ from util.visual.visual_registration import mk_grid_img
 
 
 def train_reg(config, basedir):
+    print(f"start train time: {time.asctime()}")
+    train_path = os.path.abspath(__file__)
+    print(f"train file path: {train_path}")
+    copyfile(os.path.abspath(__file__), os.path.join(basedir, os.path.basename(train_path)))
     writer = SummaryWriter(log_dir=os.path.join(basedir, "logs"))
     model_saver = ModelSaver(config["TrainConfig"].get("max_save_num", 2))
 
@@ -49,7 +56,7 @@ def train_reg(config, basedir):
     train_dataset = RandomPairDataset(dataset_config, dataset_type='train',
                                       registration_type=dataset_config['registration_type'], seg=seg, atlas=atlas)
     val_dataset = ValPairDataset(dataset_config, dataset_type='val',
-                                    registration_type=dataset_config['registration_type'], atlas=atlas)
+                                 registration_type=dataset_config['registration_type'], atlas=atlas)
 
     print(f'train dataset size: {len(train_dataset)}')
     print(f'val dataset size: {len(val_dataset)}')
@@ -85,7 +92,7 @@ def train_reg(config, basedir):
         reg_net = torch.nn.DataParallel(reg_net, device_ids=[i for i in range(gpu_num)])
         STN_bilinear = torch.nn.DataParallel(STN_bilinear, device_ids=[i for i in range(gpu_num)])
         STN_nearest = torch.nn.DataParallel(STN_nearest, device_ids=[i for i in range(gpu_num)])
-
+    model_without_ddp = reg_net.module if gpu_num > 1 else reg_net
     optimizer = Optimizer(config=config["OptimConfig"],
                           model=reg_net,
                           checkpoint=config["TrainConfig"]["checkpoint"])
@@ -94,7 +101,7 @@ def train_reg(config, basedir):
     step = 0
     best_val_dice_metric = -1. * float('inf')
 
-    start_epoch = torch.load(checkpoint).get("epoch", 1) if checkpoint is not None else 1
+    start_epoch = torch.load(checkpoint).get("epoch", 1) + 1 if checkpoint is not None else 1
     for epoch in range(start_epoch, config["TrainConfig"]["epoch"] + 1):
         """
          ------------------------------------------------
@@ -222,26 +229,22 @@ def train_reg(config, basedir):
                 writer.add_scalar("val/metric/" + metric_type, metric_value, epoch)
             print(f"val dice: {mean_val_metric_dict['dice']}")
 
+            if epoch % 100 == 0:
+                model_saver.save(os.path.join(basedir, "checkpoint", f"{epoch}_epoch.pth"),
+                                 {"epoch": epoch, "model": model_without_ddp.state_dict(),
+                                  "optim": optimizer.state_dict()})
+
             if mean_val_metric_dict['dice'] > best_val_dice_metric:
                 best_val_dice_metric = mean_val_metric_dict['dice']
-                if gpu_num > 1:
-                    model_saver.save(os.path.join(basedir, "checkpoint", "best_epoch.pth"),
-                                     {"epoch": epoch, "model": reg_net.module.state_dict(),
-                                      "optim": optimizer.state_dict()})
-                else:
-                    model_saver.save(os.path.join(basedir, "checkpoint", "best_epoch.pth"),
-                                     {"epoch": epoch, "model": reg_net.state_dict(),
-                                      "optim": optimizer.state_dict()})
-    if gpu_num > 1:
-        model_saver.save(
-            os.path.join(basedir, "checkpoint", "last_epoch.pth"),
-            {"epoch": config["TrainConfig"]["epoch"], "model": reg_net.module.state_dict(),
-             "optim": optimizer.state_dict()})
-    else:
-        model_saver.save(
-            os.path.join(basedir, "checkpoint", "last_epoch.pth"),
-            {"epoch": config["TrainConfig"]["epoch"], "model": reg_net.state_dict(),
-             "optim": optimizer.state_dict()})
+                model_saver.save(os.path.join(basedir, "checkpoint", "best_epoch.pth"),
+                                 {"epoch": epoch, "model": model_without_ddp.state_dict(),
+                                  "optim": optimizer.state_dict()})
+
+    model_saver.save(
+        os.path.join(basedir, "checkpoint", "last_epoch.pth"),
+        {"epoch": config["TrainConfig"]["epoch"], "model": model_without_ddp.state_dict(),
+         "optim": optimizer.state_dict()})
+    print(f"end train time: {time.asctime()}")
 
 
 def compute_reg_loss(config, dvf, loss_function_dict, STN_bilinear, volume1, label1, volume2, label2):

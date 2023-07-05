@@ -6,7 +6,7 @@ from model.registration.voxelmorpher import VoxelMorph
 
 
 def get_reg_model(model_config, checkpoint=None, image_size=(128, 128, 128)):
-    if  model_config['type'] == 'VoxelMorph':
+    if model_config['type'] == 'VoxelMorph':
         reg_net = create_VoxelMorph(image_size)
 
     elif model_config['type'] == 'VoxelMorph_diff':
@@ -25,7 +25,7 @@ def get_reg_model(model_config, checkpoint=None, image_size=(128, 128, 128)):
 
     if checkpoint is not None:
         print(f"load weights from {checkpoint}")
-        reg_net.load_state_dict(torch.load(checkpoint)["model"])
+        reg_net.load_state_dict(torch.load(checkpoint, map_location=torch.device("cpu"))["model"])
 
     return reg_net
 

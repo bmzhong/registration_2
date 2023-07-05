@@ -39,7 +39,7 @@ if __name__ == '__main__':
     random.seed(0)
     np.random.seed(0)
 
-    data_path = '../../datasets/json/35_128_OASIS_115.json'
+    data_path = '../../datasets/json/45_128_IXI_191.json'
     with open(data_path, 'r') as f:
         dataset_config = json.load(f)
     train_size = dataset_config['train_size']

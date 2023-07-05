@@ -68,5 +68,9 @@ LossConfig:
     type: 'BendingEnergyLoss'
     weight: 1
 
+  supervised_loss:
+    use: True
+    type: 'MSELoss'
+    weight: 10
 
 

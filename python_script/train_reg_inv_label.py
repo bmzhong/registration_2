@@ -1,4 +1,7 @@
 import json
+import time
+from shutil import copyfile
+
 from tqdm import tqdm
 
 from model.registration.mask_util import process_mask
@@ -24,9 +27,38 @@ from util.metric.segmentation_metric import dice_metric, ASD_metric, HD_metric, 
 from util.visual.tensorboard_visual import tensorboard_visual_deformation
 from util import loss
 from util.visual.visual_registration import mk_grid_img
+import numpy as np
+
+
+def sigmoid_rampup(current, rampup_length):
+    """Exponential rampup from https://arxiv.org/abs/1610.02242"""
+    if rampup_length == 0:
+        return 1.0
+    else:
+        current = np.clip(current, 0.0, rampup_length)
+        phase = 1.0 - current / rampup_length
+        return float(np.exp(-5.0 * phase * phase))
+
+
+def get_current_consistency_weight(epoch, consistency, consistency_rampup=200):
+    # Consistency ramp-up from https://arxiv.org/abs/1610.02242
+    return consistency * sigmoid_rampup(epoch, consistency_rampup)
+
+
+def plot_weight():
+    import matplotlib.pyplot as plt
+    x = []
+    for i in range(200 - 200, 1000):
+        x.append(get_current_consistency_weight(i, 0.1))
+    plt.plot(x)
+    plt.show()
 
 
 def train_reg_inv_label(config, basedir):
+    print(f"start train time: {time.asctime()}")
+    train_path = os.path.abspath(__file__)
+    print(f"train file path: {train_path}")
+    copyfile(os.path.abspath(__file__), os.path.join(basedir, os.path.basename(train_path)))
     writer = SummaryWriter(log_dir=os.path.join(basedir, "logs"))
     model_saver = ModelSaver(config["TrainConfig"].get("max_save_num", 2))
 
@@ -49,7 +81,7 @@ def train_reg_inv_label(config, basedir):
     train_dataset = RandomPairDataset(dataset_config, dataset_type='train',
                                       registration_type=dataset_config['registration_type'], seg=seg, atlas=atlas)
     val_dataset = ValPairDataset(dataset_config, dataset_type='val',
-                                    registration_type=dataset_config['registration_type'], atlas=atlas)
+                                 registration_type=dataset_config['registration_type'], atlas=atlas)
 
     print(f'train dataset size: {len(train_dataset)}')
     print(f'val dataset size: {len(val_dataset)}')
@@ -85,7 +117,7 @@ def train_reg_inv_label(config, basedir):
         reg_net = torch.nn.DataParallel(reg_net, device_ids=[i for i in range(gpu_num)])
         STN_bilinear = torch.nn.DataParallel(STN_bilinear, device_ids=[i for i in range(gpu_num)])
         STN_nearest = torch.nn.DataParallel(STN_nearest, device_ids=[i for i in range(gpu_num)])
-
+    model_without_ddp = reg_net.module if gpu_num > 1 else reg_net
     optimizer = Optimizer(config=config["OptimConfig"],
                           model=reg_net,
                           checkpoint=config["TrainConfig"]["checkpoint"])
@@ -94,7 +126,7 @@ def train_reg_inv_label(config, basedir):
     step = 0
     best_val_dice_metric = -1. * float('inf')
 
-    start_epoch = torch.load(checkpoint).get("epoch", 1) if checkpoint is not None else 1
+    start_epoch = torch.load(checkpoint).get("epoch", 1) + 1 if checkpoint is not None else 1
     inv_label_loss_start_epoch = config["TrainConfig"].get("inv_label_loss_start_epoch", 0)
     print(f"inv_label_loss_start_epoch: {inv_label_loss_start_epoch}")
     for epoch in range(start_epoch, config["TrainConfig"]["epoch"] + 1):
@@ -106,6 +138,14 @@ def train_reg_inv_label(config, basedir):
         reg_net.train()
         train_losses_dict = dict()
         train_metrics_dict = dict()
+
+        if config['TrainConfig'].get('consistency_rampup', 0) > 0:
+            inv_label_loss_weight = get_current_consistency_weight(epoch - inv_label_loss_start_epoch,
+                                                                   config['LossConfig']["inv_label_loss"]['weight'],
+                                                                   config['TrainConfig']['consistency_rampup'])
+        else:
+            inv_label_loss_weight = config['LossConfig']["inv_label_loss"]['weight']
+
         for id1, volume1, label1, id2, volume2, label2 in tqdm(train_dataloader):
             volume1 = volume1.to(device)
             label1 = label1.to(device) if label1 != [] else label1
@@ -122,16 +162,15 @@ def train_reg_inv_label(config, basedir):
             if epoch >= inv_label_loss_start_epoch:
                 with torch.no_grad():
                     inv_dvf = reg_net(volume2, volume1)
+
                 if label1 != [] and label2 == []:
                     inv_loss = compute_inv_label_loss(label1, dvf, inv_dvf, STN_bilinear, loss_function_dict)
                     loss_dict['inv_label_loss'] = inv_loss
-                    loss_dict['total_loss'] = loss_dict['total_loss'] + config['LossConfig']["inv_label_loss"][
-                        'weight'] * inv_loss
+                    loss_dict['total_loss'] = loss_dict['total_loss'] + inv_label_loss_weight * inv_loss
                 elif label1 == [] and label2 != []:
                     inv_loss = compute_inv_label_loss(label2, inv_dvf, dvf, STN_bilinear, loss_function_dict)
                     loss_dict['inv_label_loss'] = inv_loss
-                    loss_dict['total_loss'] = loss_dict['total_loss'] + config['LossConfig']["inv_label_loss"][
-                        'weight'] * inv_loss
+                    loss_dict['total_loss'] = loss_dict['total_loss'] + inv_label_loss_weight * inv_loss
 
             loss_dict['total_loss'].backward()
             optimizer.step()
@@ -149,6 +188,8 @@ def train_reg_inv_label(config, basedir):
                 'weight']
             writer.add_scalar("train/loss/inv_label_loss*weight", weight_inv_label_loss, epoch)
 
+        writer.add_scalar("train/loss/inv_label_loss_weight", inv_label_loss_weight, epoch)
+
         print(f"training total loss: {mean_train_loss_dict['total_loss']}")
 
         # mean_train_metric_dict = mean_dict(train_metrics_dict)
@@ -164,6 +205,16 @@ def train_reg_inv_label(config, basedir):
                 validating network
          ------------------------------------------------
         """
+
+        if epoch == inv_label_loss_start_epoch:
+            if gpu_num > 1:
+                model_saver.save(os.path.join(basedir, "checkpoint", f"{epoch}_epoch.pth"),
+                                 {"epoch": epoch, "model": reg_net.module.state_dict(),
+                                  "optim": optimizer.state_dict()})
+            else:
+                model_saver.save(os.path.join(basedir, "checkpoint", f"{epoch}_epoch.pth"),
+                                 {"epoch": epoch, "model": reg_net.state_dict(),
+                                  "optim": optimizer.state_dict()})
 
         if epoch % config['TrainConfig']['val_interval'] == 0:
             reg_net.eval()
@@ -235,24 +286,14 @@ def train_reg_inv_label(config, basedir):
 
             if mean_val_metric_dict['dice'] > best_val_dice_metric:
                 best_val_dice_metric = mean_val_metric_dict['dice']
-                if gpu_num > 1:
-                    model_saver.save(os.path.join(basedir, "checkpoint", "best_epoch.pth"),
-                                     {"epoch": epoch, "model": reg_net.module.state_dict(),
-                                      "optim": optimizer.state_dict()})
-                else:
-                    model_saver.save(os.path.join(basedir, "checkpoint", "best_epoch.pth"),
-                                     {"epoch": epoch, "model": reg_net.state_dict(),
-                                      "optim": optimizer.state_dict()})
-    if gpu_num > 1:
-        model_saver.save(
-            os.path.join(basedir, "checkpoint", "last_epoch.pth"),
-            {"epoch": config["TrainConfig"]["epoch"], "model": reg_net.module.state_dict(),
-             "optim": optimizer.state_dict()})
-    else:
-        model_saver.save(
-            os.path.join(basedir, "checkpoint", "last_epoch.pth"),
-            {"epoch": config["TrainConfig"]["epoch"], "model": reg_net.state_dict(),
-             "optim": optimizer.state_dict()})
+                model_saver.save(os.path.join(basedir, "checkpoint", "best_epoch.pth"),
+                                 {"epoch": epoch, "model": model_without_ddp.state_dict(),
+                                  "optim": optimizer.state_dict()})
+    model_saver.save(
+        os.path.join(basedir, "checkpoint", "last_epoch.pth"),
+        {"epoch": config["TrainConfig"]["epoch"], "model": model_without_ddp.state_dict(),
+         "optim": optimizer.state_dict()})
+    print(f"end train time: {time.asctime()}")
 
 
 def compute_inv_label_loss(label, dvf, inv_dvf, STN_bilinear, loss_function_dict):

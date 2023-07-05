@@ -24,6 +24,7 @@ from util.visual.visual_registration import mk_grid_img
 
 
 def test_reg(config, basedir, checkpoint=None, model_config=None):
+    print(f"start test time: {time.asctime()}")
     csv_file = open(os.path.join(basedir, "result.csv"), 'a', encoding='utf-8', newline='')
     csv_writer = csv.writer(csv_file)
 
@@ -136,7 +137,7 @@ def test_reg(config, basedir, checkpoint=None, model_config=None):
             print(f"mean {key}: {mean_test_metric_dict[key]}, std {key}: {std_metric_dict[key]}")
 
         csv_file.close()
-
+    print(f"end test time: {time.asctime()}")
 
 def compute_reg_metric(dvf, warp_volume1, warp_label1, volume2, label2, num_classes):
     metric_dict = dict()
